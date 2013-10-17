@@ -47,7 +47,7 @@ c-------------------------------------------------------------------------------
       double precision, dimension(:), pointer :: xoptim, gradient,
      &             lbfgs_l,  lbfgs_u, lbfgs_wa, xoptim_bck,xuncert
       integer, dimension(:), pointer :: lbfgs_nbd, lbfgs_iwa
-      integer, dimension(:) :: i_map,j_map
+      integer, dimension(:), pointer :: i_map,j_map
       integer :: lbfgs_nmax, lbfgs_mmax, lbfgs_lenwa
       parameter (lbfgs_nmax=5000000,  lbfgs_mmax=17)
       parameter (lbfgs_lenwa=2*lbfgs_mmax*lbfgs_nmax +4*lbfgs_nmax 

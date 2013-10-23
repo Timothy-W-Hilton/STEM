@@ -29,10 +29,16 @@ APILIB= -L$(ROOTDIR)/local/lib -lioapi -lnetcdf
 DIRINCL=$(STEMSRCDIR)/Include
 # The Stem Common Blocks and other Things to Include
 STEMINCL=-I$(DIRINCL) -I$(STEMSRCDIR)/Tuvsub
-FFLAGS   = -c $(APINCL) $(STEMINCL)
-PFFLAGS  = -c $(APINCL) $(STEMINCL)
+FFLAGS   = -c -O $(APINCL) $(STEMINCL)
+PFFLAGS  = -c -O $(APINCL) $(STEMINCL)
 LDFLAGS  = -O -g77libs
-PLDFLAGS = -O -g77libs
+PLDFLAGS = -O -g77libs 
+
+# use debugging compiler and linker flags if debug target specified
+debug:FFLAGS  += -g
+debug:PFFLAGS  += -g
+debug:LDFLAGS  += -g
+debug:PLDFLAGS += -g
  
 MATHLIB= -llapack -lblas
 
@@ -40,6 +46,7 @@ CMDOPT = $(STEMRUNDIR)/saprcnov-opt.exe
 CMDFUN = $(STEMRUNDIR)/saprcnov-fun.exe
 
 all:  $(CMDFUN) $(CMDOPT)
+debug: all
 
 #  ---- DRIVER Files ---- 
 DIRDRV=Drivers

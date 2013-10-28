@@ -629,17 +629,17 @@ c
 c
       io_log=init3()
       call open_ioapi('DOMAIN')
-      call open_ioapi('DOBSON') ! ozone dobson
-      call open_ioapi('EMISSION')
-      call open_ioapi('EMDAILY')
+c      call open_ioapi('DOBSON') ! ozone dobson
+c      call open_ioapi('EMISSION')
+c      call open_ioapi('EMDAILY')
       call open_ioapi('EMHOURLY')
-      call open_ioapi('BIOGENIC') ! biogenic emissions
+c      call open_ioapi('BIOGENIC') ! biogenic emissions
       call open_ioapi('METEO3D')
       call open_ioapi('METEO2D')
       call open_ioapi('INITF')
       call open_ioapi('BDF')
       call open_ioapi('BDFV')  ! time-varied boundary condition
-      call open_ioapi('DEPVEL')
+c      call open_ioapi('DEPVEL')
       call open_ioapi('TOPBND')
 
 c      if(.not.open3('DOMAIN',FSREAD3,'aq_open')) then

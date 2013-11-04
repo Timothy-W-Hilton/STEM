@@ -198,7 +198,7 @@ c***********************************************************************
 C*****************************************************************
       SUBROUTINE aq_TOTAL2(ix,iy,il,CONC,TOT,DX,DY,I0,I1,J0,J1)
 C*****************************************************************
-      parameter (mxgr=200)
+      parameter (mxgr=400)
       DIMENSION CONC(IX,IY,IL),conc3(mxgr,mxgr),conc1(100)
       DIMENSION TOT(1),dx(1),dy(1)
 cc
@@ -227,7 +227,7 @@ C*****************************************************************
       SUBROUTINE aq_TOTAL3
      1         (ix,iy,iz,il,CONC,TOT,DX,DY,DZ,I0,I1,J0,J1,k0,k1)
 C*****************************************************************
-      parameter (mxgr=200)
+      parameter (mxgr=400)
       DIMENSION CONC(IX,IY,IZ,IL),conc3(mxgr,mxgr),conc1(mxgr)
       DIMENSION TOT(1),dx(1),dy(1),dz(1)
 cc

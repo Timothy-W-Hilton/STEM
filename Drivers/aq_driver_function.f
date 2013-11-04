@@ -48,7 +48,7 @@ c--------------------------------------------------------------------------
      &     f_obs(NUM_obs_max,NUM_mea_max), 
      &     f_obs_model(NUM_obs_max,NUM_mea_max)
       integer :: obs_index(NUM_mea_max,NUM_spe_max) 
-      integer :: i_flt, i_mea, i_sg1,ix2,iy2,iz2
+      integer :: i_flt, i_mea, i_sg1
       real unc_obs(NUM_mea_max),ave_obs(NUM_mea_max)
       real count_valid(NUM_mea_max)  !no need to convert from int to float
 c--------------------------------------------------------------------------
@@ -149,16 +149,22 @@ c
 c-------------------------------------------------------------------------------
 c   Initialize MPI Stuff
 c-------------------------------------------------------------------------------
+!		print*,'Test_casa_1'
+
       call MPI_INIT( ierr )
+!	print*,'Test_casa_2'
       call MPI_COMM_RANK( MPI_COMM_WORLD, MyId, ierr )
+!	print*,'Test_casa_3'
       call MPI_COMM_SIZE( MPI_COMM_WORLD, Nprocs, ierr )
 c-------------------------------------------------------------------------------
 c    The data mapping scheme, communciation pattern, initialization
 c-------------------------------------------------------------------------------
-      call init_hv(ix,iy,iz,izloc,icloc,N_gas)
+!     	print*,'Test_casa_4'
+	 call init_hv(ix,iy,iz,izloc,icloc,N_gas)
 c-------------------------------------------------------------------------------
 c    Check if not enough or too many workers
 c-------------------------------------------------------------------------------
+!	print*,'Test_casa_5'
       if (Nprocs<=1) then
          print*,'There are only ',Nprocs-1,' worker(s),'
          print*,'   not enough for parallelization!'
@@ -168,7 +174,7 @@ c-------------------------------------------------------------------------------
      &        'and only ',iz,' h-slices, ',ix*iy,' v-columns.'
          print*,'Some workers will go to unemployment !' 
       end if	 
-		                                                      
+c	 print*,'Test a',Nprocs-1,iz,ix,iy                                                     
 c----------------------------------------------------------------------c
 c                      Allocate memory                                 c
 c----------------------------------------------------------------------c
@@ -264,13 +270,15 @@ c----------------------------------------------------------------------c
      3                sg1,sl1,sp1,
      3                u,v,w,kh,kv,t,wc,wr2,sprc,q,em,
      4                vg,fz,sx,sy,sz)
-       
+        print*,'Test_casa_6'
         num=numl(1,1)
         call input1(idate,ut,iend,ix,iy,iz,
      1	             t,sg1,sl1,sp1,
      2               tlon,tlat,h,deltah,hdz,dx,dy,dz,dht,
      3               sigmaz,baseh,dtmax,iunit,iout)
-        uut=ut 
+c        print*,'Test 2'
+       
+	uut=ut 
 C ---- Read the initial concentration provided by the simulation subroutine -----
 	open( unit=unit_mode, file='TmpMode' )
 	read( unit_mode,fmt="(A3)" ) mode
@@ -279,29 +287,30 @@ C ---- Read the initial concentration provided by the simulation subroutine ----
         !@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 
         costfct=0.0
         emi_grd=0.0
+!	print*,'Test mode ',mode,ix,iy
         if (mode == 'fbw' .or. mode == 'fwd') then
-          open(unit_emi_fac,file='TmpEmiFac', access='direct',
-     &         recl=4*ix*iy*2*1)
-          read(unit_emi_fac) emi_fac
-          close(unit_emi_fac)
-          print*,'done reading TmpEmiFac'
+!          open(unit_emi_fac,file='TmpEmiFac', access='direct',
+!     &         recl=4*ix*iy*2*1)
+!          read(unit_emi_fac) emi_fac
+!          close(unit_emi_fac)
+	    emi_fac = 1.0
         !@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
           open(unit_obs1, file='input.dat',status='old')
           read(unit_obs1,*) NUM_obs,NUM_mea
-          write(*,*) NUM_obs,NUM_mea
+!          write(*,*) NUM_obs,NUM_mea
           read(unit_obs1,*) 
           do i_mea=1,NUM_mea
              read(unit_obs1,*) unc_obs(i_mea),NUM_spe(i_mea)
              read(unit_obs1,*) obs_index(i_mea,1:NUM_spe(i_mea))
-C             print *, unc_obs(i_mea),NUM_spe(i_mea)
-C             print *, obs_index(i_mea,1:NUM_spe(i_mea))
+!             print *, unc_obs(i_mea),NUM_spe(i_mea)
+!             print *, obs_index(i_mea,1:NUM_spe(i_mea))
           enddo
           do i_flt=1,NUM_obs
             read(unit_obs1,*)
      &      f_t(i_flt),f_x(i_flt),f_y(i_flt),f_z(i_flt),
      &      f_obs(i_flt,1:NUM_mea)
-c$$$            print *, f_t(i_flt),f_x(i_flt),f_y(i_flt),f_z(i_flt),
-c$$$     &      f_obs(i_flt,1:NUM_mea)
+!            print *, f_t(i_flt),f_x(i_flt),f_y(i_flt),f_z(i_flt),
+!     &      f_obs(i_flt,1:NUM_mea)
             f_obs_model(i_flt,1:NUM_mea)=0.0
           enddo
           do i_mea=1, NUM_mea
@@ -315,8 +324,8 @@ c$$$     &      f_obs(i_flt,1:NUM_mea)
                 endif
              enddo
              ave_obs(i_mea)=ave_obs(i_mea)/count_valid(i_mea)
-C             print *, i_mea, obs_index(i_mea,1:NUM_spe(i_mea)), 
-C     &                count_valid(i_mea), ave_obs(i_mea) 
+!             print *, i_mea, obs_index(i_mea,1:NUM_spe(i_mea)), 
+!     &                count_valid(i_mea), ave_obs(i_mea) 
           enddo 
            
          close(unit_obs1)
@@ -328,7 +337,9 @@ C ------------------------------------------------------------------------------
       costfct=0d0 
 
       call MPI_BCAST(mode,3,MPI_CHARACTER,0,MPI_COMM_WORLD,ierr) ! broadcast mode
-      if (mode=='ini') goto 123
+c        print*,'Test 3'
+      
+	if (mode=='ini') goto 123
 
      
       call int_distrib1(iend)
@@ -347,6 +358,7 @@ c----------------------------------------------------------------------c
 c    FORWARD  SIMULATION BEGINS HERE    
       call MPI_BARRIER(MPI_COMM_WORLD, Ierr)
       big_fwd:do it=1,iend
+c        print*,'Test 4'
       
 c----------------------------------------------------------------------c
 c      
@@ -354,36 +366,25 @@ c
 c
       if (Master) then
 c      
-        if(idate(1).ne.2008) then
-	  print*, 'time error before calling input2'
-	  print*, 'idate=',idate
-	  print*, 'it,ut=',it,ut
-	  stop
-	endif
+c        if(idate(1).ne.2004) then
+c	  print*, 'time error before calling input2'
+c	  print*, 'idate=',idate
+c	  print*, 'it,ut=',it,ut
+c	  stop
+c	endif
 	print*,'Call input2 acquiring time dependent data'
         print*,'int(ut)=', int(ut)
         print*,'ut=', int(ut)
         print*,'int(uut)=', int(uut)
         print*,'uut=', int(uut) 
-	print*,'DEBUG calling input2 (TWH)'
         call input2(ix,iy,iz,num,int(ut),idate,
      &     sg1,u,v,w,kh,kv,t,
      &	   wc,wr2,rvel,q,em,vg,fz,sprc,
      &     sx,sy,sz,dx,dy,hdz,h,cldod,ccover,kctop,dobson,iunit)
 
-	print*,'DEBUG premodify KV', kv(40,30,2),maxval(kv)
+c	print*,'DEBUG premodify KV', kv(40,30,2)
 c	kv = kv * 1.5
-c	do ix2 = 1,97
-c	do iy2 = 1,62
-c	do iz2 = 1,21
-c		if (kv(ix2,iy2,iz2).gt.5.) then
-c		  kv(ix2,iy2,iz2) = 5.  !0.5 *  kv(ix2,iy2,iz2)
-c		endif
-c	enddo
-c	enddo
-c	enddo
-
-	print*,'DEBUG postmodify KV', kv(40,30,2),maxval(kv)
+c	print*,'DEBUG postmodify KV', kv(40,30,2)
 
 
          if (it.eq.1) then
@@ -447,7 +448,7 @@ c
           em(i,j,2:iz,is_em)=em(i,j,2:iz,is_em)*emi_fac(i,j,2,iit)
        enddo
        enddo
-	print*,'DEBUG1',q(50,40,1), em(50,40,1,1), maxval(emi_fac(:,:,1))
+!	print*,'DEBUG1',q(50,40,1), em(50,40,1,1), maxval(emi_fac(:,:,1))
        !q(1:ix,1:iy,1)=q(1:ix,1:iy,1)*
        !em(1:ix,1:iy,1:iz,1)=em(1:ix,1:iy,1:iz,1)*fac_emi
        !@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -726,7 +727,7 @@ c-----------------------------------------------------------------------c
         write(*,*) 'After writing the file'
       endif
       call MPI_BARRIER(MPI_COMM_WORLD, Ierr)
-           
+c         print*,'Test 5'  
       ! print*,'RECORD=',record_no_conc,mdt*iend
       
       if(.true.) then 
@@ -735,8 +736,8 @@ c-----------------------------------------------------------------------c
         open(unit=unit_pred1,file='t_obs_pred.dat')
         print *,'==================================================='
         do i_flt=1,NUM_obs
-           write(unit_pred1,('3e13.5')) 
-     &       f_t(i_flt),f_obs(i_flt,1:NUM_mea),
+           write(unit_pred1,125) 
+     &          f_t(i_flt),f_obs(i_flt,1:NUM_mea),
      &       f_obs_model(i_flt,1:NUM_mea)*1.e9
            do i_mea=1,NUM_mea
               if(f_obs(i_flt,i_mea).ge.0.) then
@@ -758,6 +759,7 @@ c-----------------------------------------------------------------------c
             enddo
             enddo
 
+125   FORMAT (3e13.5)
 
         print *, 'costfct=', costfct 
         print *,'===================================================' 
@@ -1226,7 +1228,8 @@ c
      &         EndTime/60.0
       end if 
       call MPI_FINALIZE(Ierr)
-      return       
+c      	print*,'Test 6'
+	return       
 c      
       end program aq_driver_function
 

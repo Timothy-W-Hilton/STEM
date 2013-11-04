@@ -5,14 +5,14 @@ c********************************************************************
       include 'aqcon1.cmm'
       include 'aqsymb.cmm'
       do i=1,numl(1,3)
-      write(*,'(2x,i3,2x,a20)') i,sname(i,1)
+!      write(*,'(2x,i3,2x,a20)') i,sname(i,1)
       enddo
       return
       end
 c*********************************************************************
       subroutine prtemp(idate,ut,ix,iy,iz,sg1,sl1,iout)
 c*********************************************************************
-      parameter (mxspg=250,mxgr=200)
+      parameter (mxspg=250,mxgr=400)
       include 'aqcon1.cmm'      
       include 'aqcont.cmm'      
       include 'aqsymb.cmm'
@@ -37,7 +37,7 @@ c*********************************************************************
 c**********************************************************************
       subroutine prtout(idate,ut,ix,iy,iz,sg1,sl1,iout)
 c*********************************************************************
-      parameter (mxspg=250,mxgr=200)
+      parameter (mxspg=250,mxgr=400)
       include 'aqcon1.cmm'
       include 'aqsymb.cmm'
       include 'aqcont.cmm'
@@ -51,7 +51,9 @@ c*********************************************************************
       call open_ioapw("AQOUT")
       ihr=nint(ut)
       if(mxgr*mxgr*5.lt.ix*iy*izout) then
-	 write(6,*) '** critical error in prtout, AQOUT **'
+	   print*, mxgr*mxgr*5
+	   print*, ix*iy*izout 
+	 write(6,*) '** critical error in prtout **'
 	 stop
       endif
       
@@ -77,7 +79,7 @@ c
 c     Print Checkpoint Level 1
 c
 c*********************************************************************
-      parameter (mxspg=250,mxgr=200)
+      parameter (mxspg=250,mxgr=400)
       include 'aqcon1.cmm'
       include 'aqsymb.cmm'
       include 'aqcont.cmm'
@@ -192,7 +194,7 @@ c     +    ' on AQMS output file ' // outfile
 c**********************************************************************
       subroutine praero(idate,ut,ix,iy,iz,sg1,sl1,iout)
 c*********************************************************************
-      parameter (mxspg=250,mxgr=200)
+      parameter (mxspg=250,mxgr=400)
       include 'aqcon1.cmm'
       include 'aqsymb.cmm'
       include 'aqcont.cmm'
@@ -252,7 +254,7 @@ c*********************************************************************
       print*, joutsp,joutindex(1:joutsp)
       do l=1,joutsp
       lsp=joutindex(l)
-      print *, lsp, jvname(lsp)
+!      print *, lsp, jvname(lsp)
       call aq_copy_mat(ix*iy*jzout,sg1(1,1,1,lsp+jno2-1),dum1)
       call write_out_ioapi("JOUT",idate(1),idate(2),idate(3),ihr,
      1    jvname(lsp),dum1)

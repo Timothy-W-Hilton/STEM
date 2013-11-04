@@ -51,7 +51,7 @@ c*********************************************************************
       call open_ioapw("AQOUT")
       ihr=nint(ut)
       if(mxgr*mxgr*5.lt.ix*iy*izout) then
-	 write(6,*) '** critical error in prtout **'
+	 write(6,*) '** critical error in prtout, AQOUT **'
 	 stop
       endif
       

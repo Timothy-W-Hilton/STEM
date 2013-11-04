@@ -284,6 +284,7 @@ C ---- Read the initial concentration provided by the simulation subroutine ----
      &         recl=4*ix*iy*2*1)
           read(unit_emi_fac) emi_fac
           close(unit_emi_fac)
+          print*,'done reading TmpEmiFac'
         !@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
           open(unit_obs1, file='input.dat',status='old')
           read(unit_obs1,*) NUM_obs,NUM_mea
@@ -292,15 +293,15 @@ C ---- Read the initial concentration provided by the simulation subroutine ----
           do i_mea=1,NUM_mea
              read(unit_obs1,*) unc_obs(i_mea),NUM_spe(i_mea)
              read(unit_obs1,*) obs_index(i_mea,1:NUM_spe(i_mea))
-             print *, unc_obs(i_mea),NUM_spe(i_mea)
-             print *, obs_index(i_mea,1:NUM_spe(i_mea))
+C             print *, unc_obs(i_mea),NUM_spe(i_mea)
+C             print *, obs_index(i_mea,1:NUM_spe(i_mea))
           enddo
           do i_flt=1,NUM_obs
             read(unit_obs1,*)
      &      f_t(i_flt),f_x(i_flt),f_y(i_flt),f_z(i_flt),
      &      f_obs(i_flt,1:NUM_mea)
-            print *, f_t(i_flt),f_x(i_flt),f_y(i_flt),f_z(i_flt),
-     &      f_obs(i_flt,1:NUM_mea)
+c$$$            print *, f_t(i_flt),f_x(i_flt),f_y(i_flt),f_z(i_flt),
+c$$$     &      f_obs(i_flt,1:NUM_mea)
             f_obs_model(i_flt,1:NUM_mea)=0.0
           enddo
           do i_mea=1, NUM_mea
@@ -314,8 +315,8 @@ C ---- Read the initial concentration provided by the simulation subroutine ----
                 endif
              enddo
              ave_obs(i_mea)=ave_obs(i_mea)/count_valid(i_mea)
-             print *, i_mea, obs_index(i_mea,1:NUM_spe(i_mea)), 
-     &                count_valid(i_mea), ave_obs(i_mea) 
+C             print *, i_mea, obs_index(i_mea,1:NUM_spe(i_mea)), 
+C     &                count_valid(i_mea), ave_obs(i_mea) 
           enddo 
            
          close(unit_obs1)
@@ -353,7 +354,7 @@ c
 c
       if (Master) then
 c      
-        if(idate(1).ne.2004) then
+        if(idate(1).ne.2008) then
 	  print*, 'time error before calling input2'
 	  print*, 'idate=',idate
 	  print*, 'it,ut=',it,ut
@@ -364,6 +365,7 @@ c
         print*,'ut=', int(ut)
         print*,'int(uut)=', int(uut)
         print*,'uut=', int(uut) 
+	print*,'DEBUG calling input2 (TWH)'
         call input2(ix,iy,iz,num,int(ut),idate,
      &     sg1,u,v,w,kh,kv,t,
      &	   wc,wr2,rvel,q,em,vg,fz,sprc,

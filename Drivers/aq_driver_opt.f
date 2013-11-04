@@ -1,7 +1,7 @@
       ! Name of the executable model
       module execname
         character(len=*), parameter :: 
-     &         exec_name = "./icartt.run "
+     &         exec_name = "./mabu_124x124_casa-cos_2008_2009.run"
       end module execname
 
       program aq_driver

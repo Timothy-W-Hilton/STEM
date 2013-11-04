@@ -347,8 +347,9 @@ c29     continue
          call aq_speci(ix*iy,numsp,vgnum,vgal,vg)
       endif
 
-      call INTERP_IOAPI('DOBSON','O3-dobson',               
-     1     idate(1),idate(2),idate(3),ihr,dobson,ix*iy,idum)
+      print*, 'Dobson O3 interpolation removed -- TWH 31 Oct 2013'
+c$$$      call INTERP_IOAPI('DOBSON','O3-dobson',               
+c$$$     1     idate(1),idate(2),idate(3),ihr,dobson,ix*iy,idum)
            
       print*,' Read 2D meteorological data in input2 for date',idate(1),
      1 idate(2),idate(3), ihr
@@ -1025,7 +1026,7 @@ c------------------------------------------------------------------------------
       date3d = 1000 * year + jul3d		! current date YYYYDDD
       time3d = 10000 * hour			! current time HHMMSS
 
-      if (.not. DESC3(TRIM(lname))) stop   
+      if (.not. DESC3(TRIM(lname))) stop 'INTERP_IOAPI DESC3 failed'
       do L=1,nvars3d
        if(vname3d(L).eq.trim(varname)) goto 10   ! find this variable
       enddo

@@ -57,6 +57,13 @@ c-------------------------------------------------------------------------------
       logical :: lbfgs_lsave(4),restart
       integer :: lbfgs_n,lbfgs_m,lbfgs_iprint,lbfgs_isave(44), Num_grid
       double precision :: lbfgs_factor,lbfgs_pgtol,lbfgs_dsave(29)
+      character*24 ctime, t_string
+      INTEGER*4  t_0, t_end, time
+
+C ---- write a "begin" message
+      t_0 = time()
+      t_string = ctime( t_0 )
+      write(*,*) 'BEGIN OPTIMIZATION RUN: ', t_string
 
 C ---- Open report file
        open(unit=urpt,file='Report.opt')
@@ -136,7 +143,7 @@ c +++++  Comment this section out when doing emission inversion ++++++
 cc   Just do the forward with reading in scaling facotrs
 c
 c
-	print*, 'DEBUG emi_fac'
+c	print*, 'DEBUG emi_fac'
 c
 c        open(27, file='fixedfac.dat',status='old')
 c        do isen = 1, ixm
@@ -147,13 +154,13 @@ c         enddo
 c        enddo
 c        close(27)
 c
-	emi_fac = emi_fac*1 ! change the factor from 1 to make a fixed value
-	print*,'DEBUG emi_fac 2' , emi_fac
+c	emi_fac = emi_fac*1 ! change the factor from 1 to make a fixed value
+c	print*,'DEBUG emi_fac 2' , emi_fac
 c
-        call simulation('fwd',ix,iy,iz,N_gas,emi_fac,emi_grd,costfct) ! this can be fbw or fwd
+c        call simulation('fwd',ix,iy,iz,N_gas,emi_fac,emi_grd,costfct) ! this can be fbw or fwd
 c
-        print*, 'Force stop in aq_driver_opt.f, just want forward'
-        stop ! stop here if all want is forward
+c        print*, 'Force stop in aq_driver_opt.f, just want forward'
+c        stop ! stop here if all want is forward
 c ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -304,8 +311,16 @@ c     ---------- The end of the loop -------------
             enddo
       close(124)
 
-       print*,'________END OPTIMIZATION____________'
-       close(urpt)
+C ---- write an "end" message
+      t_end = time()
+      t_string = ctime( time( t_end ) )
+      write(*,*) 'OPTIMIZATION RUN FINISHED: ', t_string
+      write(*,*) 'TOTAL CLOCK TIME: ', t_end - t_0, ' secs'
+
+
+
+      print*,'________END OPTIMIZATION____________'
+      close(urpt)
 	
        end program aq_driver
 

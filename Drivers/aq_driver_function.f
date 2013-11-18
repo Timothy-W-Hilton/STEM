@@ -1,7 +1,7 @@
       module Names
        ! Names of local checkpoints
          character(len=32) :: fname_chkp2 =
-     &"/scratch/Conc_cae_emi2bigdom_ocs"
+     &"./output/chk/Conc_cae_emi2bigdom_ocs"
       end module Names
 
       program aq_driver_function
@@ -742,7 +742,7 @@ c         print*,'Test 5'
            do i_mea=1,NUM_mea
               if(f_obs(i_flt,i_mea).ge.0.) then
                print *,i_mea,f_obs(i_flt,i_mea),f_obs_model(i_flt,i_mea)
-               print *, 'costfct=', costfct
+               print *, 'costfct=', costfct, ' date ', idate
                costfct=costfct+
      &         (f_obs_model(i_flt,i_mea)-f_obs(i_flt,i_mea)/1.e9)**2/2.
      &          /( (unc_obs(i_mea)*ave_obs(i_mea)/1.e9)**2 )           

@@ -71,9 +71,10 @@
       if (ios/=0) then
          print*,'Error during write_4D_chkp2 unit ',iunit
 	 print*,'      (iostat = ',ios,')'
-         stop
+         stop 'write_4D_chkp2 failed'
       end if
       
+      print*,'write_4D_chkp2 succeeded'
       end subroutine write_4D_chkp2
        
       

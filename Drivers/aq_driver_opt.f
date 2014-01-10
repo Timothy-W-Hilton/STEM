@@ -100,17 +100,20 @@ C ---- Give the upper limit, to take advantage of lbfgs-b ------
        enddo
        enddo
        lbfgs_n=lbfgs_n*2  ! Two sets of scaling factors, 1 for surface, one for upper
-        
-       do i=1,lbfgs_n/2
-          print *, i, i_map(i), j_map(i), emi_unc(i_map(i),j_map(i))
-       enddo 
+
+c$$$       print *, "=================================================="
+c$$$       print *, "i    i_map     j_map     emi_unc(i_map(i), j_map(i))"
+c$$$       do i=1,lbfgs_n/2
+c$$$          print *, i, i_map(i), j_map(i), emi_unc(i_map(i),j_map(i))
+c$$$       enddo 
+c$$$       print *, "=================================================="
 c----------------------------------------------------------------------c
 c                  Master Performs Optimization                        c           
 c----------------------------------------------------------------------c
       print*,"OPT: Start Optimization Loop"
 
          bfgs_magn=1d0     ! 1d18 factor is used before adding uncertainty term in function       
-         lbfgs_iprint=1
+         lbfgs_iprint=100
          lbfgs_factor=1.0d12
          lbfgs_pgtol=1.0d-16
          !lbfgs_n=ix*iy*1          ! dimension of the state vector

@@ -602,9 +602,11 @@ c     Compute the infinity norm of the (-) projected gradient.
          write (6,1002) iter,f,sbgnrm
          write (itfile,1003) iter,nfgv,sbgnrm,f
       endif
+      print *, 'sbgnrm: ', sbgnrm, 'pgtol: ', pgtol
       if (sbgnrm .le. pgtol) then
 c                                terminate the algorithm.
          task = 'CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL'
+         print *, 'CONVERGENCE: NORM OF PRJ GRAD. <= PGTOL (line 607)'
          goto 999
       endif 
  
@@ -798,6 +800,7 @@ c     Test for termination.
       if (sbgnrm .le. pgtol) then
 c                                terminate the algorithm.
          task = 'CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL'
+         print *, 'CONVERGENCE: NORM OF PRJ GRAD. <= PGTOL (line 800)'
          goto 999
       endif 
 

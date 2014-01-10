@@ -289,25 +289,25 @@ C ---- Read the initial concentration provided by the simulation subroutine ----
         emi_grd=0.0
 !	print*,'Test mode ',mode,ix,iy
         if (mode == 'fbw' .or. mode == 'fwd') then
-!          open(unit_emi_fac,file='TmpEmiFac', access='direct',
-!     &         recl=4*ix*iy*2*1)
-!          read(unit_emi_fac) emi_fac
-!          close(unit_emi_fac)
-	    emi_fac = 1.0
+           open(unit_emi_fac,file='TmpEmiFac', access='direct',
+     &          recl=4*ix*iy*2*1)
+           read(unit_emi_fac) emi_fac
+           close(unit_emi_fac)
+
         !@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-          open(unit_obs1, file='input.dat',status='old')
-          read(unit_obs1,*) NUM_obs,NUM_mea
-!          write(*,*) NUM_obs,NUM_mea
-          read(unit_obs1,*) 
-          do i_mea=1,NUM_mea
-             read(unit_obs1,*) unc_obs(i_mea),NUM_spe(i_mea)
-             read(unit_obs1,*) obs_index(i_mea,1:NUM_spe(i_mea))
-!             print *, unc_obs(i_mea),NUM_spe(i_mea)
-!             print *, obs_index(i_mea,1:NUM_spe(i_mea))
-          enddo
-          do i_flt=1,NUM_obs
-            read(unit_obs1,*)
-     &      f_t(i_flt),f_x(i_flt),f_y(i_flt),f_z(i_flt),
+           open(unit_obs1, file='input.dat',status='old')
+           read(unit_obs1,*) NUM_obs,NUM_mea
+!     write(*,*) NUM_obs,NUM_mea
+           read(unit_obs1,*) 
+           do i_mea=1,NUM_mea
+              read(unit_obs1,*) unc_obs(i_mea),NUM_spe(i_mea)
+              read(unit_obs1,*) obs_index(i_mea,1:NUM_spe(i_mea))
+!     print *, unc_obs(i_mea),NUM_spe(i_mea)
+!     print *, obs_index(i_mea,1:NUM_spe(i_mea))
+           enddo
+           do i_flt=1,NUM_obs
+              read(unit_obs1,*)
+     &             f_t(i_flt),f_x(i_flt),f_y(i_flt),f_z(i_flt),
      &      f_obs(i_flt,1:NUM_mea)
 !            print *, f_t(i_flt),f_x(i_flt),f_y(i_flt),f_z(i_flt),
 !     &      f_obs(i_flt,1:NUM_mea)

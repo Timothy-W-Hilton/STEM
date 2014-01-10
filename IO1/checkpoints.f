@@ -74,7 +74,6 @@
          stop 'write_4D_chkp2 failed'
       end if
       
-      print*,'write_4D_chkp2 succeeded'
       end subroutine write_4D_chkp2
        
       

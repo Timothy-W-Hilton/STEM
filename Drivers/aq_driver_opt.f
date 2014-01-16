@@ -208,11 +208,13 @@ c     ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
       print*,'__________START OPTIMIZATION__________'
-      model_runs=0
-
+      model_runs = 0
+      opt_iteration = -1
       lbfgs_task = 'START'
 c     ------- The beginning of the loop ----------
  111  continue
+
+      opt_iteration = opt_iteration + 1
 
       if(model_runs .ge. model_max  ) goto 777
 

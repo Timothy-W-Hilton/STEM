@@ -29,6 +29,7 @@ c--------------------------------------------------------------------------
       character(len=3) :: mode
       character(len=32) :: fname_conc_ini, fname_lambda
       character(len=32) :: fname_obs1, fname_pre1
+      character(len=32) :: fname_t_obs_pred
       integer :: unit_emi_fac = 38, unit_emi_grd = 39, unit_mode = 40
       integer :: unit_cost = 41, unit_obs1 = 42, unit_pred1 = 43
       !obs1,2: DC8 or P3 only here, the other should be added later
@@ -733,7 +734,9 @@ c         print*,'Test 5'
       if(.true.) then 
       if (Master) then
         costfct=0.0
-        open(unit=unit_pred1,file='t_obs_pred.dat')
+        write(fname_t_obs_pred, "(a,i0.3,'.dat')")
+     &       "t_obs_pred",iter
+        open(unit=unit_pred1,file=trim(adjustl(fname_t_obs_pred)))
         print *,'==================================================='
         do i_flt=1,NUM_obs
            write(unit_pred1,125) 

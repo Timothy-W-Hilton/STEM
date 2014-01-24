@@ -15,7 +15,7 @@ STEMROOTDIR=$(HOME)/Stem_emi2_onespecies_big_ocssib
 #the directory containing the stem sources
 STEMSRCDIR=$(STEMROOTDIR)/src.saprcnov
 #the directory containing the stem executables, input, output, etc.
-STEMRUNDIR=$(STEMROOTDIR)/run.TWH_opt_test
+STEMRUNDIR=$(STEMROOTDIR)/run.TWH_opt_test_large_slab
 #the directory containing all the local libraries, sources, etc.
 ROOTDIR=$(HOME)
 

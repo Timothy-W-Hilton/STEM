@@ -114,7 +114,11 @@ c----------------------------------------------------------------------c
 
       bfgs_magn=1d0             ! 1d18 factor is used before adding uncertainty term in function
       lbfgs_iprint=100
-      lbfgs_factor=1.0d12
+!     lbfgs_factor is a multiple of machine precision; when the change
+!     in cost function is less than lbfgs_factor * machine precision the
+!     algorithm declares convergence. Use 1.0d7 for "moderate accuracy",
+!     1.0d12 for "low accuracy", 1.0d+1 for "extremely high accuracy.
+      lbfgs_factor=1.0d7       
       lbfgs_pgtol=1.0d-16
 !     lbfgs_n=ix*iy*1          ! dimension of the state vector
       lbfgs_m = 5               ! number of pairs used by the limited memory l-bfgs

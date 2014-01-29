@@ -30,6 +30,7 @@ c--------------------------------------------------------------------------
       character(len=32) :: fname_conc_ini, fname_lambda
       character(len=32) :: fname_obs1, fname_pre1
       character(len=32) :: fname_t_obs_pred
+      integer :: n_t_obs_pred = 1
       integer :: unit_emi_fac = 38, unit_emi_grd = 39, unit_mode = 40
       integer :: unit_cost = 41, unit_obs1 = 42, unit_pred1 = 43
       !obs1,2: DC8 or P3 only here, the other should be added later
@@ -734,8 +735,9 @@ c         print*,'Test 5'
       if(.true.) then 
       if (Master) then
         costfct=0.0
-        write(fname_t_obs_pred, "(a,i0.3,'.dat')")
-     &       "t_obs_pred",iter
+        call get_tobspred_fname(fname_t_obs_pred, n_t_obs_pred)
+        print *, 't_obs_pred fname: ', trim(adjustl(fname_t_obs_pred)),
+     &       '    n_t_obs_pred: ', n_t_obs_pred
         open(unit=unit_pred1,file=trim(adjustl(fname_t_obs_pred)))
         print *,'==================================================='
         do i_flt=1,NUM_obs
@@ -1203,21 +1205,21 @@ c-------------------------------------------------------------------------------
       EndTime = MPI_WTIME()-StartTime
       if (Master) then
         !@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 
-        open(unit_emi_grd,file='TmpEmiGrd', access='direct',
-     &         recl=4*ix*iy*2*1)
-        write(unit_emi_grd) emi_grd
-        close( unit_emi_grd)
+         open(unit_emi_grd,file='TmpEmiGrd', access='direct',
+     &        recl=4*ix*iy*2*1)
+         write(unit_emi_grd) emi_grd
+         close( unit_emi_grd)
 
-        write(*,*) 'Before3 write costfct:', costfct
-        open(unit=unit_cost, file='costfct' )
-        write( unit_cost,*) costfct
-        close( unit_cost )
-        write(*,*) 'After writing the file'
+         write(*,*) 'Before3 write costfct:', costfct
+         open(unit=unit_cost, file='costfct' )
+         write( unit_cost,*) costfct
+         close( unit_cost )
+         write(*,*) 'After writing the file'
 	!@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-	print*,'MAX LAMBDA = ',
-     &     maxval(Lambda(1:ix,1:iy,1:iz,1:N_gas)),
-     &   ' at ',maxloc(Lambda(1:ix,1:iy,1:iz,1:N_gas))
+         print*,'MAX LAMBDA = ',
+     &        maxval(Lambda(1:ix,1:iy,1:iz,1:N_gas)),
+     &        ' at ',maxloc(Lambda(1:ix,1:iy,1:iz,1:N_gas))
 	!call plot_spc('Lfun',ix,iy,iz,numl(1,3),Lambda)
       endif ! Master
        ! print("('Proc[',I2,'] Total Time = ',F9.2,' min.')"),
@@ -1237,7 +1239,7 @@ c
       end program aq_driver_function
 
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
       subroutine plot_spc(name,ix,iy,iz,is,sg1)
       integer Np,ix,iy,iz,is,ixtrn,iytrn,iztrn,irxng
@@ -1251,3 +1253,55 @@ c
       close(10)
       return
       end
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+      subroutine get_tobspred_fname(fname, i)
+c     *************
+c
+c     Subroutine get_tobspred_fname
+c
+c     searches the current directory for the next unused filename for a
+c     new t_obs_pred_XYZ.dat file, where XYZ are consecutive integers
+c     beginning with 1.  
+c
+c     fname is a character variable
+c        On entry fname is uninitialized
+c        On exit fname contains the lowest-numbered unused
+c            t_obs_pred_XYZ.dat
+c
+c     i is an integer variable
+c        On entry i is uninitialized
+c        On exit i contains contains XYZ from the lowest-numbered unused
+c           t_obs_pred_XYZ.dat
+c
+c     Example:
+c
+c     If the current directory contains files t_obs_pred_001.dat and
+c     t_obs_pred_002.dat, on exit fname will contain
+c     't_obs_pred_003.dat' and i will contain 3.
+c
+c     written by Timothy W. Hilton, UC Merced, 24 January 2014
+c
+c     *************
+
+      integer i
+      character(len=32) :: fname, format_str
+      logical :: exist
+
+      i = 1
+      format_str="(a,i0.3,'.dat')"
+      do
+         write(fname,format_str)'t_obs_pred_',i
+         inquire(file=fname, exist=exist)
+         if (.not. exist) then
+            !write(*,*) "File ", trim(fname), " not found, exiting loop"
+            exit
+         end if
+
+         !write(*,*) "File: ", trim(fname), " found."
+         i = i + 1
+      end do
+
+      end !subroutine get_tobspred_fname
+

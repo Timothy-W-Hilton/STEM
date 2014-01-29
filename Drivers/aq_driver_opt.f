@@ -85,7 +85,7 @@ C     ---- Give the upper limit, to take advantage of lbfgs-b ------
             if(.true.) then
                itemp=i
                jtemp=j
-               unc_temp=0.5
+               unc_temp=10.0
             endif
             if((i-itemp)*(j-jtemp)>small) then
                write(*,*) 'reading error for uncertainty'
@@ -118,7 +118,7 @@ c----------------------------------------------------------------------c
 !     in cost function is less than lbfgs_factor * machine precision the
 !     algorithm declares convergence. Use 1.0d7 for "moderate accuracy",
 !     1.0d12 for "low accuracy", 1.0d+1 for "extremely high accuracy.
-      lbfgs_factor=1.0d7       
+      lbfgs_factor=1.0d12
       lbfgs_pgtol=1.0d-16
 !     lbfgs_n=ix*iy*1          ! dimension of the state vector
       lbfgs_m = 5               ! number of pairs used by the limited memory l-bfgs
@@ -259,8 +259,9 @@ c     Compute the forward model and cost function
          endif
 
          print *,'Mismatch part of the cost, costfct=', costfct !molefraction^2
-         costfct=costfct+SUM(((xoptim-1)/xuncert)**2)/2.0
-         print *,'After adding background error, costfct=', costfct
+c$$$         costfct=costfct+SUM(((xoptim-1)/xuncert)**2)/2.0
+c$$$         print *,'After adding background error, costfct=', costfct
+         print *,'background error forced to be zero this run'
 !==============================================================
          do i=1,lbfgs_n/2
             gradient(i)=emi_grd(i_map(i),j_map(i),1,1)

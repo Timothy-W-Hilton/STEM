@@ -38,7 +38,7 @@ c--------------------------------------------------------------------------
 c--------------------------------------------------------------------------
 
       parameter(indep_div=0)   ! distance from lateral boundary for divergence correction 
-      parameter(NUM_obs_max=49999, NUM_mea_max=100, NUM_spe_max=50)       
+      parameter(NUM_obs_max=200000, NUM_mea_max=100, NUM_spe_max=50)
       ! Actual number of records, measurements/record, species/measurement 
       integer :: NUM_obs,NUM_mea
       integer :: NUM_spe(NUM_mea_max)

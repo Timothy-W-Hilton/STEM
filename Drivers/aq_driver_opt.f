@@ -44,6 +44,7 @@ c  optimization variables and parameters
 c-------------------------------------------------------------------------------
       double precision :: costfct,costfct_ini,bfgs_magn
       double precision :: cost_mismatch
+      logical :: cost_includes_mismatch=.true.
       double precision, dimension(:), pointer :: xoptim, gradient,
      &     lbfgs_l,  lbfgs_u, lbfgs_wa, xoptim_bck,xuncert
       integer, dimension(:), pointer :: lbfgs_nbd, lbfgs_iwa
@@ -64,7 +65,8 @@ C     ---- write a "begin" message
       t_0 = time()
       t_string = ctime( t_0 )
       write(*,*) 'BEGIN OPTIMIZATION RUN: ', t_string
-
+      unc_temp = 0.5
+      write(*,*) 'prior flux uncertainty: ', unc_temp 
 C     ---- Open report file
       open(unit=urpt,file='Report.opt')
 !open(unit=uemiunc,file='Hg90x60_emi_unc.dat')
@@ -85,7 +87,6 @@ C     ---- Give the upper limit, to take advantage of lbfgs-b ------
             if(.true.) then
                itemp=i
                jtemp=j
-               unc_temp=10.0
             endif
             if((i-itemp)*(j-jtemp)>small) then
                write(*,*) 'reading error for uncertainty'
@@ -257,11 +258,13 @@ c     Compute the forward model and cost function
          if(model_runs == 1) then
             costfct_ini = costfct
          endif
-
-         print *,'Mismatch part of the cost, costfct=', costfct !molefraction^2
-c$$$         costfct=costfct+SUM(((xoptim-1)/xuncert)**2)/2.0
-c$$$         print *,'After adding background error, costfct=', costfct
-         print *,'background error forced to be zero this run'
+         if (cost_includes_mismatch) then 
+            print *,'Mismatch part of the cost, costfct=', costfct !molefraction^2
+            costfct=costfct+SUM(((xoptim-1)/xuncert)**2)/2.0
+            print *,'After adding background error, costfct=', costfct
+         else
+            print *,'background error forced to be zero this run'
+         end if 
 !==============================================================
          do i=1,lbfgs_n/2
             gradient(i)=emi_grd(i_map(i),j_map(i),1,1)

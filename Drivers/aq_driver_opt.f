@@ -162,13 +162,13 @@ c     enddo
 c     enddo
 c     close(27)
 c
-c     emi_fac = emi_fac*1 ! change the factor from 1 to make a fixed value
-c     print*,'DEBUG emi_fac 2' , emi_fac
-c
-c     call simulation('fwd',ix,iy,iz,N_gas,emi_fac,emi_grd,costfct) ! this can be fbw or fwd
-c
-c     print*, 'Force stop in aq_driver_opt.f, just want forward'
-c     stop ! stop here if all want is forward
+      emi_fac = emi_fac*1 ! change the factor from 1 to make a fixed value
+      print*,'DEBUG emi_fac 2' , emi_fac
+
+      call simulation('fwd',ix,iy,iz,N_gas,emi_fac,emi_grd,costfct) ! this can be fbw or fwd
+
+      print*, 'Force stop in aq_driver_opt.f, just want forward'
+      stop ! stop here if all want is forward
 c     ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 

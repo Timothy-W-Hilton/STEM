@@ -1,7 +1,7 @@
       ! Name of the executable model
       module execname
-        character(len=*), parameter ::
-     &         exec_name = "./mabu_124x124_casa-cos_2008_2009.run"
+        character(200), parameter ::
+     &         exec_name = ""
       end module execname
 
       program aq_driver
@@ -433,6 +433,8 @@ C     ---- Write Initial Conc.
 
 
 C     ---- Call simulation by executing Adjoint stem in a new shell -------------
+      call getarg(1, exec_name)
+      print *, 'exec_name: ', exec_name
       call system( exec_name )
       print *, 'after exec_name call'
 

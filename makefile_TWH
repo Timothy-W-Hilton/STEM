@@ -15,7 +15,8 @@ STEMROOTDIR=$(HOME)/Stem_emi2_onespecies_big_ocssib
 #the directory containing the stem sources
 STEMSRCDIR=$(STEMROOTDIR)/src.saprcnov
 #the directory in which to place the stem executables
-STEMRUNDIR=$(STEMROOTDIR)
+STEMRUNDIR=$(STEMROOTDIR)/STEM_Runs_LRU_Paper/
+#STEMRUNDIR=$(HOME)
 #the directory containing all the local libraries, sources, etc.
 ROOTDIR=$(HOME)
 
@@ -42,8 +43,8 @@ debug:PLDFLAGS += -g
  
 MATHLIB= -llapack -lblas
 
-CMDOPT = $(STEMRUNDIR)/saprcnov-opt.exe
-CMDFUN = $(STEMRUNDIR)/saprcnov-fun.exe
+CMDOPT = $(STEMRUNDIR)/saprcnov-LRU_paper_fwd_main.exe
+CMDFUN = $(STEMRUNDIR)/saprcnov-LRU_paper_fun.exe
 
 all:  $(CMDFUN) $(CMDOPT)
 debug: all

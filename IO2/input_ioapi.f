@@ -4,6 +4,7 @@ c**********************************************************************
      &    dht,sigmaz,baseh,dt2,iunit,iout)
 c****************************************************************************
 c---+----1----+----2----+----3----+----4----+----5----+----6----+----7-----
+
       include 'PARMS3.EXT'      ! i/o API
       include 'FDESC3.EXT'      ! i/o API
       include 'IODECL3.EXT'     ! i/o API      
@@ -13,6 +14,7 @@ c---+----1----+----2----+----3----+----4----+----5----+----6----+----7-----
       include 'aqcon1.cmm'
       include 'aqsymb.cmm'
       include 'aqcont.cmm'
+
 cc
       dimension sg1(ix,iy,iz,1),sl1(ix,iy,iz,1),sp1(ix,iy,iz,1)
 !      dimension work(ix,iy,iz,mxspg) ! Changed by sarika
@@ -277,8 +279,10 @@ c     1     2001,1,weekday,ihr, em(1,1,1,L),iflag2)   ! our emission already in 
 !     1    idate(1),idate(2),idate(3), 0, q(1,1,L),iflag)   ! our emission already in molecular/cm2
 !        if(iflag.eq.1) call aq_zero_r4(ix*iy,q(1,1,L))
 	
-        call READ_IOAPI('EMHOURLY',emname(L),        ! read in diurnal-cycle emission
-     1    idate(1),idate(2),idate(3),ihr, q(1,1,L),iflag)   ! our emission already in molecular/cm2
+!     read in diurnal-cycle emission
+!     our emission already in molecular/cm2
+         call READ_IOAPI_FIND_PREVIOUS('EMHOURLY',emname(L), 
+     &        idate(1),idate(2),idate(3),ihr, q(1,1,L),iflag)
            print*, '*********************************'
            print*, 'iflag = ',iflag
            print*, '*********************************'
@@ -981,6 +985,142 @@ c          call M3EXIT (subname, date3d, time3d, msg3d, 1)
       
       return
       end
+
+      subroutine READ_IOAPI_FIND_PREVIOUS
+     +     (lname, varname, year, month, day, hour, field, iflag)
+c------------------------------------------------------------------------------
+c     T.W. Hilton, 6.17.2014
+c     
+c     LAST REV:
+c     
+c     PURPOSE: Read a field from an AQMS input EMHOURLY file
+c     (EDSS/Models-3 I/O API format)
+c     
+c     PRECONDITIONS: 
+c     Following env vars need to be set: 
+c     <lname>	logical name of input file
+c     
+c     INPUT:
+c     <lname>		C  logical name of output file
+c     varname	     C*16  name of variable to be read
+c     year, month, day	I  year (yyyy), month, day
+c     hour			I  hour
+c     
+c     OUTPUT:
+c     field			R  field just read
+c     
+c     CALLS: I/O API library
+c     
+c     NOTES: If 'varname' does not exist at the specified time, the
+c     latest value prior to the specified time is used.  If the
+c     specified time precedes all time stamps in the file 'field' is
+c     returned unchanged.  This is a minor variation on the behavior of
+c     subroutine READ_IOAPI, which returns field unchanged if the
+c     requested time step is not present.  The output will be the same
+c     if a previous call to READ_IOAPI resulted in a valid value.
+c     Without a previous successful READ_IOAPI, READ_IOAPI will return
+c     field unchanged -- this will keep whatever value field was
+c     initialized to, which is probably not wanted.  If, for example,
+c     EMHOURLY contains monthly data, READ_EMHOURLY will not return
+c     valid results until the requested time step happens to line up
+c     with a monthly timestamp.  This could result in many bogus values
+c     returned with only warnings.  read_ioapi_find_previous, in
+c     contrast, will find the correct values in this situation.
+c------------------------------------------------------------------------------
+      implicit none
+
+      include 'aqms.param'
+      include 'PARMS3.EXT'	! i/o API
+      include 'FDESC3.EXT'	! i/o API
+      include 'IODECL3.EXT'	! i/o API
+
+      character*(*) lname
+      character*(*) varname
+      integer day, month, year, hour
+      real field(1),work(imother,jmother,izm)
+
+      integer trimlen, julian
+
+      integer date3d, time3d, jul3d
+      integer reqdate3d, reqtime3d  !timestep requested by caller
+      integer result,iflag,i,j,k
+      character*256 filename
+      character*18 subname
+      character*80 msg3d
+
+      data subname /'read_ioapi'/
+
+
+      iflag=0
+      jul3d = JULIAN (year, month, day)
+      date3d = 1000 * year + jul3d ! current date YYYYDDD
+      time3d = 10000 * hour     ! current time HHMMSS
+
+      if (.not. DESC3(trim(lname)) ) then
+         print*,'No information for',lname
+         stop
+      endif
+
+!     find the timestep in lname that is relevant to the requested
+!     timestep and place it in date3d, time3d.  If the requested
+!      timestep precedes all timesteps in lname issue a warning.
+      reqdate3d = date3d
+      reqtime3d = time3d
+      if (.not. CHECK3(
+     &     TRIM(lname), TRIM(varname), reqdate3d, reqtime3d)
+     &     ) then
+!     the I/O API documentation says that CURRSTEP is a Fortran function
+!      that returns type logical.  I cannot get it to compile that way
+!      (see commented out call below).  Calling it as a subroutine
+!      compiles and runs and relates timesteps to one another as
+!      expected, but I do not know what would happen if no appropriate
+!      timestamp is present in the file.  The function should return
+!      false in that case but there is no equivalent argument for the
+!       "subroutine".   -TWH
+         call CURRSTEP(reqdate3d, reqtime3d,
+     &        SDATE3D, STIME3D, TSTEP3D, 
+     &        date3d, time3d)
+         write(6,*)'using ', date3d, time3d, 'for', reqdate3d, reqtime3d
+c$$$         if (.not. CURRSTEP(reqdate3d, reqtime3d, 
+c$$$     &        SDATE3D, STIME3D, TSTEP3D, 
+c$$$     &        date3d, time3d)) then
+c$$$         iflag=1
+c$$$         write(6,*)'Warning: Can not Read the variable ',
+c$$$     &        varname,lname
+c$$$         write(6,*)'time =', date3d, time3d
+c$$$         return
+      endif
+
+      if(imother.eq.ncols3d.and.jmother.eq.nrows3d) then ! mother domain
+         if(.not.read3(trim(lname),trim(varname),ALLAYS3,date3d,time3d, 
+     &        field)) then
+            write(6,*) 'Error reading var ' //TRIM(varname)//
+     &           ' from file ' // TRIM(lname) // 'at time ',
+     &           date3d,time3d  
+            stop
+         endif 	
+         return 
+      endif
+
+      if(ixm.ne.ncols3d.or.iym.ne.nrows3d) then ! check dimension
+         print*,'dimension does not match ',lname
+         print*,ixm,iym,ncols3d,nrows3d
+         stop
+      endif
+
+      if (.not.
+     &     READ3 (TRIM(lname), 
+     &     TRIM(varname),
+     &     ALLAYS3, date3d, time3d, field)
+     &     ) then
+         write(6,*) 'Error reading var ' // TRIM(varname)//
+     &        ' from file ' // TRIM(lname) // 'at time ',
+     &        date3d,time3d  
+         stop
+      endif
+
+      return
+      end subroutine READ_IOAPI_FIND_PREVIOUS
 
 
       subroutine INTERP_IOAPI

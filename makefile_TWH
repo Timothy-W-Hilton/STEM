@@ -11,11 +11,11 @@ PFC=mpif90 -f90=pgfortran
 PLD=mpif90 -f90=pgfortran
 
 # the "root" directory for stem, containing the src and run directories
-STEMROOTDIR=$(HOME)/Stem_emi2_onespecies_big_ocssib
+STEMROOTDIR=/home/ecampbell_lab/thilton/STEM
 #the directory containing the stem sources
-STEMSRCDIR=$(STEMROOTDIR)/src.saprcnov
+STEMSRCDIR=$(STEMROOTDIR)/STEM_src_Tim
 #the directory in which to place the stem executables
-STEMRUNDIR=$(STEMROOTDIR)/STEM_Runs_LRU_Paper/
+STEMRUNDIR=$(STEMROOTDIR)/STEM_Runs_LRU_Paper
 #STEMRUNDIR=$(HOME)
 #the directory containing all the local libraries, sources, etc.
 ROOTDIR=$(HOME)
@@ -23,8 +23,8 @@ ROOTDIR=$(HOME)
 # The Vis5D home directory
 V5DHOME=/usr/local/vis5d-5.2
 
-APINCL=-I$(ROOTDIR)/local/include
-APILIB= -L$(ROOTDIR)/local/lib -lioapi -lnetcdf
+APINCL=-I$(HOME)/thilton/local/include
+APILIB= -L$(HOME)/thilton/local/lib -lioapi -lnetcdf
 
 # ---- Include Directory ----
 DIRINCL=$(STEMSRCDIR)/Include
@@ -33,14 +33,14 @@ STEMINCL=-I$(DIRINCL) -I$(STEMSRCDIR)/Tuvsub
 FFLAGS   = -c -O $(APINCL) $(STEMINCL)
 PFFLAGS  = -c -O $(APINCL) $(STEMINCL)
 LDFLAGS  = -O -g77libs
-PLDFLAGS = -O -g77libs 
+PLDFLAGS = -O -g77libs
 
 # use debugging compiler and linker flags if debug target specified
 debug:FFLAGS  += -g
 debug:PFFLAGS  += -g
 debug:LDFLAGS  += -g
 debug:PLDFLAGS += -g
- 
+
 MATHLIB= -llapack -lblas
 
 CMDOPT = $(STEMRUNDIR)/saprcnov-LRU_paper_fwd_main.exe
@@ -49,12 +49,12 @@ CMDFUN = $(STEMRUNDIR)/saprcnov-LRU_paper_fun.exe
 all:  $(CMDFUN) $(CMDOPT)
 debug: all
 
-#  ---- DRIVER Files ---- 
+#  ---- DRIVER Files ----
 DIRDRV=Drivers
-SRCDRVFUN=  aq_driver_function.f  
-OBJDRVFUN=  aq_driver_function.o 
-SRCDRVOPT=  aq_driver_opt.f  
-OBJDRVOPT=  aq_driver_opt.o 
+SRCDRVFUN=  aq_driver_function.f
+OBJDRVFUN=  aq_driver_function.o
+SRCDRVOPT=  aq_driver_opt.f
+OBJDRVOPT=  aq_driver_opt.o
 
 
 # ---- Transport Files ----
@@ -77,9 +77,9 @@ OBJMEM=stem_memalloc.o
 # ---- Parallelization Files ----
 DIRPAR=$(STEMSRCDIR)/Paqmsg
 SRCMPI= paqmsg_util.f paqmsg_library.f paqmsg_communication.f \
-        paqmsg_stem.f 
+        paqmsg_stem.f
 OBJPAR= paqmsg_util.o paqmsg_library.o paqmsg_communication.o \
-	paqmsg_stem.o 
+	paqmsg_stem.o
 
 # --------------Input/Output Files -----------------------------------
 DIRIO=$(STEMSRCDIR)/IO1
@@ -95,7 +95,7 @@ SRCGCHEM=rxn_eq.f saprcnov_stem_model.f saprcnov_stem_integrator.f \
 OBJGCHEM=rxn_eq.o saprcnov_stem_model.o saprcnov_stem_integrator.o \
 	saprcnov_stem_linalg.o  saprcnov_stem_hessian.o \
 	rxn_adjoint.o
-HEADGCHEM=  $(DIRGCHEM)/saprcnov_stem.h $(DIRGCHEM)/saprcnov_stem_s.h    
+HEADGCHEM=  $(DIRGCHEM)/saprcnov_stem.h $(DIRGCHEM)/saprcnov_stem_s.h
 
 # --------------Radiation Files --------------------------------------
 DIRTUV=$(STEMSRCDIR)/Tuvsub
@@ -105,7 +105,7 @@ OBJTUV=tuvsub.o
 
 # --------------Optimization Files -----------------------------------
 DIROPT=$(STEMSRCDIR)/Optimization
-SRCOPT=setulb.f 
+SRCOPT=setulb.f
 OBJOPT=setulb.o
 
 
@@ -114,11 +114,11 @@ OBJ =  $(OBJLIB) $(OBJPAR) $(OBJTRAN) $(OBJIO) \
 	$(OBJTUV) $(OBJGCHEM) $(OBJMEM) $(OBJUTIL) \
 	$(OBJOPT)
 
-$(CMDFUN):  $(OBJ) $(OBJDRVFUN) $(DIRINCL)/aqms.param 
+$(CMDFUN):  $(OBJ) $(OBJDRVFUN) $(DIRINCL)/aqms.param
 	$(PLD) $(PLDFLAGS) -o $(CMDFUN) $(OBJ) $(OBJDRVFUN)  \
 	$(APILIB) $(MATHLIB)
 
-$(CMDOPT):  $(OBJ) $(OBJDRVOPT) $(DIRINCL)/aqms.param 
+$(CMDOPT):  $(OBJ) $(OBJDRVOPT) $(DIRINCL)/aqms.param
 	$(PLD) $(PLDFLAGS) -o $(CMDOPT) $(OBJ) $(OBJDRVOPT)  \
 	$(APILIB) $(MATHLIB)
 
@@ -129,10 +129,10 @@ f90.o:
 	$(FC) $(FFLAGS) $(APINCL) $<
 
 # --------------Driver Files --------------------------------------
-aq_driver_function.o:$(DIRDRV)/aq_driver_function.f $(DIRINCL)/aqms.param 
+aq_driver_function.o:$(DIRDRV)/aq_driver_function.f $(DIRINCL)/aqms.param
 	$(FC) $(FFLAGS) $<
 
-aq_driver_opt.o:$(DIRDRV)/aq_driver_opt.f $(DIRINCL)/aqms.param 
+aq_driver_opt.o:$(DIRDRV)/aq_driver_opt.f $(DIRINCL)/aqms.param
 	$(FC) $(FFLAGS) $<
 
 # --------------Parallelization Files --------------------------------
@@ -151,31 +151,31 @@ paqmsg_stem.o: $(DIRPAR)/paqmsg_stem.f
 
 
 # -------------- Utility Files --------------------------------------
-aq_lib.o: $(DIRUTIL)/aq_lib.f $(DIRINCL)/aqms.param 
+aq_lib.o: $(DIRUTIL)/aq_lib.f $(DIRINCL)/aqms.param
 	$(FC) $(FFLAGS) $<
-	
-setup.o: $(DIRUTIL)/setup.f $(DIRINCL)/aqms.param 
+
+setup.o: $(DIRUTIL)/setup.f $(DIRINCL)/aqms.param
 	$(FC) $(FFLAGS) $<
-	
-convert.o: $(DIRUTIL)/convert.f $(DIRINCL)/aqms.param 
+
+convert.o: $(DIRUTIL)/convert.f $(DIRINCL)/aqms.param
 	$(FC) $(FFLAGS) $<
 # ------------------------------------------------------------------------
 
 
 # --------------Transport Files --------------------------------------
 advdiff_1d_finitediff_conc.o: $(DIRTRAN)/advdiff_1d_finitediff_conc.f90 \
-	$(DIRINCL)/aqms.param 
+	$(DIRINCL)/aqms.param
 	$(FC) $(FFLAGS) $<
 
 advdiff_1d_finitevol_conc.o: $(DIRTRAN)/advdiff_1d_finitevol_conc.f90 \
-	$(DIRINCL)/aqms.param 
+	$(DIRINCL)/aqms.param
 	$(FC) $(FFLAGS) $<
 
 advdiff_1d_finitediff_mf_em.o: $(DIRTRAN)/advdiff_1d_finitediff_mf_em.f90 \
-	$(DIRINCL)/aqms.param 
+	$(DIRINCL)/aqms.param
 	$(FC) $(FFLAGS) $<
 
-cartesian2sigma.o: $(DIRTRAN)/cartesian2sigma.f90 $(DIRINCL)/aqms.param 
+cartesian2sigma.o: $(DIRTRAN)/cartesian2sigma.f90 $(DIRINCL)/aqms.param
 	$(FC) $(FFLAGS) $<
 # ------------------------------------------------------------------------
 
@@ -183,7 +183,7 @@ cartesian2sigma.o: $(DIRTRAN)/cartesian2sigma.f90 $(DIRINCL)/aqms.param
 # -------------- Gas-Phase Chemistry Files -----------------------------------
 rxn_eq.o:  $(DIRGCHEM)/rxn_eq.f $(HEADGCHEM)
 	$(FC) $(FFLAGS) $<
-	
+
 saprcnov_stem_model.o: $(DIRGCHEM)/saprcnov_stem_model.f $(HEADGCHEM)
 	$(FC) $(FFLAGS) $<
 
@@ -195,7 +195,7 @@ saprcnov_stem_linalg.o: $(DIRGCHEM)/saprcnov_stem_linalg.f $(HEADGCHEM)
 
 saprcnov_stem_hessian.o: $(DIRGCHEM)/saprcnov_stem_hessian.f $(HEADGCHEM)
 	$(FC) $(FFLAGS) $<
-	
+
 rxn_adjoint.o:  $(DIRGCHEM)/rxn_adjoint.f $(HEADGCHEM)
 	$(FC) $(FFLAGS) $<
 # ------------------------------------------------------------------------
@@ -216,7 +216,7 @@ tuvsub.o: $(DIRTUV)/tuvsub.f $(DIRTUV)/tuv.params
 # --------------Input/Output Files --------------------------------------
 checkpoints.o: $(DIRIO)/checkpoints.f
 	$(FC) $(FFLAGS) $<
-	
+
 input_ioapi.o: $(DIRIO2)/input_ioapi.f
 	$(FC) $(FFLAGS) $<
 

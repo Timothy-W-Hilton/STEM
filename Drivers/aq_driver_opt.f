@@ -66,7 +66,7 @@ C     ---- write a "begin" message
       t_string = ctime( t_0 )
       write(*,*) 'BEGIN OPTIMIZATION RUN: ', t_string
       unc_temp = 0.5
-      write(*,*) 'prior flux uncertainty: ', unc_temp 
+      write(*,*) 'prior flux uncertainty: ', unc_temp
 C     ---- Open report file
       open(unit=urpt,file='Report.opt')
 !open(unit=uemiunc,file='Hg90x60_emi_unc.dat')
@@ -136,7 +136,7 @@ c----------------------------------------------------------------------c
       allocate( lbfgs_iwa(3*lbfgs_n), STAT=ierr)
 
       lbfgs_u=10.0
-      lbfgs_l=0.1	
+      lbfgs_l=0.1
       Num_grid=lbfgs_n
 
 C---- Background /initial guess  =1
@@ -163,7 +163,7 @@ c     enddo
 c     close(27)
 c
       emi_fac = emi_fac*1 ! change the factor from 1 to make a fixed value
-      print*,'DEBUG emi_fac 2' , emi_fac
+
 
       call simulation('fwd',ix,iy,iz,N_gas,emi_fac,emi_grd,costfct) ! this can be fbw or fwd
 
@@ -258,13 +258,13 @@ c     Compute the forward model and cost function
          if(model_runs == 1) then
             costfct_ini = costfct
          endif
-         if (cost_includes_mismatch) then 
+         if (cost_includes_mismatch) then
             print *,'Mismatch part of the cost, costfct=', costfct !molefraction^2
             costfct=costfct+SUM(((xoptim-1)/xuncert)**2)/2.0
             print *,'After adding background error, costfct=', costfct
          else
             print *,'background error forced to be zero this run'
-         end if 
+         end if
 !==============================================================
          do i=1,lbfgs_n/2
             gradient(i)=emi_grd(i_map(i),j_map(i),1,1)
@@ -412,7 +412,7 @@ C     --- Check if the value of mode is appropriate
      &     .and.(mode(1:3).ne.'ini').and.(mode(1:3).ne.'obs') ) then
          print*,'Error in simulation: mode = <',mode,'>'
          print*,'Accepted values are <fwd>, <fbw>, <ini> or <obs>'
-      end if     		
+      end if
 
 C     ---- Open File for Mode -----
       open( unit=unit_mode, file='TmpMode' )
@@ -433,31 +433,8 @@ C     ---- Write Initial Conc.
 
 
 C     ---- Call simulation by executing Adjoint stem in a new shell -------------
-      call getarg(1, exec_name)
-      print *, 'exec_name: ', exec_name
-      call system( exec_name )
-      print *, 'after exec_name call'
 
-      costfct=-1d0              ! initialize with a negative number
-      if ( mode == 'fbw'.or.mode == 'fwd') then
-         open(unit=unit_cost, file='costfct')
-         read(unit_cost,*) costfct
-         close(unit_cost)
-         call system('rm costfct')
-      endif
-
-C     ---- Read The results -----
-
-      if ( mode == 'fbw' ) then
-         open(unit_emi_grd,file=fname_emi_grd, access='direct',
-     &        recl=4*ix*iy*2*1)
-         read(unit_emi_grd) emi_grd
-         close(unit_emi_grd)
-      end if
-
-C     ---- Clean the Temporary Files ----
-      call system('rm TmpMode')
-      call system('rm caca')
-
+C      ---- TWH : removed code here to test submitting chained job on NERSC
+C      ---- TWH : worker instances are now started by second qsub call from
+C      ---- TWH : within the PBS script, not from system call here.
       end subroutine simulation
-

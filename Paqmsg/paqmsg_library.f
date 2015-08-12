@@ -26,9 +26,9 @@ c	distrib_x_3D	Distribution of the 3D (x,y,z) arrays in
 c			x-slices from the master to the workers
 c	distrib_y_3D	Distribution of the 3D (x,y,z) arrays in
 c			y-slices from the master to the workers
-c	distrib_x_BDx	Distribution of the BDx (y,z,Ns) boundary data 
+c	distrib_x_BDx	Distribution of the BDx (y,z,Ns) boundary data
 c			arrays in x-slices from the master to the workers
-c	distrib_y_BDy	Distribution of the BDy (x,z,Ns) boundary data 
+c	distrib_y_BDy	Distribution of the BDy (x,z,Ns) boundary data
 c			arrays in y-slices from the master to the workers
 c	distrib_x_BD	Distribution of the boundary data arrays in
 c			x-slices from the master to the workers - Stem-III 		c			dependent: BDx2 (y,z,2,Ns)
@@ -44,31 +44,31 @@ c-------------------------------------------------------------------------------
       include 'mpif.h'
 
       contains
-      
+
 c-----------------------------------------------------------------
 c  Master distributes a 4D array of data in x-slice format to all xworkers
 c  each x-slice seperately, standard version
 c-----------------------------------------------------------------
       subroutine distrib_x_4D_v1(ix,iy,iz,iyloc,Ns,s,s_x)
-c      
+c
       implicit none
 c
       integer :: ix, iy, iz, iyloc, Ns
       real :: s(ix,iy,iz,Ns)
       real :: s_x(ix,iyloc,iz,Ns)
-      integer :: i, ierr 
+      integer :: i, ierr
       integer :: status(MPI_STATUS_SIZE, iyloc)
       integer :: request(iyloc)
-c      
+c
       if (Master) then
         do i=1,iy
-          call MPI_SEND(s(1,i,1,1), 1, GLOBAL_4D_XSLICE, 
+          call MPI_SEND(s(1,i,1,1), 1, GLOBAL_4D_XSLICE,
      & 		owner_of_xslice(i), i,  MPI_COMM_WORLD, ierr)
 	end do
       else if (XWorker) then
         do i=1, no_of_xslices(myid)
-          call MPI_IRECV(s_x(1,i,1,1), 1, LOCAL_4D_XSLICE, 0, 
-     &		global_xslice_id(myid,i), MPI_COMM_WORLD, 
+          call MPI_IRECV(s_x(1,i,1,1), 1, LOCAL_4D_XSLICE, 0,
+     &		global_xslice_id(myid,i), MPI_COMM_WORLD,
      &		request(i), ierr)
 	end do
 	call MPI_WAITALL(no_of_xslices(myid), request, status, ierr)
@@ -81,7 +81,7 @@ c  Master distributes a 4D array of data in y-slice format to all yworkers
 c  y-slice by y-slice
 c-----------------------------------------------------------------
       subroutine distrib_y_4D_v1(ix,iy,iz,ixloc,Ns,s,s_y)
-c      
+c
       implicit none
 c
       integer :: ix, iy, iz, ixloc, Ns
@@ -90,91 +90,91 @@ c
       integer :: i, ierr
       integer :: status(MPI_STATUS_SIZE, ixloc)
       integer :: request(ixloc)
-c      
+c
       if (Master) then
         do i=1,ix
-          call MPI_SEND(s(i,1,1,1), 1, GLOBAL_4D_YSLICE, 
+          call MPI_SEND(s(i,1,1,1), 1, GLOBAL_4D_YSLICE,
      &        owner_of_yslice(i), i,  MPI_COMM_WORLD, ierr)
 	end do
       else if (YWorker) then
         do i=1, no_of_yslices(myid)
-          call MPI_IRECV(s_y(i,1,1,1), 1, LOCAL_4D_YSLICE, 0,  
-     &		global_yslice_id(myid,i), MPI_COMM_WORLD, 
+          call MPI_IRECV(s_y(i,1,1,1), 1, LOCAL_4D_YSLICE, 0,
+     &		global_yslice_id(myid,i), MPI_COMM_WORLD,
      &		request(i), ierr)
 	end do
 	call MPI_WAITALL(no_of_yslices(myid), request, status, ierr)
       end if
 c
       end subroutine  distrib_y_4D_v1
-      
+
 c-----------------------------------------------------------------
 c  Master gathers a 4D array of data in x-slice format from all xworkers
 c   xslice by xslice, standard version
 c-----------------------------------------------------------------
       subroutine gather_x_4D_v1(ix,iy,iz,iyloc,Ns,s,s_x)
-c      
+c
       implicit none
 c
       integer :: ix, iy, iz, iyloc, Ns
       real :: s(ix,iy,iz,Ns)
       real :: s_x(ix,iyloc,iz,Ns)
       integer :: i, ierr
-      integer,pointer,dimension(:,:),save :: status
-      integer,pointer,dimension(:),save :: request
-      
-c      
+      integer,allocatable,dimension(:,:),save :: status
+      integer,allocatable,dimension(:),save :: request
+
+c
       if (Master) then
         if (.not. allocated(status)) then
 	  allocate( status(MPI_STATUS_SIZE,iy),STAT=ierr )
 	end if
 	if (.not. allocated(request)) then
-          allocate( request(iy),STAT=ierr )      
+          allocate( request(iy),STAT=ierr )
 	end if
         do i=1,iy
-        call MPI_IRECV(s(1,i,1,1), 1, GLOBAL_4D_XSLICE, 
+        call MPI_IRECV(s(1,i,1,1), 1, GLOBAL_4D_XSLICE,
      &      owner_of_xslice(i), i,  MPI_COMM_WORLD, request(i), ierr)
 	end do
 	call MPI_WAITALL(iy, request, status, ierr)
       else if (XWorker) then
         do i=1, no_of_xslices(myid)
-        call MPI_SEND(s_x(1,i,1,1), 1, LOCAL_4D_XSLICE, 0, 
+        call MPI_SEND(s_x(1,i,1,1), 1, LOCAL_4D_XSLICE, 0,
      &      global_xslice_id(myid,i), MPI_COMM_WORLD, ierr)
 	end do
       end if
 c
       end subroutine  gather_x_4D_v1
-        
+
 c-----------------------------------------------------------------
 c  Master gathers a 4D array of data in x-slice format from all yworkers
 c   yslice by yslice, standard version
 c-----------------------------------------------------------------
       subroutine gather_y_4D_v1(ix,iy,iz,ixloc,Ns,s,s_y)
-c      
+c
       implicit none
 
       integer :: ix, iy, iz, ixloc, Ns
       real :: s(ix,iy,iz,Ns)
       real :: s_y(ixloc,iy,iz,Ns)
       integer :: i, ierr
-      integer,pointer,dimension(:,:),save :: status
-      integer,pointer,dimension(:),save :: request
+      integer,allocatable,dimension(:,:),save :: status
+      integer,allocatable,dimension(:),save :: request
 
       if (Master) then
         if (.not. allocated(status)) then
           allocate( status(MPI_STATUS_SIZE,ix),STAT=ierr )
 	end if
 	if (.not. allocated(request)) then
-          allocate( request(ix),STAT=ierr )      
+          allocate( request(ix),STAT=ierr )
 	end if
         do i=1,ix
-          call MPI_IRECV(s(i,1,1,1), 1, GLOBAL_4D_YSLICE, 
-     &        owner_of_yslice(i), i,  
+          call MPI_IRECV(s(i,1,1,1), 1, GLOBAL_4D_YSLICE,
+     &        owner_of_yslice(i), i,
      &	      MPI_COMM_WORLD, request(i), ierr)
 	end do
 	call MPI_WAITALL(ix, request, status, ierr)
       else if (YWorker) then
         do i=1, no_of_yslices(myid)
-          call MPI_SEND(s_y(i,1,1,1), 1, LOCAL_4D_YSLICE, 0, 
+          call MPI_SEND(s_y(i,1,1,1), 1, LOCAL_4D_YSLICE, 0,
      &        global_yslice_id(myid,i), MPI_COMM_WORLD, ierr)
 	end do
       end if
@@ -185,8 +185,8 @@ c---------------------------------------------------------
 c      Slaves exchange data:  - old format is x-slices (for sending)
 c                             - new format is y-slices (for receiving)
 c---------------------------------------------------------
-      subroutine shuffle_x2y_4D_v1(ix,iy,iz,ixloc,iyloc,Ns,s_x,s_y)  
-c      
+      subroutine shuffle_x2y_4D_v1(ix,iy,iz,ixloc,iyloc,Ns,s_x,s_y)
+c
       implicit none
 c
       integer :: ix, iy, iz, ixloc, iyloc, Ns
@@ -194,10 +194,10 @@ c
       real   :: s_x(ix,iyloc,iz,Ns)
       real   :: s_y(ixloc,iy,iz,Ns)
       integer :: i, j, Ierr
-      integer,pointer,dimension(:,:),save :: status
-      integer,pointer,dimension(:),save :: request
-c      
-      
+      integer,allocatable,dimension(:,:),save :: status
+      integer,allocatable,dimension(:),save :: request
+c
+
       if (YWorker) then
         if (.not.allocated(status)) then
 	  allocate( status(MPI_STATUS_SIZE,iy*no_of_yslices(myid)),
@@ -207,38 +207,38 @@ c
           allocate( request(iy*no_of_yslices(myid)),STAT=ierr )
 	end if
 
-	do j=1,iy   
-          do i=1,no_of_yslices(myid)   
+	do j=1,iy
+          do i=1,no_of_yslices(myid)
              call MPI_IRECV(s_y(i,j,1,1), 1, LOCAL_4D_YCOLUMN,
-     &           owner_of_xslice(j)-1, global_yslice_id(myid,i)+ix*j, 
+     &           owner_of_xslice(j)-1, global_yslice_id(myid,i)+ix*j,
      &           MPI_COMM_WORKERS, request(j+iy*(i-1)), ierr)
           end do
         end do
       end if
 
       if (XWorker) then
-c      
-        do j=1,no_of_xslices(myid)   
-          do i=1,ix   
-            call MPI_SEND(s_x(i,j,1,1), 1, LOCAL_4D_XCOLUMN, 
-     &          owner_of_yslice(i)-1, i+ix*global_xslice_id(myid,j),  
+c
+        do j=1,no_of_xslices(myid)
+          do i=1,ix
+            call MPI_SEND(s_x(i,j,1,1), 1, LOCAL_4D_XCOLUMN,
+     &          owner_of_yslice(i)-1, i+ix*global_xslice_id(myid,j),
      &          MPI_COMM_WORKERS, ierr)
           end do
         end do
       end if
-      
+
       if (YWorker) then
 	call MPI_WAITALL(iy*no_of_yslices(myid), request, status, ierr)
       end if
-c	
+c
       end subroutine shuffle_x2y_4D_v1
-	
+
 c---------------------------------------------------------
 c      Slaves exchange data:  - old format is y-slices (for sending)
 c                             - new format is x-slices (for receiving)
 c---------------------------------------------------------
-      subroutine shuffle_y2x_4D_v1(ix,iy,iz,ixloc,iyloc,Ns,s_x,s_y)  
-c      
+      subroutine shuffle_y2x_4D_v1(ix,iy,iz,ixloc,iyloc,Ns,s_x,s_y)
+c
       implicit none
 c
       integer :: ix, iy, iz, ixloc, iyloc, Ns
@@ -246,34 +246,34 @@ c
       real   :: s_x(ix,iyloc,iz,Ns)
       real   :: s_y(ixloc,iy,iz,Ns)
       integer :: i, j, ierr
-      integer,pointer,dimension(:,:),save :: status
-      integer,pointer,dimension(:),save :: request
-c      
-c      
+      integer,allocatable,dimension(:,:),save :: status
+      integer,allocatable,dimension(:),save :: request
+c
+c
       if (XWorker) then
         if (.not.allocated(status)) then
   	  allocate( status(MPI_STATUS_SIZE,ix*no_of_xslices(myid)),
      &		STAT=ierr )
         end if
 	if (.not.allocated(request)) then
-          allocate( request(ix*no_of_xslices(myid)),STAT=ierr )      
+          allocate( request(ix*no_of_xslices(myid)),STAT=ierr )
 	end if
 
-        do j=1,no_of_xslices(myid)   
-	  do i=1,ix   
-            call MPI_IRECV(s_x(i,j,1,1), 1, LOCAL_4D_XCOLUMN, 
+        do j=1,no_of_xslices(myid)
+	  do i=1,ix
+            call MPI_IRECV(s_x(i,j,1,1), 1, LOCAL_4D_XCOLUMN,
      &             owner_of_yslice(i)-1, i+ix*global_xslice_id(myid,j),
      &             MPI_COMM_WORKERS, request(i+ix*(j-1)), ierr)
           end do
         end do
-	
+
       end if
 
       if (YWorker) then  ! Master has no role in this communication
-	do j=1,iy   
-          do i=1,no_of_yslices(myid)   
-            call MPI_SEND(s_y(i,j,1,1), 1, LOCAL_4D_YCOLUMN, 
-     &          owner_of_xslice(j)-1, global_yslice_id(myid,i)+j*ix,  
+	do j=1,iy
+          do i=1,no_of_yslices(myid)
+            call MPI_SEND(s_y(i,j,1,1), 1, LOCAL_4D_YCOLUMN,
+     &          owner_of_xslice(j)-1, global_yslice_id(myid,i)+j*ix,
      &          MPI_COMM_WORKERS, ierr)
           end do
         end do
@@ -284,12 +284,12 @@ c
       end if
 
       end subroutine shuffle_y2x_4D_v1
-      
+
 c--------------------------------------------------------------------------
-c  Master distributes a 2D (ix.iy) array of data in x-slice format 
+c  Master distributes a 2D (ix.iy) array of data in x-slice format
 c  to all workers
 c--------------------------------------------------------------------------
-c      
+c
       subroutine distrib_x_2D_v1(ix,iy,iyloc,s,s_x)
 
       implicit none
@@ -300,29 +300,29 @@ c
       integer :: j, ierr
       integer :: request(iyloc)
       integer :: status(MPI_STATUS_SIZE, iyloc)
-c      
+c
       if (Master) then
         do j=1,iy
-        call MPI_SEND(s(1,j), ix, MPI_REAL, 
+        call MPI_SEND(s(1,j), ix, MPI_REAL,
      &         owner_of_xslice(j), j,  MPI_COMM_WORLD, ierr)
 	end do
       else if (XWorker) then
         do j=1, no_of_xslices(myid)
-        call MPI_IRECV(s_x(1,j), ix, MPI_REAL, 0, 
-     &			global_xslice_id(myid,j), 
+        call MPI_IRECV(s_x(1,j), ix, MPI_REAL, 0,
+     &			global_xslice_id(myid,j),
      &                  MPI_COMM_WORLD, request(j), ierr)
 	end do
 	call MPI_WAITALL(no_of_xslices(myid), request, status, ierr)
       end if
 c
       end subroutine  distrib_x_2D_v1
-      
-        
+
+
 c---------------------------------------------------------------------------
-c  Master distributes a 2D  (ix.iy) array of data in y-slice format 
+c  Master distributes a 2D  (ix.iy) array of data in y-slice format
 c  to all workers
 c---------------------------------------------------------------------------
-c      
+c
       subroutine distrib_y_2D_v1(ix,iy,ixloc,s,s_y)
 
       implicit none
@@ -333,29 +333,29 @@ c
       integer :: i, ierr
       integer :: request(ixloc)
       integer :: status(MPI_STATUS_SIZE, ixloc)
-c      
+c
       if (Master) then
         do i=1,ix
-          call MPI_SEND(s(i,1), 1, GLOBAL_2D_YSLICE, 
+          call MPI_SEND(s(i,1), 1, GLOBAL_2D_YSLICE,
      &         owner_of_yslice(i), i,  MPI_COMM_WORLD, ierr)
 	end do
       else if (YWorker) then
         do i=1, no_of_yslices(myid)
-          call MPI_IRECV(s_y(i,1), 1, LOCAL_2D_YSLICE, 0, 
-     &			global_yslice_id(myid,i), 
+          call MPI_IRECV(s_y(i,1), 1, LOCAL_2D_YSLICE, 0,
+     &			global_yslice_id(myid,i),
      &                 MPI_COMM_WORLD, request(i), ierr)
 	end do
 	call MPI_WAITALL(no_of_yslices(myid), request, status, ierr)
       end if
 c
       end subroutine  distrib_y_2D_v1
-        
-c      
+
+c
 c-------------------------------------------------------------------------
-c  Master distributes a BDz (ix.iy.is) array of data in x-slice format 
+c  Master distributes a BDz (ix.iy.is) array of data in x-slice format
 c   to all workers
 c-------------------------------------------------------------------------
-c      
+c
       subroutine distrib_x_BDz_v1(ix,iy,iyloc,Ns,s,s_x)
 
       implicit none
@@ -366,28 +366,28 @@ c
       integer :: j, ierr
       integer :: request(iyloc)
       integer :: status(MPI_STATUS_SIZE, iyloc)
-c      
+c
       if (Master) then
         do j=1,iy
-        call MPI_SEND(s(1,j,1), 1, GLOBAL_BDz_XSLICE, 
+        call MPI_SEND(s(1,j,1), 1, GLOBAL_BDz_XSLICE,
      &         owner_of_xslice(j), j,  MPI_COMM_WORLD, ierr)
 	end do
       else if (XWorker) then
         do j=1, no_of_xslices(myid)
-        call MPI_IRECV(s_x(1,j,1), 1, LOCAL_BDz_XSLICE, 0, 
-     &			global_xslice_id(myid,j), 
+        call MPI_IRECV(s_x(1,j,1), 1, LOCAL_BDz_XSLICE, 0,
+     &			global_xslice_id(myid,j),
      &          	MPI_COMM_WORLD, request(j), ierr)
 	end do
 	call MPI_WAITALL(no_of_xslices(myid), request, status, ierr)
       end if
 c
       end subroutine  distrib_x_BDz_v1
-      
+
 c-------------------------------------------------------------------------
-c  Master distributes a BDz (ix.iy.is) array of data in y-slice format 
+c  Master distributes a BDz (ix.iy.is) array of data in y-slice format
 c   to all workers
 c-------------------------------------------------------------------------
-c      
+c
       subroutine distrib_y_BDz_v1(ix,iy,ixloc,Ns,s,s_y)
 
       implicit none
@@ -398,16 +398,16 @@ c
       integer :: i, ierr
       integer :: request(ixloc)
       integer :: status(MPI_STATUS_SIZE, ixloc)
-c      
+c
       if (Master) then
         do i=1,ix
-        call MPI_SEND(s(i,1,1), 1, GLOBAL_BDz_YSLICE, 
+        call MPI_SEND(s(i,1,1), 1, GLOBAL_BDz_YSLICE,
      &         owner_of_yslice(i), i,  MPI_COMM_WORLD, ierr)
 	end do
       else if (YWorker) then
         do i=1, no_of_yslices(myid)
-        call MPI_IRECV(s_y(i,1,1), 1, LOCAL_BDz_YSLICE, 0, 
-     &			global_yslice_id(myid,i), 
+        call MPI_IRECV(s_y(i,1,1), 1, LOCAL_BDz_YSLICE, 0,
+     &			global_yslice_id(myid,i),
      &                 MPI_COMM_WORLD, request(i), ierr)
 	end do
 	call MPI_WAITALL(no_of_yslices(myid), request, status, ierr)
@@ -417,12 +417,12 @@ c
 
 
 
-              
+
 c-------------------------------------------------------------------------
-c  Master distributes a 3D (ix.iy.iz) array of data in x-slice format 
+c  Master distributes a 3D (ix.iy.iz) array of data in x-slice format
 c   to all workers
 c-------------------------------------------------------------------------
-c      
+c
       subroutine distrib_x_3D_v1(ix,iy,iz,iyloc,s,s_x)
 
       implicit none
@@ -433,10 +433,10 @@ c
       integer :: i, ierr
       integer :: request(iyloc)
       integer :: status(MPI_STATUS_SIZE, iyloc)
-c      
+c
       if (Master) then
         do i=1,iy
-          call MPI_SEND(s(1,i,1), 1, GLOBAL_3D_XSLICE, 
+          call MPI_SEND(s(1,i,1), 1, GLOBAL_3D_XSLICE,
      &         owner_of_xslice(i), i,  MPI_COMM_WORLD, ierr)
           if (ierr.ne.MPI_SUCCESS) then
 	    print*, 'Error: distrib_x_3D: send failed'
@@ -445,8 +445,8 @@ c
 	end do
       else if (XWorker) then
         do i=1, no_of_xslices(myid)
-          call MPI_IRECV(s_x(1,i,1), 1, LOCAL_3D_XSLICE, 0, 
-     &			global_xslice_id(myid,i), 
+          call MPI_IRECV(s_x(1,i,1), 1, LOCAL_3D_XSLICE, 0,
+     &			global_xslice_id(myid,i),
      &                 MPI_COMM_WORLD, request(i), ierr)
           if (ierr.ne.MPI_SUCCESS) then
 	    print*, 'Error: distrib_x_3D: receive failed'
@@ -458,23 +458,23 @@ c
 c
       end subroutine  distrib_x_3D_v1
 
-      
+
 c--------------------------------------------------------------------------
-c  Master distributes a 3D (ix.iy.iz) array of data in y-slice format 
+c  Master distributes a 3D (ix.iy.iz) array of data in y-slice format
 c   to all workers
 c--------------------------------------------------------------------------
 c
       subroutine distrib_y_3D_v1(ix,iy,iz,ixloc,sg1,sgy)
 
       implicit none
-c      
+c
       integer :: ix, iy, iz, ixloc
       real   :: sg1(ix,iy,iz)
       real   :: sgy(ixloc,iy,iz)
       integer :: i, ierr
       integer :: request(ixloc)
       integer :: status(MPI_STATUS_SIZE, ixloc)
-c      
+c
       if (Master) then
         do i=1,ix
            call MPI_SEND(sg1(i,1,1), 1, GLOBAL_3D_YSLICE,
@@ -482,20 +482,20 @@ c
         end do
       else if (YWorker) then
         do i=1, no_of_yslices(myid)
-           call MPI_IRECV(sgy(i,1,1), 1, LOCAL_3D_YSLICE, 0, 
-     &			global_yslice_id(myid,i), 
+           call MPI_IRECV(sgy(i,1,1), 1, LOCAL_3D_YSLICE, 0,
+     &			global_yslice_id(myid,i),
      &                 MPI_COMM_WORLD, request(i), ierr)
         end do
 	call MPI_WAITALL(no_of_yslices(myid), request, status, ierr)
       endif
-c	
+c
       return
       end subroutine distrib_y_3D_v1
 
 c---------------------------------------------------------------------------
 c  Master distributes the x-boundary array  BDx (only for x-partitioning)
 c---------------------------------------------------------------------------
-c      
+c
       subroutine distrib_x_BDx_v1(iy,iz,iyloc,Ns,s,sloc)
 
       implicit none
@@ -506,16 +506,16 @@ c
       integer :: j, ierr
       integer :: request(iyloc)
       integer :: status(MPI_STATUS_SIZE, iyloc)
-c      
+c
       if (Master) then
         do j=1,iy
-        call MPI_SEND(s(j,1,1), 1, GLOBAL_BDx_XSLICE, 
+        call MPI_SEND(s(j,1,1), 1, GLOBAL_BDx_XSLICE,
      &         owner_of_xslice(j), j,  MPI_COMM_WORLD, ierr)
 	end do
       else if (XWorker) then
         do j=1, no_of_xslices(myid)
-        call MPI_IRECV(sloc(j,1,1), 1, LOCAL_BDx_XSLICE, 0, 
-     &			global_xslice_id(myid,j), 
+        call MPI_IRECV(sloc(j,1,1), 1, LOCAL_BDx_XSLICE, 0,
+     &			global_xslice_id(myid,j),
      &                 MPI_COMM_WORLD, request(j), ierr)
 	end do
 	call MPI_WAITALL(no_of_xslices(myid), request, status, ierr)
@@ -526,7 +526,7 @@ c
 c---------------------------------------------------------------------------
 c  Master distributes the x-boundary array BDx2
 c---------------------------------------------------------------------------
-c      
+c
       subroutine distrib_x_BD_v1(iy,iz,iyloc,Ns,s,sloc)
 
       implicit none
@@ -537,27 +537,27 @@ c
       integer :: j, ierr
       integer :: request(iyloc)
       integer :: status(MPI_STATUS_SIZE, iyloc)
-c      
+c
       if (Master) then
         do j=1,iy
-        call MPI_SEND(s(j,1,1,1), 1, GLOBAL_BD_XSLICE, 
+        call MPI_SEND(s(j,1,1,1), 1, GLOBAL_BD_XSLICE,
      &         owner_of_xslice(j), j,  MPI_COMM_WORLD, ierr)
 	end do
       else if (XWorker) then
         do j=1, no_of_xslices(myid)
-        call MPI_IRECV(sloc(j,1,1,1), 1, LOCAL_BD_XSLICE, 0, 
-     &			global_xslice_id(myid,j), 
+        call MPI_IRECV(sloc(j,1,1,1), 1, LOCAL_BD_XSLICE, 0,
+     &			global_xslice_id(myid,j),
      &                 MPI_COMM_WORLD, request(j), ierr)
 	end do
 	call MPI_WAITALL(no_of_xslices(myid), request, status, ierr)
       end if
 c
       end subroutine  distrib_x_BD_v1
-      
+
 c---------------------------------------------------------------------------
 c  Master distributes the y-boundary array  BDy (only for y-partitioning)
 c---------------------------------------------------------------------------
-c      
+c
       subroutine distrib_y_BDy_v1(ix,iz,ixloc,Ns,s,sloc)
 
       implicit none
@@ -568,16 +568,16 @@ c
       integer :: i, ierr
       integer :: request(ixloc)
       integer :: status(MPI_STATUS_SIZE, ixloc)
-c      
+c
       if (Master) then
         do i=1,ix
-        call MPI_SEND(s(i,1,1), 1, GLOBAL_BDy_YSLICE, 
+        call MPI_SEND(s(i,1,1), 1, GLOBAL_BDy_YSLICE,
      &         owner_of_yslice(i), i,  MPI_COMM_WORLD, ierr)
 	end do
       else if (YWorker) then
         do i=1, no_of_yslices(myid)
         call MPI_IRECV(sloc(i,1,1), 1, LOCAL_BDy_YSLICE, 0,
-     &			global_yslice_id(myid,i), 
+     &			global_yslice_id(myid,i),
      &                 MPI_COMM_WORLD, request(i), ierr)
 	end do
 	call MPI_WAITALL(no_of_yslices(myid), request, status, ierr)
@@ -588,7 +588,7 @@ c
 c---------------------------------------------------------------------------
 c  Master distributes the y-boundary array BDy2 (Stem-III dependent)
 c---------------------------------------------------------------------------
-c      
+c
       subroutine distrib_y_BD_v1(ix,iz,ixloc,Ns,s,sloc)
 
       implicit none
@@ -599,23 +599,23 @@ c
       integer :: i, ierr
       integer :: request(ixloc)
       integer :: status(MPI_STATUS_SIZE, ixloc)
-c      
+c
       if (Master) then
         do i=1,ix
-        call MPI_SEND(s(i,1,1,1), 1, GLOBAL_BD_YSLICE, 
+        call MPI_SEND(s(i,1,1,1), 1, GLOBAL_BD_YSLICE,
      &         owner_of_yslice(i), i,  MPI_COMM_WORLD, ierr)
 	end do
       else if (YWorker) then
         do i=1, no_of_yslices(myid)
         call MPI_IRECV(sloc(i,1,1,1), 1, LOCAL_BD_YSLICE, 0,
-     &			global_yslice_id(myid,i), 
+     &			global_yslice_id(myid,i),
      &                 MPI_COMM_WORLD, request(i), ierr)
 	end do
 	call MPI_WAITALL(no_of_yslices(myid), request, status, ierr)
       end if
 c
       end subroutine  distrib_y_BD_v1
-      
+
 c *******************************************************************
 c ***************** single communication ****************************
 c *******************************************************************
@@ -625,7 +625,7 @@ c  Master distributes a 4D array of data in x-slice format to all workers
 c  all at once in one message
 c-----------------------------------------------------------------
       subroutine distrib_x_4D_v2(ix,iy,iz,iyloc,Ns,s,s_x)
-c      
+c
       implicit none
 c
       integer :: ix, iy, iz, iyloc, Ns
@@ -638,10 +638,10 @@ c  message for each worker, depending on the array size
       if (Master) then
         do i=1,NXworkers
 	  if (no_of_xslices(i) .eq. iyloc) then
-            call MPI_SEND(s(1,i,1,1), 1, GLOBAL_LARGE_4D_XSLICES, 
+            call MPI_SEND(s(1,i,1,1), 1, GLOBAL_LARGE_4D_XSLICES,
      &         owner_of_xslice(i), i,  MPI_COMM_WORLD, ierr)
 	  else
-            call MPI_SEND(s(1,i,1,1), 1, GLOBAL_SMALL_4D_XSLICES, 
+            call MPI_SEND(s(1,i,1,1), 1, GLOBAL_SMALL_4D_XSLICES,
      &         owner_of_xslice(i), i,  MPI_COMM_WORLD, ierr)
 	  end if
 	end do
@@ -664,7 +664,7 @@ c  Master distributes a 4D array of data in y-slice format to all workers
 c  all in one message
 c-----------------------------------------------------------------
       subroutine distrib_y_4D_v2(ix,iy,iz,ixloc,Ns,s,s_y)
-c      
+c
       implicit none
 c
       integer :: ix, iy, iz, ixloc, Ns
@@ -676,10 +676,10 @@ c  one message, depending on the size.
       if (Master) then
         do i=1,NYworkers
 	  if (no_of_yslices(i) .eq. ixloc) then
-	    call MPI_SEND(s(i,1,1,1), 1, GLOBAL_LARGE_4D_YSLICES, 
+	    call MPI_SEND(s(i,1,1,1), 1, GLOBAL_LARGE_4D_YSLICES,
      &         owner_of_yslice(i), i,  MPI_COMM_WORLD, ierr)
 	  else
-	    call MPI_SEND(s(i,1,1,1), 1, GLOBAL_SMALL_4D_YSLICES, 
+	    call MPI_SEND(s(i,1,1,1), 1, GLOBAL_SMALL_4D_YSLICES,
      &         owner_of_yslice(i), i,  MPI_COMM_WORLD, ierr)
           end if
 	end do
@@ -687,30 +687,30 @@ c The workers receive their y-slice array at once depending on
 c  the size
       else if (YWorker) then
 	if (no_of_yslices(myid) .eq. ixloc) then
-          call MPI_RECV(s_y(1,1,1,1), 1, LOCAL_LARGE_4D_YSLICES, 0, 
+          call MPI_RECV(s_y(1,1,1,1), 1, LOCAL_LARGE_4D_YSLICES, 0,
      &		myid, MPI_COMM_WORLD, status, ierr)
 	else
-          call MPI_RECV(s_y(1,1,1,1), 1, LOCAL_SMALL_4D_YSLICES, 0, 
+          call MPI_RECV(s_y(1,1,1,1), 1, LOCAL_SMALL_4D_YSLICES, 0,
      &		myid, MPI_COMM_WORLD, status, ierr)
         end if
       end if
 c
       end subroutine  distrib_y_4D_v2
-      
+
 c-----------------------------------------------------------------
 c  Master gathers a 4D array of data in x-slice format from all workers
 c-----------------------------------------------------------------
       subroutine gather_x_4D_v2(ix,iy,iz,iyloc,Ns,s,s_x)
-c      
+c
       implicit none
 c
       integer :: ix, iy, iz, iyloc, Ns
       real   :: s(ix,iy,iz,Ns)
       real   :: s_x(ix,iyloc,iz,Ns)
       integer :: i, ierr
-      integer,pointer,dimension(:,:),save :: status
-      integer,pointer,dimension(:),save :: request
-c      
+      integer,allocatable,dimension(:,:),save :: status
+      integer,allocatable,dimension(:),save :: request
+c
 c The master receives a the x-slice array from each of the workers
 c  and places it right in the global array, depending on the size
       if (Master) then
@@ -718,51 +718,51 @@ c  and places it right in the global array, depending on the size
           allocate( status(MPI_STATUS_SIZE,NXworkers),STAT=ierr )
 	end if
 	if (.not. allocated(request)) then
-          allocate( request(NXworkers),STAT=ierr )      
+          allocate( request(NXworkers),STAT=ierr )
 	end if
         do i=1,NXworkers
 	  if ( no_of_xslices(i) .eq. iyloc) then
-	    call MPI_IRECV(s(1,i,1,1), 1, GLOBAL_LARGE_4D_XSLICES, 
-     &         owner_of_xslice(i), i,  MPI_COMM_WORLD, 
+	    call MPI_IRECV(s(1,i,1,1), 1, GLOBAL_LARGE_4D_XSLICES,
+     &         owner_of_xslice(i), i,  MPI_COMM_WORLD,
      &         request(i), ierr)
      	  else
-	    call MPI_IRECV(s(1,i,1,1), 1, GLOBAL_SMALL_4D_XSLICES, 
-     &         owner_of_xslice(i), i,  MPI_COMM_WORLD, 
+	    call MPI_IRECV(s(1,i,1,1), 1, GLOBAL_SMALL_4D_XSLICES,
+     &         owner_of_xslice(i), i,  MPI_COMM_WORLD,
      &         request(i), ierr)
      	  end if
 	end do
 	call MPI_WAITALL(NXworkers, request, status, ierr)
-	
+
 c The xworkers send their x-slice array to the master in one message
 c  depending on the size
       else if (XWorker) then
       	if (no_of_xslices(myid) .eq. iyloc) then
-	  call MPI_SEND(s_x(1,1,1,1), 1, LOCAL_LARGE_4D_XSLICES, 
-     &                 0, myid, 
+	  call MPI_SEND(s_x(1,1,1,1), 1, LOCAL_LARGE_4D_XSLICES,
+     &                 0, myid,
      &                 MPI_COMM_WORLD, ierr)
         else
-	  call MPI_SEND(s_x(1,1,1,1), 1, LOCAL_SMALL_4D_XSLICES, 
-     &                 0, myid, 
+	  call MPI_SEND(s_x(1,1,1,1), 1, LOCAL_SMALL_4D_XSLICES,
+     &                 0, myid,
      &                 MPI_COMM_WORLD, ierr)
      	end if
       end if
 c
-      end subroutine  gather_x_4D_v2  
+      end subroutine  gather_x_4D_v2
 
 c-----------------------------------------------------------------
 c  Master gathers a 4D array of data in y-slice format from all yworkers
 c-----------------------------------------------------------------
       subroutine gather_y_4D_v2(ix,iy,iz,ixloc,Ns,s,s_y)
-c      
+c
       implicit none
 c
       integer :: ix, iy, iz, ixloc, Ns
       real   :: s(ix,iy,iz,Ns)
       real   :: s_y(ixloc,iy,iz,Ns)
       integer :: i, ierr
-      integer,pointer,dimension(:,:),save :: status
-      integer,pointer,dimension(:),save :: request
-c      
+      integer,allocatable,dimension(:,:),save :: status
+      integer,allocatable,dimension(:),save :: request
+c
 c The master receives the y-slice array from each yworker and places
 c  it in the right position, depending on the size
       if (Master) then
@@ -770,16 +770,16 @@ c  it in the right position, depending on the size
           allocate( status(MPI_STATUS_SIZE,NYworkers),STAT=ierr )
 	end if
 	if (.not. allocated(request)) then
-          allocate( request(NYworkers),STAT=ierr )      
+          allocate( request(NYworkers),STAT=ierr )
 	end if
         do i=1,NYworkers
 	  if ( no_of_yslices(i) .eq. ixloc) then
-	    call MPI_IRECV(s(i,1,1,1), 1, GLOBAL_LARGE_4D_YSLICES, 
-     &         owner_of_yslice(i), i,  MPI_COMM_WORLD, 
+	    call MPI_IRECV(s(i,1,1,1), 1, GLOBAL_LARGE_4D_YSLICES,
+     &         owner_of_yslice(i), i,  MPI_COMM_WORLD,
      &         request(i), ierr)
      	  else
-	    call MPI_IRECV(s(i,1,1,1), 1, GLOBAL_SMALL_4D_YSLICES, 
-     &         owner_of_yslice(i), i,  MPI_COMM_WORLD, 
+	    call MPI_IRECV(s(i,1,1,1), 1, GLOBAL_SMALL_4D_YSLICES,
+     &         owner_of_yslice(i), i,  MPI_COMM_WORLD,
      &         request(i), ierr)
      	  end if
 	end do
@@ -790,43 +790,43 @@ c Each yworker sends the y-slice array to the master in one message
 c  depending on the size
       else if (YWorker) then
       	if ( no_of_yslices(myid) .eq. ixloc ) then
-          call MPI_SEND(s_y(1,1,1,1), 1, LOCAL_LARGE_4D_YSLICES, 
-     &                 0, myid, 
+          call MPI_SEND(s_y(1,1,1,1), 1, LOCAL_LARGE_4D_YSLICES,
+     &                 0, myid,
      &                 MPI_COMM_WORLD, ierr)
         else
-          call MPI_SEND(s_y(1,1,1,1), 1, LOCAL_SMALL_4D_YSLICES, 
-     &                 0, myid, 
+          call MPI_SEND(s_y(1,1,1,1), 1, LOCAL_SMALL_4D_YSLICES,
+     &                 0, myid,
      &                 MPI_COMM_WORLD, ierr)
 	end if
       end if
 c
-      end subroutine  gather_y_4D_v2  
-        
+      end subroutine  gather_y_4D_v2
+
 c---------------------------------------------------------
 c      Slaves exchange data:  - old format is x-slices (for sending)
 c                             - new format is y-slices (for receiving)
 c---------------------------------------------------------
-      subroutine shuffle_x2y_4D_v2(ix,iy,iz,ixloc,iyloc,Ns,s_x,s_y)  
-c      
+      subroutine shuffle_x2y_4D_v2(ix,iy,iz,ixloc,iyloc,Ns,s_x,s_y)
+c
       implicit none
 c
       integer :: ix, iy, iz, ixloc, iyloc, Ns
       real   :: s_x(ix,iyloc,iz,Ns)
       real   :: s_y(ixloc,iy,iz,Ns)
       integer :: i, j, ierr
-      integer,pointer,dimension(:,:),save :: status
-      integer,pointer,dimension(:),save :: request
+      integer,allocatable,dimension(:,:),save :: status
+      integer,allocatable,dimension(:),save :: request
 
-c      
+c
 c Each yworker receives one message from all the xworkers combining
 c  all the data needed in one message, depending on x-slice
-c  size at the sender and y-slice size at the receiver      
+c  size at the sender and y-slice size at the receiver
       if (YWorker) then
 	if (.not. allocated(status)) then
           allocate( status(MPI_STATUS_SIZE,NXworkers),STAT=ierr )
 	end if
 	if (.not. allocated(request)) then
-          allocate( request(NXworkers),STAT=ierr )      
+          allocate( request(NXworkers),STAT=ierr )
 	end if
 
 	if (no_of_yslices(myid) .eq. ixloc) then
@@ -843,7 +843,7 @@ c	print*,'proc',myid,'receives SXLY from',j
 	  end do
 	else
           do j=1, NXworkers ! ID's in worker group only
-	  if (no_of_xslices(j) .eq. iyloc) then	
+	  if (no_of_xslices(j) .eq. iyloc) then
 c	print*,'proc',myid,'receives LXSY from',j
      	    call MPI_IRECV(s_y(1,j,1,1),1,LOCAL_4D_LXSY_YCOLS,
      &		j-1, myid, MPI_COMM_WORKERS, request(j), ierr)
@@ -860,13 +860,13 @@ c	print*,'proc',myid,'receives SXSY from',j
 c Each xworker sends one message to each
 c  of the yworkers combining all the data that need
 c  to be sent there in one message, depending on x-slice
-c  size at the sender and y-slice size at the receiver      
+c  size at the sender and y-slice size at the receiver
 	if (no_of_xslices(myid) .eq. iyloc) then
           do i=1, NYworkers ! ID's in worker group only
 	  if (no_of_yslices(i) .eq. ixloc) then
 c	print*,'proc',myid,'sends LXLY to',i
        	    call MPI_SEND(s_x(i,1,1,1),1,LOCAL_4D_LXLY_XCOLS,
-     &		i-1, i, MPI_COMM_WORKERS, ierr)	  	
+     &		i-1, i, MPI_COMM_WORKERS, ierr)
 	  else
 c	print*,'proc',myid,'sends LXSY to',i
        	    call MPI_SEND(s_x(i,1,1,1),1,LOCAL_4D_LXSY_XCOLS,
@@ -875,7 +875,7 @@ c	print*,'proc',myid,'sends LXSY to',i
 	  end do
 	else
           do i=1, NYworkers ! ID's in worker group only
-	  if (no_of_yslices(i) .eq. ixloc) then	
+	  if (no_of_yslices(i) .eq. ixloc) then
 c	print*,'proc',myid,'sends SXLY to',i
        	    call MPI_SEND(s_x(i,1,1,1),1,LOCAL_4D_SXLY_XCOLS,
      &		i-1, i, MPI_COMM_WORKERS, ierr)
@@ -886,38 +886,38 @@ c	print*,'proc',myid,'sends SXSY to',i
  	  end if
           end do
 	end if
-      end if 
+      end if
 
       if (YWorker) call MPI_WAITALL(NXworkers, request, status, ierr)
-	
+
       end subroutine shuffle_x2y_4D_v2
 
 c---------------------------------------------------------
 c      Slaves exchange data:  - old format is y-slices (for sending)
 c                             - new format is x-slices (for receiving)
 c---------------------------------------------------------
-      subroutine shuffle_y2x_4D_v2(ix,iy,iz,ixloc,iyloc,Ns,s_x,s_y)  
-c      
+      subroutine shuffle_y2x_4D_v2(ix,iy,iz,ixloc,iyloc,Ns,s_x,s_y)
+c
       implicit none
 c
       integer :: ix, iy, iz, ixloc, iyloc, Ns
       real   :: s_x(ix,iyloc,iz,Ns)
       real   :: s_y(ixloc,iy,iz,Ns)
       integer :: i, j, ierr
-      integer,pointer,dimension(:,:),save :: status
-      integer,pointer,dimension(:),save :: request
+      integer,allocatable,dimension(:,:),save :: status
+      integer,allocatable,dimension(:),save :: request
 c
-    
+
       if (XWorker) then
-c Each xworker receives one message from all the yworkers 
-c  combining all the data needed in one message, depending 
-c  on x-slice size at the sender and y-slice size at the 
-c  receiver      
+c Each xworker receives one message from all the yworkers
+c  combining all the data needed in one message, depending
+c  on x-slice size at the sender and y-slice size at the
+c  receiver
       if(.not. allocated(status)) then
         allocate( status(MPI_STATUS_SIZE,NYworkers),STAT=ierr )
       end if
       if (.not. allocated(request)) then
-        allocate( request(NYworkers),STAT=ierr )      
+        allocate( request(NYworkers),STAT=ierr )
       end if
 
       if (no_of_xslices(myid) .eq. iyloc) then
@@ -934,7 +934,7 @@ c	print*, 'P', myid, ' receives LXSY from ', j
 	end do
       else
 	do j=1,NYworkers
-	  if (no_of_yslices(j) .eq. ixloc) then	
+	  if (no_of_yslices(j) .eq. ixloc) then
 c	print*, 'P', myid, ' receives SXLY from ', j
      	    call MPI_IRECV(s_x(j,1,1,1),1,LOCAL_4D_SXLY_XCOLS,
      &		j-1, myid, MPI_COMM_WORKERS, request(j), ierr)
@@ -947,19 +947,19 @@ c	print*, 'P', myid, ' receives SXSY from ', j
       end if
 
       end if
-      
+
       if (YWorker) then
 c Each yworker sends one message to each
 c  of the xworkers combining all the data that needs
 c  to be sent there in one message, depending on y-slice
-c  size at the sender and x-slice size at the receiver      
+c  size at the sender and x-slice size at the receiver
 
       if (no_of_yslices(myid) .eq. ixloc) then
         do i=1, NXworkers
 	  if (no_of_xslices(i) .eq. iyloc) then
 c	print*, 'P', myid, ' sends LXLY to ', i
        	    call MPI_SEND(s_y(1,i,1,1),1,LOCAL_4D_LXLY_YCOLS,
-     &		i-1, i, MPI_COMM_WORKERS, ierr)	  	
+     &		i-1, i, MPI_COMM_WORKERS, ierr)
      	  else
 c	print*, 'P', myid, ' sends SXLY to ', i
        	    call MPI_SEND(s_y(1,i,1,1),1,LOCAL_4D_SXLY_YCOLS,
@@ -968,7 +968,7 @@ c	print*, 'P', myid, ' sends SXLY to ', i
      	end do
       else
 	do i=1,NXworkers
-	  if (no_of_xslices(i) .eq. iyloc) then	
+	  if (no_of_xslices(i) .eq. iyloc) then
 c	print*, 'P', myid, ' sends LXSY to ', i
        	    call MPI_SEND(s_y(1,i,1,1),1,LOCAL_4D_LXSY_YCOLS,
      &		i-1, i, MPI_COMM_WORKERS, ierr)
@@ -979,18 +979,18 @@ c	print*, 'P', myid, ' sends SXSY to ', i
      	  end if
 	end do
       end if
-      
+
       end if
 
       if (XWorker) call MPI_WAITALL(NYworkers, request, status, ierr)
-      
+
       end subroutine shuffle_y2x_4D_v2
-	
+
 c--------------------------------------------------------------------------
-c  Master distributes a 2D (ix.iy) array of data in x-slice format 
+c  Master distributes a 2D (ix.iy) array of data in x-slice format
 c  to all xworkers
 c--------------------------------------------------------------------------
-c      
+c
       subroutine distrib_x_2D_v2(ix,iy,iyloc,s,s_x)
 
       implicit none
@@ -999,16 +999,16 @@ c
       real :: s(ix,iy)
       real :: s_x(ix,iyloc)
       integer :: j, ierr, status(MPI_STATUS_SIZE)
-c      
+c
       if (Master) then
 c The master sends the x-slice arrays to the xworkers using one
 c  message for each xworker, depending on the array size
         do j=1,NXworkers
 	  if (no_of_xslices(j) .eq. iyloc) then
-            call MPI_SEND(s(1,j), 1, GLOBAL_LARGE_2D_XSLICES, 
+            call MPI_SEND(s(1,j), 1, GLOBAL_LARGE_2D_XSLICES,
      &         owner_of_xslice(j), j,  MPI_COMM_WORLD, ierr)
           else
-            call MPI_SEND(s(1,j), 1, GLOBAL_SMALL_2D_XSLICES, 
+            call MPI_SEND(s(1,j), 1, GLOBAL_SMALL_2D_XSLICES,
      &         owner_of_xslice(j), j,  MPI_COMM_WORLD, ierr)
           end if
 	end do
@@ -1016,22 +1016,22 @@ c  message for each xworker, depending on the array size
 c The xworkers receive the x-slice arrays from the master in one
 c  message depending on the array size
         if (no_of_xslices(myid) .eq. iyloc) then
-          call MPI_RECV(s_x(1,1), 1, LOCAL_LARGE_2D_XSLICES, 0, 
+          call MPI_RECV(s_x(1,1), 1, LOCAL_LARGE_2D_XSLICES, 0,
      &			myid, MPI_COMM_WORLD, status, ierr)
         else
-          call MPI_RECV(s_x(1,1), 1, LOCAL_SMALL_2D_XSLICES, 0, 
+          call MPI_RECV(s_x(1,1), 1, LOCAL_SMALL_2D_XSLICES, 0,
      &			myid, MPI_COMM_WORLD, status, ierr)
-	end if	  
+	end if
       end if
 c
       end subroutine  distrib_x_2D_v2
-      
-        
+
+
 c---------------------------------------------------------------------------
-c  Master distributes a 2D  (ix.iy) array of data in y-slice format 
+c  Master distributes a 2D  (ix.iy) array of data in y-slice format
 c  to all yworkers
 c---------------------------------------------------------------------------
-c      
+c
       subroutine distrib_y_2D_v2(ix,iy,ixloc,s,s_y)
 
       implicit none
@@ -1040,16 +1040,16 @@ c
       real :: s(ix,iy)
       real :: s_y(ixloc,iy)
       integer :: i, ierr, status(MPI_STATUS_SIZE)
-c      
+c
       if (Master) then
 c The master sends one y-slice array to each of the yworkers using
 c  one message, depending on the size.
         do i=1,NYworkers
 	  if (no_of_yslices(i) .eq. ixloc) then
-            call MPI_SEND(s(i,1), 1, GLOBAL_LARGE_2D_YSLICES, 
+            call MPI_SEND(s(i,1), 1, GLOBAL_LARGE_2D_YSLICES,
      &         owner_of_yslice(i), i,  MPI_COMM_WORLD, ierr)
           else
-            call MPI_SEND(s(i,1), 1, GLOBAL_SMALL_2D_YSLICES, 
+            call MPI_SEND(s(i,1), 1, GLOBAL_SMALL_2D_YSLICES,
      &         owner_of_yslice(i), i,  MPI_COMM_WORLD, ierr)
           end if
 	end do
@@ -1057,22 +1057,22 @@ c  one message, depending on the size.
 c The yworkers receive their y-slice array at once depending on
 c  the size
         if (no_of_yslices(myid) .eq. ixloc) then
-          call MPI_RECV(s_y(1,1), 1, LOCAL_LARGE_2D_YSLICES, 0, 
+          call MPI_RECV(s_y(1,1), 1, LOCAL_LARGE_2D_YSLICES, 0,
      &			myid, MPI_COMM_WORLD, status, ierr)
 	else
-          call MPI_RECV(s_y(1,1), 1, LOCAL_SMALL_2D_YSLICES, 0, 
+          call MPI_RECV(s_y(1,1), 1, LOCAL_SMALL_2D_YSLICES, 0,
      &			myid, MPI_COMM_WORLD, status, ierr)
 	end if
       end if
 c
       end subroutine  distrib_y_2D_v2
-        
-c      
+
+c
 c-------------------------------------------------------------------------
-c  Master distributes a BDz (ix.iy.is) array of data in x-slice format 
+c  Master distributes a BDz (ix.iy.is) array of data in x-slice format
 c   to all xworkers
 c-------------------------------------------------------------------------
-c      
+c
       subroutine distrib_x_BDz_v2(ix,iy,iyloc,Ns,s,s_x)
 
       implicit none
@@ -1081,16 +1081,16 @@ c
       real   :: s(ix,iy,Ns)
       real   :: s_x(ix,iyloc,Ns)
       integer :: j, ierr, status(MPI_STATUS_SIZE)
-c      
+c
       if (Master) then
 c The master sends the x-slice arrays to the xworkers using one
 c  message for each xworker, depending on the array size
         do j=1,NXworkers
 	  if (no_of_xslices(j) .eq. iyloc) then
-            call MPI_SEND(s(1,j,1), 1, GLOBAL_LARGE_BDz_XSLICES, 
+            call MPI_SEND(s(1,j,1), 1, GLOBAL_LARGE_BDz_XSLICES,
      &         owner_of_xslice(j), j,  MPI_COMM_WORLD, ierr)
           else
-            call MPI_SEND(s(1,j,1), 1, GLOBAL_SMALL_BDz_XSLICES, 
+            call MPI_SEND(s(1,j,1), 1, GLOBAL_SMALL_BDz_XSLICES,
      &         owner_of_xslice(j), j,  MPI_COMM_WORLD, ierr)
           end if
 	end do
@@ -1098,21 +1098,21 @@ c  message for each xworker, depending on the array size
 c The xworkers receive the x-slice arrays from the master in one
 c  message depending on the array size
         if (no_of_xslices(myid) .eq. iyloc) then
-          call MPI_RECV(s_x(1,1,1), 1, LOCAL_LARGE_BDz_XSLICES, 0, 
+          call MPI_RECV(s_x(1,1,1), 1, LOCAL_LARGE_BDz_XSLICES, 0,
      &			myid, MPI_COMM_WORLD, status, ierr)
         else
-          call MPI_RECV(s_x(1,1,1), 1, LOCAL_SMALL_BDz_XSLICES, 0, 
+          call MPI_RECV(s_x(1,1,1), 1, LOCAL_SMALL_BDz_XSLICES, 0,
      &			myid, MPI_COMM_WORLD, status, ierr)
-	end if	  
+	end if
       end if
 c
       end subroutine  distrib_x_BDz_v2
-      
+
 c-------------------------------------------------------------------------
-c  Master distributes a BDz (ix.iy.is) array of data in y-slice format 
+c  Master distributes a BDz (ix.iy.is) array of data in y-slice format
 c   to all yworkers
 c-------------------------------------------------------------------------
-c      
+c
       subroutine distrib_y_BDz_v2(ix,iy,ixloc,Ns,s,s_y)
 
       implicit none
@@ -1121,16 +1121,16 @@ c
       real :: s(ix,iy,Ns)
       real :: s_y(ixloc,iy,Ns)
       integer :: i, ierr, status(MPI_STATUS_SIZE)
-c      
+c
       if (Master) then
 c The master sends one y-slice array to each of the yworkers using
 c  one message, depending on the size.
         do i=1,NYworkers
 	  if (no_of_yslices(i) .eq. ixloc) then
-            call MPI_SEND(s(i,1,1), 1, GLOBAL_LARGE_BDz_YSLICES, 
+            call MPI_SEND(s(i,1,1), 1, GLOBAL_LARGE_BDz_YSLICES,
      &         owner_of_yslice(i), i,  MPI_COMM_WORLD, ierr)
           else
-            call MPI_SEND(s(i,1,1), 1, GLOBAL_SMALL_BDz_YSLICES, 
+            call MPI_SEND(s(i,1,1), 1, GLOBAL_SMALL_BDz_YSLICES,
      &         owner_of_yslice(i), i,  MPI_COMM_WORLD, ierr)
           end if
 	end do
@@ -1138,10 +1138,10 @@ c  one message, depending on the size.
 c The yworkers receive their y-slice array at once depending on
 c  the size
         if (no_of_yslices(myid) .eq. ixloc) then
-          call MPI_RECV(s_y(1,1,1), 1, LOCAL_LARGE_BDz_YSLICES, 0, 
+          call MPI_RECV(s_y(1,1,1), 1, LOCAL_LARGE_BDz_YSLICES, 0,
      &			myid, MPI_COMM_WORLD, status, ierr)
 	else
-          call MPI_RECV(s_y(1,1,1), 1, LOCAL_SMALL_BDz_YSLICES, 0, 
+          call MPI_RECV(s_y(1,1,1), 1, LOCAL_SMALL_BDz_YSLICES, 0,
      &			myid, MPI_COMM_WORLD, status, ierr)
 	end if
       end if
@@ -1150,12 +1150,12 @@ c
 
 
 
-              
+
 c-------------------------------------------------------------------------
-c  Master distributes a 3D (ix.iy.iz) array of data in x-slice format 
+c  Master distributes a 3D (ix.iy.iz) array of data in x-slice format
 c   to all xworkers
 c-------------------------------------------------------------------------
-c      
+c
       subroutine distrib_x_3D_v2(ix,iy,iz,iyloc,s,s_x)
 
       implicit none
@@ -1164,16 +1164,16 @@ c
       real :: s(ix,iy,iz)
       real :: s_x(ix,iyloc,iz)
       integer :: j, ierr, status(MPI_STATUS_SIZE)
-c      
+c
       if (Master) then
 c The master sends the x-slice arrays to the xworkers using one
 c  message for each xworker, depending on the array size
         do j=1,NXworkers
 	  if (no_of_xslices(j) .eq. iyloc) then
-            call MPI_SEND(s(1,j,1), 1, GLOBAL_LARGE_3D_XSLICES, 
+            call MPI_SEND(s(1,j,1), 1, GLOBAL_LARGE_3D_XSLICES,
      &         owner_of_xslice(j), j,  MPI_COMM_WORLD, ierr)
           else
-            call MPI_SEND(s(1,j,1), 1, GLOBAL_SMALL_3D_XSLICES, 
+            call MPI_SEND(s(1,j,1), 1, GLOBAL_SMALL_3D_XSLICES,
      &         owner_of_xslice(j), j,  MPI_COMM_WORLD, ierr)
           end if
 	end do
@@ -1181,40 +1181,40 @@ c  message for each xworker, depending on the array size
 c The xworkers receive the x-slice arrays from the master in one
 c  message depending on the array size
         if (no_of_xslices(myid) .eq. iyloc) then
-          call MPI_RECV(s_x(1,1,1), 1, LOCAL_LARGE_3D_XSLICES, 0, 
+          call MPI_RECV(s_x(1,1,1), 1, LOCAL_LARGE_3D_XSLICES, 0,
      &			myid, MPI_COMM_WORLD, status, ierr)
         else
-          call MPI_RECV(s_x(1,1,1), 1, LOCAL_SMALL_3D_XSLICES, 0, 
+          call MPI_RECV(s_x(1,1,1), 1, LOCAL_SMALL_3D_XSLICES, 0,
      &			myid, MPI_COMM_WORLD, status, ierr)
-	end if	  
+	end if
       end if
 c
-      end subroutine  distrib_x_3D_v2    
+      end subroutine  distrib_x_3D_v2
 
-      
+
 c--------------------------------------------------------------------------
-c  Master distributes a 3D (ix.iy.iz) array of data in y-slice format 
+c  Master distributes a 3D (ix.iy.iz) array of data in y-slice format
 c   to all yworkers
 c--------------------------------------------------------------------------
 c
       subroutine distrib_y_3D_v2(ix,iy,iz,ixloc,s,s_y)
 
       implicit none
-c      
+c
       integer :: ix, iy, iz, ixloc
       real   :: s(ix,iy,iz)
       real   :: s_y(ixloc,iy,iz)
       integer :: i, ierr, status(MPI_STATUS_SIZE)
-c      
+c
       if (Master) then
 c The master sends one y-slice array to each of the yworkers using
 c  one message, depending on the size.
         do i=1,NYworkers
 	  if (no_of_yslices(i) .eq. ixloc) then
-            call MPI_SEND(s(i,1,1), 1, GLOBAL_LARGE_3D_YSLICES, 
+            call MPI_SEND(s(i,1,1), 1, GLOBAL_LARGE_3D_YSLICES,
      &         owner_of_yslice(i), i,  MPI_COMM_WORLD, ierr)
           else
-            call MPI_SEND(s(i,1,1), 1, GLOBAL_SMALL_3D_YSLICES, 
+            call MPI_SEND(s(i,1,1), 1, GLOBAL_SMALL_3D_YSLICES,
      &         owner_of_yslice(i), i,  MPI_COMM_WORLD, ierr)
           end if
 	end do
@@ -1222,20 +1222,20 @@ c  one message, depending on the size.
 c The yworkers receive their y-slice array at once depending on
 c  the size
         if (no_of_yslices(myid) .eq. ixloc) then
-          call MPI_RECV(s_y(1,1,1), 1, LOCAL_LARGE_3D_YSLICES, 0, 
+          call MPI_RECV(s_y(1,1,1), 1, LOCAL_LARGE_3D_YSLICES, 0,
      &			myid, MPI_COMM_WORLD, status, ierr)
 	else
-          call MPI_RECV(s_y(1,1,1), 1, LOCAL_SMALL_3D_YSLICES, 0, 
+          call MPI_RECV(s_y(1,1,1), 1, LOCAL_SMALL_3D_YSLICES, 0,
      &			myid, MPI_COMM_WORLD, status, ierr)
 	end if
       end if
-c	
-      end subroutine distrib_y_3D_v2 
+c
+      end subroutine distrib_y_3D_v2
 
 c---------------------------------------------------------------------------
 c  Master distributes the x-boundary array BDx
 c---------------------------------------------------------------------------
-c      
+c
       subroutine distrib_x_BDx_v2(iy,iz,iyloc,Ns,s,sloc)
 
       implicit none
@@ -1244,16 +1244,16 @@ c
       real :: s(iy,iz,Ns)
       real :: sloc(iyloc,iz,Ns)
       integer :: j, ierr, status(MPI_STATUS_SIZE)
-c      
+c
       if (Master) then
         do j=1,NXworkers
 c The master sends the x-slice arrays to the xworkers using one
 c  message for each xworker, depending on the array size
 	  if (no_of_xslices(j) .eq. iyloc) then
-            call MPI_SEND(s(j,1,1), 1, GLOBAL_LARGE_BDx_XSLICES, 
+            call MPI_SEND(s(j,1,1), 1, GLOBAL_LARGE_BDx_XSLICES,
      &         owner_of_xslice(j), j,  MPI_COMM_WORLD, ierr)
           else
-            call MPI_SEND(s(j,1,1), 1, GLOBAL_SMALL_BDx_XSLICES, 
+            call MPI_SEND(s(j,1,1), 1, GLOBAL_SMALL_BDx_XSLICES,
      &         owner_of_xslice(j), j,  MPI_COMM_WORLD, ierr)
           end if
 	end do
@@ -1261,20 +1261,20 @@ c  message for each xworker, depending on the array size
 c The xworkers receive the x-slice arrays from the master in one
 c  message depending on the array size
         if (no_of_xslices(myid) .eq. iyloc) then
-          call MPI_RECV(sloc(1,1,1), 1, LOCAL_LARGE_BDx_XSLICES, 0, 
+          call MPI_RECV(sloc(1,1,1), 1, LOCAL_LARGE_BDx_XSLICES, 0,
      &			myid, MPI_COMM_WORLD, status, ierr)
         else
-          call MPI_RECV(sloc(1,1,1), 1, LOCAL_SMALL_BDx_XSLICES, 0, 
+          call MPI_RECV(sloc(1,1,1), 1, LOCAL_SMALL_BDx_XSLICES, 0,
      &			myid, MPI_COMM_WORLD, status, ierr)
-	end if	  
+	end if
       end if
 c
       end subroutine  distrib_x_BDx_v2
-      
+
 c---------------------------------------------------------------------------
 c  Master distributes the x-boundary array BDx2
 c---------------------------------------------------------------------------
-c      
+c
       subroutine distrib_x_BD_v2(iy,iz,iyloc,Ns,s,sloc)
 
       implicit none
@@ -1283,16 +1283,16 @@ c
       real :: s(iy,iz,2,Ns)
       real :: sloc(iyloc,iz,2,Ns)
       integer :: j, ierr, status(MPI_STATUS_SIZE)
-c      
+c
       if (Master) then
         do j=1,NXworkers
 c The master sends the x-slice arrays to the xworkers using one
 c  message for each xworker, depending on the array size
 	  if (no_of_xslices(j) .eq. iyloc) then
-            call MPI_SEND(s(j,1,1,1), 1, GLOBAL_LARGE_BD_XSLICES, 
+            call MPI_SEND(s(j,1,1,1), 1, GLOBAL_LARGE_BD_XSLICES,
      &         owner_of_xslice(j), j,  MPI_COMM_WORLD, ierr)
           else
-            call MPI_SEND(s(j,1,1,1), 1, GLOBAL_SMALL_BD_XSLICES, 
+            call MPI_SEND(s(j,1,1,1), 1, GLOBAL_SMALL_BD_XSLICES,
      &         owner_of_xslice(j), j,  MPI_COMM_WORLD, ierr)
           end if
 	end do
@@ -1300,20 +1300,20 @@ c  message for each xworker, depending on the array size
 c The xworkers receive the x-slice arrays from the master in one
 c  message depending on the array size
         if (no_of_xslices(myid) .eq. iyloc) then
-          call MPI_RECV(sloc(1,1,1,1), 1, LOCAL_LARGE_BD_XSLICES, 0, 
+          call MPI_RECV(sloc(1,1,1,1), 1, LOCAL_LARGE_BD_XSLICES, 0,
      &			myid, MPI_COMM_WORLD, status, ierr)
         else
-          call MPI_RECV(sloc(1,1,1,1), 1, LOCAL_SMALL_BD_XSLICES, 0, 
+          call MPI_RECV(sloc(1,1,1,1), 1, LOCAL_SMALL_BD_XSLICES, 0,
      &			myid, MPI_COMM_WORLD, status, ierr)
-	end if	  
+	end if
       end if
 c
       end subroutine  distrib_x_BD_v2
-      
+
 c---------------------------------------------------------------------------
 c  Master distributes the y-boundary array BDy
 c---------------------------------------------------------------------------
-c      
+c
       subroutine distrib_y_BDy_v2(ix,iz,ixloc,Ns,s,sloc)
 
       implicit none
@@ -1322,16 +1322,16 @@ c
       real :: s(ix,iz,Ns)
       real :: sloc(ixloc,iz,Ns)
       integer :: i, ierr, status(MPI_STATUS_SIZE)
-c      
+c
       if (Master) then
 c The master sends one y-slice array to each of the yworkers using
 c  one message, depending on the size.
         do i=1,NYworkers
 	  if (no_of_yslices(i) .eq. ixloc) then
-            call MPI_SEND(s(i,1,1), 1, GLOBAL_LARGE_BDy_YSLICES, 
+            call MPI_SEND(s(i,1,1), 1, GLOBAL_LARGE_BDy_YSLICES,
      &         owner_of_yslice(i), i,  MPI_COMM_WORLD, ierr)
           else
-            call MPI_SEND(s(i,1,1), 1, GLOBAL_SMALL_BDy_YSLICES, 
+            call MPI_SEND(s(i,1,1), 1, GLOBAL_SMALL_BDy_YSLICES,
      &         owner_of_yslice(i), i,  MPI_COMM_WORLD, ierr)
           end if
 	end do
@@ -1339,10 +1339,10 @@ c  one message, depending on the size.
 c The yworkers receive their y-slice array at once depending on
 c  the size
         if (no_of_yslices(myid) .eq. ixloc) then
-          call MPI_RECV(sloc(1,1,1), 1, LOCAL_LARGE_BDy_YSLICES, 0, 
+          call MPI_RECV(sloc(1,1,1), 1, LOCAL_LARGE_BDy_YSLICES, 0,
      &			myid, MPI_COMM_WORLD, status, ierr)
 	else
-          call MPI_RECV(sloc(1,1,1), 1, LOCAL_SMALL_BDy_YSLICES, 0, 
+          call MPI_RECV(sloc(1,1,1), 1, LOCAL_SMALL_BDy_YSLICES, 0,
      &			myid, MPI_COMM_WORLD, status, ierr)
 	end if
       end if
@@ -1352,7 +1352,7 @@ c  the size
 c---------------------------------------------------------------------------
 c  Master distributes the y-boundary array BDy2
 c---------------------------------------------------------------------------
-c      
+c
       subroutine distrib_y_BD_v2(ix,iz,ixloc,Ns,s,sloc)
 
       implicit none
@@ -1361,16 +1361,16 @@ c
       real :: s(ix,iz,2,Ns)
       real :: sloc(ixloc,iz,2,Ns)
       integer :: i, ierr, status(MPI_STATUS_SIZE)
-c      
+c
       if (Master) then
 c The master sends one y-slice array to each of the yworkers using
 c  one message, depending on the size.
         do i=1,NYworkers
 	  if (no_of_yslices(i) .eq. ixloc) then
-            call MPI_SEND(s(i,1,1,1), 1, GLOBAL_LARGE_BD_YSLICES, 
+            call MPI_SEND(s(i,1,1,1), 1, GLOBAL_LARGE_BD_YSLICES,
      &         owner_of_yslice(i), i,  MPI_COMM_WORLD, ierr)
           else
-            call MPI_SEND(s(i,1,1,1), 1, GLOBAL_SMALL_BD_YSLICES, 
+            call MPI_SEND(s(i,1,1,1), 1, GLOBAL_SMALL_BD_YSLICES,
      &         owner_of_yslice(i), i,  MPI_COMM_WORLD, ierr)
           end if
 	end do
@@ -1378,10 +1378,10 @@ c  one message, depending on the size.
 c The yworkers receive their y-slice array at once depending on
 c  the size
         if (no_of_yslices(myid) .eq. ixloc) then
-          call MPI_RECV(sloc(1,1,1,1), 1, LOCAL_LARGE_BD_YSLICES, 0, 
+          call MPI_RECV(sloc(1,1,1,1), 1, LOCAL_LARGE_BD_YSLICES, 0,
      &			myid, MPI_COMM_WORLD, status, ierr)
 	else
-          call MPI_RECV(sloc(1,1,1,1), 1, LOCAL_SMALL_BD_YSLICES, 0, 
+          call MPI_RECV(sloc(1,1,1,1), 1, LOCAL_SMALL_BD_YSLICES, 0,
      &			myid, MPI_COMM_WORLD, status, ierr)
 	end if
       end if
@@ -1391,13 +1391,13 @@ c  the size
 c *******************************************************************
 c ***************** collective communication ************************
 c *******************************************************************
-      
+
 c-----------------------------------------------------------------
 c  Master distributes a 4D array of data in x-slice format to all workers
 c  using scatterv
 c-----------------------------------------------------------------
       subroutine distrib_x_4D_v3(ix,iy,iz,iyloc,Ns,s,s_x)
-c      
+c
       implicit none
 c
       integer :: ix, iy, iz, iyloc, Ns
@@ -1422,14 +1422,14 @@ c
 c The master scatters the x-slices in one call if all have the
 c same amount of slices
       if (no_of_xslices(NXworkers) .eq. iyloc) then
-        call MPI_SCATTERV(s(1,1,1,1), sendcounts, displs, 
+        call MPI_SCATTERV(s(1,1,1,1), sendcounts, displs,
      &		GLOB_LARGE_4D_XSLICES, s_x(1,1,1,1),
      &		recvcount, LOCAL_LARGE_4D_XSLICES, 0,
      &		MPI_COMM_WORLD, ierr)
       else
 c Otherwise we need 2 calls.
 c First everybody gets the minimal size everybody has
-        call MPI_SCATTERV(s(1,1,1,1), sendcounts, displs, 
+        call MPI_SCATTERV(s(1,1,1,1), sendcounts, displs,
      &		GLOB_SMALL_4D_XSLICES, s_x(1,1,1,1),
      &		recvcount, LOCAL_SMALL_4D_XSLICES, 0,
      &		MPI_COMM_WORLD, ierr)
@@ -1439,7 +1439,7 @@ c First everybody gets the minimal size everybody has
           recvcount = 0
         end if
 c Then the rest processors get their further slices (max. one more)
-        call MPI_SCATTERV(s(1,NXworkers*(iyloc-1)+1,1,1), sendcounts,  
+        call MPI_SCATTERV(s(1,NXworkers*(iyloc-1)+1,1,1), sendcounts,
      &		displs, GLOB_4D_XSLICE, s_x(1,iyloc,1,1),
      &		recvcount, LOCAL_4D_XSLICE, 0,
      &		MPI_COMM_WORLD, ierr)
@@ -1447,13 +1447,13 @@ c Then the rest processors get their further slices (max. one more)
 
       end subroutine  distrib_x_4D_v3
 
-      
+
 c-----------------------------------------------------------------
 c  Master distributes a 4D array of data in y-slice format to all workers
 c  using scatterv
 c-----------------------------------------------------------------
       subroutine distrib_y_4D_v3(ix,iy,iz,ixloc,Ns,s,s_y)
-c      
+c
       implicit none
 c
       integer :: ix, iy, iz, ixloc, Ns
@@ -1475,17 +1475,17 @@ c
       else
         recvcount = 1
       end if
-c If everyone has the same number of slices, one scatter is 
+c If everyone has the same number of slices, one scatter is
 c  needed only
       if (no_of_yslices(NYworkers) .eq. ixloc) then
-        call MPI_SCATTERV(s(1,1,1,1), sendcounts, displs, 
+        call MPI_SCATTERV(s(1,1,1,1), sendcounts, displs,
      &		GLOB_LARGE_4D_YSLICES, s_y(1,1,1,1),
      &		recvcount, LOCAL_LARGE_4D_YSLICES, 0,
      &		MPI_COMM_WORLD, ierr)
       else
 c The matrix has to be scattered in 2 calls
 c First everybody gets the minimal size everybody has
-        call MPI_SCATTERV(s(1,1,1,1), sendcounts, displs, 
+        call MPI_SCATTERV(s(1,1,1,1), sendcounts, displs,
      &		GLOB_SMALL_4D_YSLICES, s_y(1,1,1,1),
      &		recvcount, LOCAL_SMALL_4D_YSLICES, 0,
      &		MPI_COMM_WORLD, ierr)
@@ -1494,8 +1494,8 @@ c First everybody gets the minimal size everybody has
         if (MyId .gt. mod(ix,NYworkers)+1) then
           recvcount = 0
         end if
-c then the rest processors get their further slices (max. one more)        
-	call MPI_SCATTERV(s(NYworkers*(ixloc-1)+1,1,1,1), sendcounts,  
+c then the rest processors get their further slices (max. one more)
+	call MPI_SCATTERV(s(NYworkers*(ixloc-1)+1,1,1,1), sendcounts,
      &		displs, GLOB_4D_YSLICE, s_y(ixloc,1,1,1),
      &		recvcount, LOCAL_4D_YSLICE, 0,
      &		MPI_COMM_WORLD, ierr)
@@ -1508,7 +1508,7 @@ c  Master gathers a 4D array of data in x-slice format from all workers
 c  using gatherv
 c-----------------------------------------------------------------
       subroutine gather_x_4D_v3(ix,iy,iz,iyloc,Ns,s,s_x)
-c      
+c
       implicit none
 c
       integer :: ix, iy, iz, iyloc, Ns
@@ -1531,7 +1531,7 @@ c
       else
         sendcount = 1
       end if
-c If everyone has the same number of slices as the last processor, 
+c If everyone has the same number of slices as the last processor,
 c  one gather is needed only
       if (no_of_xslices(NXworkers) .eq. iyloc) then
         call MPI_GATHERV(s_x(1,1,1,1), sendcount,
@@ -1550,7 +1550,7 @@ c First everybody sends the minimal size everybody has
         if (MyId .gt. mod(iy,NXworkers)) then
           sendcount = 0
         end if
-c then the rest processors send their further slices (max. one more)        
+c then the rest processors send their further slices (max. one more)
         call MPI_GATHERV(s_x(1,iyloc,1,1), sendcount,
      &		LOCAL_4D_XSLICE, s(1,NXworkers*(iyloc-1)+1,1,1),
      &		recvcounts, displs, GLOB_4D_XSLICE, 0,
@@ -1564,7 +1564,7 @@ c  Master gathers a 4D array of data in y-slice format from all workers
 c  using gatherv
 c-----------------------------------------------------------------
       subroutine gather_y_4D_v3(ix,iy,iz,ixloc,Ns,s,s_y)
-c      
+c
       implicit none
 c
       integer :: ix, iy, iz, ixloc, Ns
@@ -1587,7 +1587,7 @@ c
       else
         sendcount = 1
       end if
-c If everyone has the same number of slices, one gather is 
+c If everyone has the same number of slices, one gather is
 c  needed only
       if (no_of_yslices(NYworkers) .eq. ixloc) then
         call MPI_GATHERV(s_y(1,1,1,1), sendcount,
@@ -1606,7 +1606,7 @@ c First everybody sends the minimal size everybody has
         if (MyId .gt. mod(ix,NYworkers)) then
           sendcount = 0
         end if
-c then the rest processors send their further slices (max. one more)        
+c then the rest processors send their further slices (max. one more)
         call MPI_GATHERV(s_y(ixloc,1,1,1), sendcount,
      &		LOCAL_4D_YSLICE, s(NYworkers*(ixloc-1)+1,1,1,1),
      &		recvcounts, displs, GLOB_4D_YSLICE, 0,
@@ -1620,8 +1620,8 @@ c      Slaves exchange data:  - old format is x-slices (for sending)
 c                             - new format is y-slices (for receiving)
 c	using alltoallv and copying - easier, just one call!
 c---------------------------------------------------------
-      subroutine shuffle_x2y_4D_v3(ix,iy,iz,ixloc,iyloc,Ns,s_x,s_y)  
-c      
+      subroutine shuffle_x2y_4D_v3(ix,iy,iz,ixloc,iyloc,Ns,s_x,s_y)
+c
       implicit none
 c
       integer :: ix, iy, iz, ixloc, iyloc, Ns
@@ -1631,13 +1631,13 @@ c
       real   :: rbuf(ixloc,iyloc,iz,Ns,max(NXworkers,NYworkers))
       integer :: i, j, ierr, tag
       integer :: status(MPI_STATUS_SIZE)
-      integer :: sendcounts(max(NXworkers,NYworkers)) 
+      integer :: sendcounts(max(NXworkers,NYworkers))
       integer :: sdispls(max(NXworkers,NYworkers))
       integer :: recvcounts(max(NXworkers,NYworkers))
       integer :: rdispls(max(NXworkers,NYworkers))
       integer :: participants
 
-c      
+c
       if (XWorker .or. YWorker) then
         participants = max(NXworkers,NYworkers)
         sdispls(1) = 0
@@ -1649,7 +1649,7 @@ c
 
 	if (XWorker) then
 	  do i=1,NYworkers
-	    sbuf(1:no_of_yslices(i),1:iyloc,1:iz,1:Ns,i) = 
+	    sbuf(1:no_of_yslices(i),1:iyloc,1:iz,1:Ns,i) =
      &		s_x(owned_yslices(i,1:no_of_yslices(i)),
      &				1:iyloc,1:iz,1:Ns)
           end do
@@ -1657,20 +1657,20 @@ c
 	sendcounts(1:participants) = ixloc*iyloc*iz*Ns
         recvcounts(1:participants) = ixloc*iyloc*iz*Ns
 
-	call MPI_ALLTOALLV(sbuf, sendcounts, sdispls, 
+	call MPI_ALLTOALLV(sbuf, sendcounts, sdispls,
      &		MPI_REAL, rbuf, recvcounts, rdispls,
      &		MPI_REAL, MPI_COMM_WORKERS, ierr)
 
 	if (YWorker) then
 	  do i=1,NXworkers
 	    s_y(1:ixloc,
-     &	   	owned_xslices(i,1:no_of_xslices(i)),1:iz,1:Ns) = 
+     &	   	owned_xslices(i,1:no_of_xslices(i)),1:iz,1:Ns) =
      &	   	rbuf(1:ixloc,1:no_of_xslices(i),1:iz,1:Ns,i)
           end do
 	end if
-            
+
       end if
-c	
+c
       end subroutine shuffle_x2y_4D_v3
 
 c---------------------------------------------------------
@@ -1679,8 +1679,8 @@ c                             - new format is x-slices (for receiving)
 c	using alltoallv and copying - easier, just one call!
 c	garbage sent
 c---------------------------------------------------------
-      subroutine shuffle_y2x_4D_v3(ix,iy,iz,ixloc,iyloc,Ns,s_x,s_y)  
-c      
+      subroutine shuffle_y2x_4D_v3(ix,iy,iz,ixloc,iyloc,Ns,s_x,s_y)
+c
       implicit none
 c
       integer :: ix, iy, iz, ixloc, iyloc, Ns
@@ -1690,13 +1690,13 @@ c
       real   :: rbuf(ixloc,iyloc,iz,Ns,max(NXworkers,NYworkers))
       integer :: i, j, ierr, tag
       integer :: status(MPI_STATUS_SIZE)
-      integer :: sendcounts(max(NXworkers,NYworkers)) 
+      integer :: sendcounts(max(NXworkers,NYworkers))
       integer :: sdispls(max(NXworkers,NYworkers))
       integer :: recvcounts(max(NXworkers,NYworkers))
       integer :: rdispls(max(NXworkers,NYworkers))
       integer :: participants
 
-c      
+c
       if (XWorker .or. YWorker) then
         participants = max(NXworkers,NYworkers)
         sdispls(1) = 0
@@ -1705,31 +1705,31 @@ c
           sdispls(i) = (i-1)*ixloc*iyloc*iz*Ns
 	  rdispls(i) = sdispls(i)
         end do
-	
+
 	if (YWorker) then
 	  do i=1,NXworkers
-	    sbuf(1:ixloc,1:no_of_xslices(i),1:iz,1:Ns,i) = 
+	    sbuf(1:ixloc,1:no_of_xslices(i),1:iz,1:Ns,i) =
      &		s_y(1:ixloc,owned_xslices(i,1:no_of_xslices(i)),
      &				1:iz,1:Ns)
           end do
 	end if
 	sendcounts(1:participants) = ixloc*iyloc*iz*Ns
         recvcounts(1:participants) = ixloc*iyloc*iz*Ns
-        
-	call MPI_ALLTOALLV(sbuf, sendcounts, sdispls, 
+
+	call MPI_ALLTOALLV(sbuf, sendcounts, sdispls,
      &		MPI_REAL, rbuf, recvcounts, rdispls,
      &		MPI_REAL, MPI_COMM_WORKERS, ierr)
 
 	if (XWorker) then
 	  do i=1,NYworkers
 	    s_x(owned_yslices(i,1:no_of_yslices(i)),
-     &	   	1:iyloc,1:iz,1:Ns) = 
+     &	   	1:iyloc,1:iz,1:Ns) =
      &	   	rbuf(1:no_of_yslices(i),1:iyloc,1:iz,1:Ns,i)
           end do
 	end if
-            
+
       end if
-c	
+c
         end subroutine shuffle_y2x_4D_v3
 
 c-----------------------------------------------------------------
@@ -1737,7 +1737,7 @@ c  Master distributes a 2D array of data in x-slice format to all workers
 c  using scatterv
 c-----------------------------------------------------------------
       subroutine distrib_x_2D_v3(ix,iy,iyloc,s,s_x)
-c      
+c
       implicit none
 c
       integer :: ix, iy, iyloc
@@ -1762,14 +1762,14 @@ c
 c The master scatters the x-slices in one call if all have the
 c same amount of slices
       if (no_of_xslices(NXworkers) .eq. iyloc) then
-        call MPI_SCATTERV(s(1,1), sendcounts, displs, 
+        call MPI_SCATTERV(s(1,1), sendcounts, displs,
      &		GLOB_LARGE_2D_XSLICES, s_x(1,1),
      &		recvcount, LOCAL_LARGE_2D_XSLICES, 0,
      &		MPI_COMM_WORLD, ierr)
       else
 c Otherwise we need 2 calls.
 c First everybody gets the minimal size everybody has
-        call MPI_SCATTERV(s(1,1), sendcounts, displs, 
+        call MPI_SCATTERV(s(1,1), sendcounts, displs,
      &		GLOB_SMALL_2D_XSLICES, s_x(1,1),
      &		recvcount, LOCAL_SMALL_2D_XSLICES, 0,
      &		MPI_COMM_WORLD, ierr)
@@ -1782,7 +1782,7 @@ c First everybody gets the minimal size everybody has
 	  recvcount = ix
         end if
 c Then the rest processors get their further slices (max. one more)
-        call MPI_SCATTERV(s(1,NXworkers*(iyloc-1)+1), sendcounts,  
+        call MPI_SCATTERV(s(1,NXworkers*(iyloc-1)+1), sendcounts,
      &		displs, MPI_REAL, s_x(1,iyloc),
      &		recvcount, MPI_REAL, 0,
      &		MPI_COMM_WORLD, ierr)
@@ -1790,13 +1790,13 @@ c Then the rest processors get their further slices (max. one more)
 
       end subroutine  distrib_x_2D_v3
 
-      
+
 c-----------------------------------------------------------------
 c  Master distributes a 2D array of data in y-slice format to all workers
 c  using scatterv
 c-----------------------------------------------------------------
       subroutine distrib_y_2D_v3(ix,iy,ixloc,s,s_y)
-c      
+c
       implicit none
 c
       integer :: ix, iy, ixloc
@@ -1818,17 +1818,17 @@ c
       else
         recvcount = 1
       end if
-c If everyone has the same number of slices, one scatter is 
+c If everyone has the same number of slices, one scatter is
 c  needed only
       if (no_of_yslices(NYworkers) .eq. ixloc) then
-        call MPI_SCATTERV(s(1,1), sendcounts, displs, 
+        call MPI_SCATTERV(s(1,1), sendcounts, displs,
      &		GLOB_LARGE_2D_YSLICES, s_y(1,1),
      &		recvcount, LOCAL_LARGE_2D_YSLICES, 0,
      &		MPI_COMM_WORLD, ierr)
       else
 c The matrix has to be scattered in 2 calls
 c First everybody gets the minimal size everybody has
-        call MPI_SCATTERV(s(1,1), sendcounts, displs, 
+        call MPI_SCATTERV(s(1,1), sendcounts, displs,
      &		GLOB_SMALL_2D_YSLICES, s_y(1,1),
      &		recvcount, LOCAL_SMALL_2D_YSLICES, 0,
      &		MPI_COMM_WORLD, ierr)
@@ -1837,8 +1837,8 @@ c First everybody gets the minimal size everybody has
         if (MyId .gt. mod(ix,NYworkers)) then
           recvcount = 0
         end if
-c then the rest processors get their further slices (max. one more)        
-	call MPI_SCATTERV(s(NYworkers*(ixloc-1)+1,1), sendcounts,  
+c then the rest processors get their further slices (max. one more)
+	call MPI_SCATTERV(s(NYworkers*(ixloc-1)+1,1), sendcounts,
      &		displs, GLOB_2D_YSLICE, s_y(ixloc,1),
      &		recvcount, LOCAL_2D_YSLICE, 0,
      &		MPI_COMM_WORLD, ierr)
@@ -1851,7 +1851,7 @@ c  Master distributes a BDz array of data in x-slice format to all workers
 c  using scatterv
 c-----------------------------------------------------------------
       subroutine distrib_x_BDz_v3(ix,iy,iyloc,Ns,s,s_x)
-c      
+c
       implicit none
 c
       integer :: ix, iy, iyloc, Ns
@@ -1876,14 +1876,14 @@ c
 c The master scatters the x-slices in one call if all have the
 c same amount of slices
       if (no_of_xslices(NXworkers) .eq. iyloc) then
-        call MPI_SCATTERV(s(1,1,1), sendcounts, displs, 
+        call MPI_SCATTERV(s(1,1,1), sendcounts, displs,
      &		GLOB_LARGE_BDz_XSLICES, s_x(1,1,1),
      &		recvcount, LOCAL_LARGE_BDz_XSLICES, 0,
      &		MPI_COMM_WORLD, ierr)
       else
 c Otherwise we need 2 calls.
 c First everybody gets the minimal size everybody has
-        call MPI_SCATTERV(s(1,1,1), sendcounts, displs, 
+        call MPI_SCATTERV(s(1,1,1), sendcounts, displs,
      &		GLOB_SMALL_BDz_XSLICES, s_x(1,1,1),
      &		recvcount, LOCAL_SMALL_BDz_XSLICES, 0,
      &		MPI_COMM_WORLD, ierr)
@@ -1893,7 +1893,7 @@ c First everybody gets the minimal size everybody has
           recvcount = 0
         end if
 c Then the rest processors get their further slices (max. one more)
-        call MPI_SCATTERV(s(1,NXworkers*(iyloc-1)+1,1), sendcounts,  
+        call MPI_SCATTERV(s(1,NXworkers*(iyloc-1)+1,1), sendcounts,
      &		displs, GLOB_BDz_XSLICE, s_x(1,iyloc,1),
      &		recvcount, LOCAL_BDz_XSLICE, 0,
      &		MPI_COMM_WORLD, ierr)
@@ -1901,13 +1901,13 @@ c Then the rest processors get their further slices (max. one more)
 
       end subroutine  distrib_x_BDz_v3
 
-      
+
 c-----------------------------------------------------------------
 c  Master distributes a BDz array of data in y-slice format to all workers
 c  using scatterv
 c-----------------------------------------------------------------
       subroutine distrib_y_BDz_v3(ix,iy,ixloc,Ns,s,s_y)
-c      
+c
       implicit none
 c
       integer :: ix, iy, ixloc, Ns
@@ -1929,17 +1929,17 @@ c
       else
         recvcount = 1
       end if
-c If everyone has the same number of slices, one scatter is 
+c If everyone has the same number of slices, one scatter is
 c  needed only
       if (no_of_yslices(NYworkers) .eq. ixloc) then
-        call MPI_SCATTERV(s(1,1,1), sendcounts, displs, 
+        call MPI_SCATTERV(s(1,1,1), sendcounts, displs,
      &		GLOB_LARGE_BDz_YSLICES, s_y(1,1,1),
      &		recvcount, LOCAL_LARGE_BDz_YSLICES, 0,
      &		MPI_COMM_WORLD, ierr)
       else
 c The matrix has to be scattered in 2 calls
 c First everybody gets the minimal size everybody has
-        call MPI_SCATTERV(s(1,1,1), sendcounts, displs, 
+        call MPI_SCATTERV(s(1,1,1), sendcounts, displs,
      &		GLOB_SMALL_BDz_YSLICES, s_y(1,1,1),
      &		recvcount, LOCAL_SMALL_BDz_YSLICES, 0,
      &		MPI_COMM_WORLD, ierr)
@@ -1948,8 +1948,8 @@ c First everybody gets the minimal size everybody has
         if (MyId .gt. mod(ix,NYworkers)) then
           recvcount = 0
         end if
-c then the rest processors get their further slices (max. one more)        
-	call MPI_SCATTERV(s(NYworkers*(ixloc-1)+1,1,1), sendcounts,  
+c then the rest processors get their further slices (max. one more)
+	call MPI_SCATTERV(s(NYworkers*(ixloc-1)+1,1,1), sendcounts,
      &		displs, GLOB_BDz_YSLICE, s_y(ixloc,1,1),
      &		recvcount, LOCAL_BDz_YSLICE, 0,
      &		MPI_COMM_WORLD, ierr)
@@ -1962,7 +1962,7 @@ c  Master distributes a 3D array of data in x-slice format to all workers
 c  using scatterv
 c-----------------------------------------------------------------
       subroutine distrib_x_3D_v3(ix,iy,iz,iyloc,s,s_x)
-c      
+c
       implicit none
 c
       integer :: ix, iy, iz, iyloc
@@ -1987,14 +1987,14 @@ c
 c The master scatters the x-slices in one call if all have the
 c same amount of slices
       if (no_of_xslices(NXworkers) .eq. iyloc) then
-        call MPI_SCATTERV(s(1,1,1), sendcounts, displs, 
+        call MPI_SCATTERV(s(1,1,1), sendcounts, displs,
      &		GLOB_LARGE_3D_XSLICES, s_x(1,1,1),
      &		recvcount, LOCAL_LARGE_3D_XSLICES, 0,
      &		MPI_COMM_WORLD, ierr)
       else
 c Otherwise we need 2 calls.
 c First everybody gets the minimal size everybody has
-        call MPI_SCATTERV(s(1,1,1), sendcounts, displs, 
+        call MPI_SCATTERV(s(1,1,1), sendcounts, displs,
      &		GLOB_SMALL_3D_XSLICES, s_x(1,1,1),
      &		recvcount, LOCAL_SMALL_3D_XSLICES, 0,
      &		MPI_COMM_WORLD, ierr)
@@ -2004,7 +2004,7 @@ c First everybody gets the minimal size everybody has
           recvcount = 0
         end if
 c Then the rest processors get their further slices (max. one more)
-        call MPI_SCATTERV(s(1,NXworkers*(iyloc-1)+1,1), sendcounts,  
+        call MPI_SCATTERV(s(1,NXworkers*(iyloc-1)+1,1), sendcounts,
      &		displs, GLOB_3D_XSLICE, s_x(1,iyloc,1),
      &		recvcount, LOCAL_3D_XSLICE, 0,
      &		MPI_COMM_WORLD, ierr)
@@ -2012,13 +2012,13 @@ c Then the rest processors get their further slices (max. one more)
 
       end subroutine  distrib_x_3D_v3
 
-      
+
 c-----------------------------------------------------------------
 c  Master distributes a 3D array of data in y-slice format to all workers
 c  using scatterv
 c-----------------------------------------------------------------
       subroutine distrib_y_3D_v3(ix,iy,iz,ixloc,s,s_y)
-c      
+c
       implicit none
 c
       integer :: ix, iy, iz, ixloc
@@ -2040,17 +2040,17 @@ c
       else
         recvcount = 1
       end if
-c If everyone has the same number of slices, one scatter is 
+c If everyone has the same number of slices, one scatter is
 c  needed only
       if (no_of_yslices(NYworkers) .eq. ixloc) then
-        call MPI_SCATTERV(s(1,1,1), sendcounts, displs, 
+        call MPI_SCATTERV(s(1,1,1), sendcounts, displs,
      &		GLOB_LARGE_3D_YSLICES, s_y(1,1,1),
      &		recvcount, LOCAL_LARGE_3D_YSLICES, 0,
      &		MPI_COMM_WORLD, ierr)
       else
 c The matrix has to be scattered in 2 calls
 c First everybody gets the minimal size everybody has
-        call MPI_SCATTERV(s(1,1,1), sendcounts, displs, 
+        call MPI_SCATTERV(s(1,1,1), sendcounts, displs,
      &		GLOB_SMALL_3D_YSLICES, s_y(1,1,1),
      &		recvcount, LOCAL_SMALL_3D_YSLICES, 0,
      &		MPI_COMM_WORLD, ierr)
@@ -2059,8 +2059,8 @@ c First everybody gets the minimal size everybody has
         if (MyId .gt. mod(ix,NYworkers)) then
           recvcount = 0
         end if
-c then the rest processors get their further slices (max. one more)        
-	call MPI_SCATTERV(s(NYworkers*(ixloc-1)+1,1,1), sendcounts,  
+c then the rest processors get their further slices (max. one more)
+	call MPI_SCATTERV(s(NYworkers*(ixloc-1)+1,1,1), sendcounts,
      &		displs, GLOB_3D_YSLICE, s_y(ixloc,1,1),
      &		recvcount, LOCAL_3D_YSLICE, 0,
      &		MPI_COMM_WORLD, ierr)
@@ -2073,7 +2073,7 @@ c  Master distributes a BDx array of data in x-slice format to all workers
 c  using scatterv
 c-----------------------------------------------------------------
       subroutine distrib_x_BDx_v3(iy,iz,iyloc,Ns,s,s_x)
-c      
+c
       implicit none
 c
       integer :: iy, iz, iyloc, Ns
@@ -2098,14 +2098,14 @@ c
 c The master scatters the x-slices in one call if all have the
 c same amount of slices
       if (no_of_xslices(NXworkers) .eq. iyloc) then
-        call MPI_SCATTERV(s(1,1,1), sendcounts, displs, 
+        call MPI_SCATTERV(s(1,1,1), sendcounts, displs,
      &		GLOB_LARGE_BDx_XSLICES, s_x(1,1,1),
      &		recvcount, LOCAL_LARGE_BDx_XSLICES, 0,
      &		MPI_COMM_WORLD, ierr)
       else
 c Otherwise we need 2 calls.
 c First everybody gets the minimal size everybody has
-        call MPI_SCATTERV(s(1,1,1), sendcounts, displs, 
+        call MPI_SCATTERV(s(1,1,1), sendcounts, displs,
      &		GLOB_SMALL_BDx_XSLICES, s_x(1,1,1),
      &		recvcount, LOCAL_SMALL_BDx_XSLICES, 0,
      &		MPI_COMM_WORLD, ierr)
@@ -2115,7 +2115,7 @@ c First everybody gets the minimal size everybody has
           recvcount = 0
         end if
 c Then the rest processors get their further slices (max. one more)
-        call MPI_SCATTERV(s(NXworkers*(iyloc-1)+1,1,1), sendcounts,  
+        call MPI_SCATTERV(s(NXworkers*(iyloc-1)+1,1,1), sendcounts,
      &		displs, GLOB_BDx_XSLICE, s_x(iyloc,1,1),
      &		recvcount, LOCAL_BDx_XSLICE, 0,
      &		MPI_COMM_WORLD, ierr)
@@ -2123,13 +2123,13 @@ c Then the rest processors get their further slices (max. one more)
 
       end subroutine  distrib_x_BDx_v3
 
-      
+
 c-----------------------------------------------------------------
 c  Master distributes a BDx2 array of data in x-slice format to all workers
 c  using scatterv
 c-----------------------------------------------------------------
       subroutine distrib_x_BD_v3(iy,iz,iyloc,Ns,s,s_x)
-c      
+c
       implicit none
 c
       integer :: iy, iz, iyloc, Ns
@@ -2154,14 +2154,14 @@ c
 c The master scatters the x-slices in one call if all have the
 c same amount of slices
       if (no_of_xslices(NXworkers) .eq. iyloc) then
-        call MPI_SCATTERV(s(1,1,1,1), sendcounts, displs, 
+        call MPI_SCATTERV(s(1,1,1,1), sendcounts, displs,
      &		GLOB_LARGE_BD_XSLICES, s_x(1,1,1,1),
      &		recvcount, LOCAL_LARGE_BD_XSLICES, 0,
      &		MPI_COMM_WORLD, ierr)
       else
 c Otherwise we need 2 calls.
 c First everybody gets the minimal size everybody has
-        call MPI_SCATTERV(s(1,1,1,1), sendcounts, displs, 
+        call MPI_SCATTERV(s(1,1,1,1), sendcounts, displs,
      &		GLOB_SMALL_BD_XSLICES, s_x(1,1,1,1),
      &		recvcount, LOCAL_SMALL_BD_XSLICES, 0,
      &		MPI_COMM_WORLD, ierr)
@@ -2171,7 +2171,7 @@ c First everybody gets the minimal size everybody has
           recvcount = 0
         end if
 c Then the rest processors get their further slices (max. one more)
-        call MPI_SCATTERV(s(NXworkers*(iyloc-1)+1,1,1,1), sendcounts,  
+        call MPI_SCATTERV(s(NXworkers*(iyloc-1)+1,1,1,1), sendcounts,
      &		displs, GLOB_BD_XSLICE, s_x(iyloc,1,1,1),
      &		recvcount, LOCAL_BD_XSLICE, 0,
      &		MPI_COMM_WORLD, ierr)
@@ -2179,13 +2179,13 @@ c Then the rest processors get their further slices (max. one more)
 
       end subroutine  distrib_x_BD_v3
 
-      
+
 c-----------------------------------------------------------------
 c  Master distributes a BDy array of data in y-slice format to all workers
 c  using scatterv
 c-----------------------------------------------------------------
       subroutine distrib_y_BDy_v3(ix,iz,ixloc,Ns,s,s_y)
-c      
+c
       implicit none
 c
       integer :: ix, iz, ixloc, Ns
@@ -2207,17 +2207,17 @@ c
       else
         recvcount = 1
       end if
-c If everyone has the same number of slices, one scatter is 
+c If everyone has the same number of slices, one scatter is
 c  needed only
       if (no_of_yslices(NYworkers) .eq. ixloc) then
-        call MPI_SCATTERV(s(1,1,1), sendcounts, displs, 
+        call MPI_SCATTERV(s(1,1,1), sendcounts, displs,
      &		GLOB_LARGE_BDy_YSLICES, s_y(1,1,1),
      &		recvcount, LOCAL_LARGE_BDy_YSLICES, 0,
      &		MPI_COMM_WORLD, ierr)
       else
 c The matrix has to be scattered in 2 calls
 c First everybody gets the minimal size everybody has
-        call MPI_SCATTERV(s(1,1,1), sendcounts, displs, 
+        call MPI_SCATTERV(s(1,1,1), sendcounts, displs,
      &		GLOB_SMALL_BDy_YSLICES, s_y(1,1,1),
      &		recvcount, LOCAL_SMALL_BDy_YSLICES, 0,
      &		MPI_COMM_WORLD, ierr)
@@ -2226,8 +2226,8 @@ c First everybody gets the minimal size everybody has
         if (MyId .gt. mod(ix,NYworkers)) then
           recvcount = 0
         end if
-c then the rest processors get their further slices (max. one more)        
-	call MPI_SCATTERV(s(NYworkers*(ixloc-1)+1,1,1), sendcounts,  
+c then the rest processors get their further slices (max. one more)
+	call MPI_SCATTERV(s(NYworkers*(ixloc-1)+1,1,1), sendcounts,
      &		displs, GLOB_BDy_YSLICE, s_y(ixloc,1,1),
      &		recvcount, LOCAL_BDy_YSLICE, 0,
      &		MPI_COMM_WORLD, ierr)
@@ -2240,7 +2240,7 @@ c  Master distributes a BDy2 array of data in y-slice format to all workers
 c  using scatterv
 c-----------------------------------------------------------------
       subroutine distrib_y_BD_v3(ix,iz,ixloc,Ns,s,s_y)
-c      
+c
       implicit none
 c
       integer :: ix, iz, ixloc, Ns
@@ -2262,17 +2262,17 @@ c
       else
         recvcount = 1
       end if
-c If everyone has the same number of slices, one scatter is 
+c If everyone has the same number of slices, one scatter is
 c  needed only
       if (no_of_yslices(NYworkers) .eq. ixloc) then
-        call MPI_SCATTERV(s(1,1,1,1), sendcounts, displs, 
+        call MPI_SCATTERV(s(1,1,1,1), sendcounts, displs,
      &		GLOB_LARGE_BD_YSLICES, s_y(1,1,1,1),
      &		recvcount, LOCAL_LARGE_BD_YSLICES, 0,
      &		MPI_COMM_WORLD, ierr)
       else
 c The matrix has to be scattered in 2 calls
 c First everybody gets the minimal size everybody has
-        call MPI_SCATTERV(s(1,1,1,1), sendcounts, displs, 
+        call MPI_SCATTERV(s(1,1,1,1), sendcounts, displs,
      &		GLOB_SMALL_BD_YSLICES, s_y(1,1,1,1),
      &		recvcount, LOCAL_SMALL_BD_YSLICES, 0,
      &		MPI_COMM_WORLD, ierr)
@@ -2281,8 +2281,8 @@ c First everybody gets the minimal size everybody has
         if (MyId .gt. mod(ix,NYworkers)) then
           recvcount = 0
         end if
-c then the rest processors get their further slices (max. one more)        
-	call MPI_SCATTERV(s(NYworkers*(ixloc-1)+1,1,1,1), sendcounts,  
+c then the rest processors get their further slices (max. one more)
+	call MPI_SCATTERV(s(NYworkers*(ixloc-1)+1,1,1,1), sendcounts,
      &		displs, GLOB_BD_YSLICE, s_y(ixloc,1,1,1),
      &		recvcount, LOCAL_BD_YSLICE, 0,
      &		MPI_COMM_WORLD, ierr)
@@ -2300,7 +2300,7 @@ c  using scatter
 c using copying
 c-----------------------------------------------------------------
       subroutine distrib_x_4D_v4(ix,iy,iz,iyloc,Ns,s,s_x)
-c      
+c
       implicit none
 c
       integer :: ix, iy, iz, iyloc, Ns
@@ -2324,7 +2324,7 @@ c
         recvcount = ix*iyloc*iz*Ns
       end if
       print*, 'call scatter'
-      call MPI_SCATTER(buf(1,1,1,1,1), sendcount, MPI_REAL, buf, 
+      call MPI_SCATTER(buf(1,1,1,1,1), sendcount, MPI_REAL, buf,
      &		recvcount, MPI_REAL, 0, MPI_COMM_WORLD, ierr)
       if (myid .ne. 0) then
         s_x(:,:,:,:) = buf(:,:,:,:,1)
@@ -2337,8 +2337,8 @@ c                             - new format is y-slices (for receiving)
 c	using alltoallw
 c    commented out because not implemented on the SUN ENTERPRISE...
 c---------------------------------------------------------
-      subroutine shuffle_x2y_4D_v4(ix,iy,iz,ixloc,iyloc,Ns,s_x,s_y)  
-c      
+      subroutine shuffle_x2y_4D_v4(ix,iy,iz,ixloc,iyloc,Ns,s_x,s_y)
+c
       implicit none
 c
       integer :: ix, iy, iz, ixloc, iyloc, Ns
@@ -2383,18 +2383,18 @@ c        call MPI_TYPE_GET_EXTENT(MPI_REAL, lb,sizeofreal,ierr)
 	    end if
 	  end if
         end do
-	
-c          call MPI_ALLTOALLW(s_x, sendcounts, sdispls, 
+
+c          call MPI_ALLTOALLW(s_x, sendcounts, sdispls,
 c     &		sendtypes, s_y, recvcounts, rdispls,
 c     &		recvtypes, MPI_COMM_WORKERS, ierr)
-            
+
       end if
-c	
-      end subroutine shuffle_x2y_4D_v4      
-	
-	
+c
+      end subroutine shuffle_x2y_4D_v4
+
+
       end module XYCommunicationLibrary
-      
+
 
 c---------------------------------------------------------------------------------------
 c
@@ -2445,7 +2445,7 @@ c-------------------------------------------------------------------------------
       contains
 
 c-----------------------------------------------------------------
-c  Master distributes a 4D array of data in h-slice 
+c  Master distributes a 4D array of data in h-slice
 c     format to all workers, standard version
 c-----------------------------------------------------------------
       subroutine distrib_h_4D_v1(ix,iy,iz,izloc,Ns,s,s_h)
@@ -2466,7 +2466,7 @@ c
         end do
       else if (HWorker) then
         do i=1,no_of_hslices(MyId)
-         call MPI_IRECV(s_h(1,1,i,1), 1, 
+         call MPI_IRECV(s_h(1,1,i,1), 1,
      &                 LOCAL_4D_HSLICE, 0, global_hslice_id(myid,i),
      &                 MPI_COMM_WORLD, request(i), ierr)
         end do
@@ -2496,88 +2496,88 @@ c
       if (Master) then
         do i=1,ix*iy
            call MPI_SEND(s(planar_vcol_id(i,1),planar_vcol_id(i,2),1,1), 
-     & 		1, GLOBAL_4D_VCOL, owner_of_vcol(i), local_vcol_id(i), 
+     & 		1, GLOBAL_4D_VCOL, owner_of_vcol(i), local_vcol_id(i),
      &		MPI_COMM_WORLD, ierr)
         end do
       else if ( VWorker ) then
         do i=1,no_of_vcols(myid)
- 	  call MPI_IRECV(s_v(1,i,1,1), 1, LOCAL_4D_VCOL, 
+ 	  call MPI_IRECV(s_v(1,i,1,1), 1, LOCAL_4D_VCOL,
      &		0, i, MPI_COMM_WORLD, request(i), ierr)
 	end do
 	call MPI_WAITALL(no_of_vcols(MyId), request, status, ierr)
       end if
-      
+
       end subroutine  distrib_v_4D_v1
-      
+
 c-----------------------------------------------------------------
 c  Master gathers a 4D array of data in h-slice format from all workers
 c  standard version
 c-----------------------------------------------------------------
       subroutine gather_h_4D_v1(ix,iy,iz,izloc,Ns,s,s_h)
-c      
+c
       implicit none
 c
       integer :: ix, iy, iz, izloc, Ns
       real   :: s(ix,iy,iz,Ns)
       real   :: s_h(ix,iy,izloc,Ns)
       integer :: i, ierr
-      integer,pointer,dimension(:,:),save :: status
-      integer,pointer,dimension(:),save :: request
-c     
+      integer,allocatable,dimension(:,:),save :: status
+      integer,allocatable,dimension(:),save :: request
+c
       if (Master) then
         if (.not. allocated(status)) then
           allocate( status(MPI_STATUS_SIZE,iz),STAT=ierr )
 	end if
 	if (.not. allocated(request)) then
-          allocate( request(iz),STAT=ierr )      
+          allocate( request(iz),STAT=ierr )
 	end if
         do i=1,iz
-        call MPI_IRECV(s(1,1,i,1), 1, GLOBAL_4D_HSLICE, 
-     &		owner_of_hslice(i), i,  MPI_COMM_WORLD, 
+        call MPI_IRECV(s(1,1,i,1), 1, GLOBAL_4D_HSLICE,
+     &		owner_of_hslice(i), i,  MPI_COMM_WORLD,
      &         request(i), ierr)
 	end do
 	call MPI_WAITALL(iz, request, status, ierr)
       else if (HWorker) then
         do i=1, no_of_hslices(myid)
-          call MPI_SEND(s_h(1,1,i,1), 1, LOCAL_4D_HSLICE, 
-     &                 0, global_hslice_id(MyId,i), 
+          call MPI_SEND(s_h(1,1,i,1), 1, LOCAL_4D_HSLICE,
+     &                 0, global_hslice_id(MyId,i),
      &                 MPI_COMM_WORLD, ierr)
 	end do
       end if
-      
+
       end subroutine  gather_h_4D_v1
-        
+
 c-----------------------------------------------------------------
 c  Master gathers a 4D array of data in v-column format from all workers
 c  standard version
 c-----------------------------------------------------------------
       subroutine gather_v_4D_v1(ix,iy,iz,icloc,Ns,s,s_v)
-c      
+c
       implicit none
 c
       integer :: ix, iy, iz, icloc, Ns
       real   :: s(ix,iy,iz,Ns)
       real   :: s_v(1,icloc,iz,Ns)
       integer :: i,ierr
-      integer,pointer,dimension(:,:),save :: status
-      integer,pointer,dimension(:),save :: request
-c     
+      integer,allocatable,dimension(:,:),save :: status
+      integer,allocatable,dimension(:),save :: request
+c
       if (Master) then
         if (.not. allocated(status)) then
           allocate( status(MPI_STATUS_SIZE,ix*iy),STAT=ierr )
 	end if
 	if (.not. allocated(request)) then
-          allocate( request(ix*iy),STAT=ierr )      
+          allocate( request(ix*iy),STAT=ierr )
 	end if
         do i=1,ix*iy
           call MPI_IRECV(s(planar_vcol_id(i,1),planar_vcol_id(i,2),1,1),
-     &		1, GLOBAL_4D_VCOL, owner_of_vcol(i), local_vcol_id(i), 
+     &		1, GLOBAL_4D_VCOL, owner_of_vcol(i), local_vcol_id(i),
      &		MPI_COMM_WORLD, request(i), ierr)
 	end do
 	call MPI_WAITALL(ix*iy, request, status, ierr)
       else if (VWorker) then
         do i=1,no_of_vcols(myid)
- 	  call MPI_SEND(s_v(1,i,1,1), 1, LOCAL_4D_VCOL, 
+ 	  call MPI_SEND(s_v(1,i,1,1), 1, LOCAL_4D_VCOL,
      &		0, i, MPI_COMM_WORLD, ierr)
 	end do
       end if
@@ -2589,8 +2589,8 @@ c      Slaves exchange data:  - old format is h-slices (for sending)
 c                             - new format is v-columns (for receiving)
 c	using copying, sending blocks (single message to each proc)
 c---------------------------------------------------------
-      subroutine shuffle_h2v_4D_v1(ix,iy,iz,izloc,icloc,Ns,s_h,s_v)  
-c      
+      subroutine shuffle_h2v_4D_v1(ix,iy,iz,izloc,icloc,Ns,s_h,s_v)
+c
       implicit none
 c
       integer,intent(in) :: ix, iy, iz, izloc, icloc, Ns
@@ -2599,8 +2599,8 @@ c
       integer :: i, ierr, gid, p
       integer :: status(MPI_STATUS_SIZE)
       integer :: sstatus(MPI_STATUS_SIZE,NVworkers),srequest(NVworkers)
-      real, pointer,dimension(:,:,:,:),save    :: sbuf
-      real, pointer,dimension(:,:,:),save :: rbuf
+      real, allocatable,dimension(:,:,:,:),save    :: sbuf
+      real, allocatable,dimension(:,:,:),save :: rbuf
 
       if (HWorker) then
         if (.not.allocated(sbuf)) then
@@ -2609,39 +2609,39 @@ c
         do p=1,NVworkers
           do i=1,no_of_vcols(p)
 	    gid = global_vcol_id(p,i)
-	    sbuf(i,1:no_of_hslices(MyId),1:Ns,p) = 
+	    sbuf(i,1:no_of_hslices(MyId),1:Ns,p) =
      &           s_h(planar_vcol_id(gid,1),planar_vcol_id(gid,2),
      &		1:no_of_hslices(MyId),1:Ns)
           end do
-          call MPI_ISEND(sbuf(1,1,1,p), icloc*izloc*Ns, MPI_REAL, 
+          call MPI_ISEND(sbuf(1,1,1,p), icloc*izloc*Ns, MPI_REAL,
      &          p, p, MPI_COMM_WORLD, srequest(p), ierr)
         end do
       end if
-      
-      if (VWorker) then	
+
+      if (VWorker) then
         if (.not.allocated(rbuf)) then
 	  allocate(rbuf(icloc, izloc, Ns),STAT=ierr)
 	end if
         do p=1,NHworkers
-          call MPI_RECV(rbuf, icloc*izloc*Ns, MPI_REAL, 
+          call MPI_RECV(rbuf, icloc*izloc*Ns, MPI_REAL,
      &             p, myid, MPI_COMM_WORLD, status, ierr)
 	  s_v(1,1:no_of_vcols(MyId),
      &              owned_hslices(p,1:no_of_hslices(p)),1:Ns)=
      &	            rbuf(1:no_of_vcols(MyId),1:no_of_hslices(p),1:Ns)
         end do
       end if
-      
+
       if (HWorker) call MPI_WAITALL(NVworkers,srequest,sstatus,ierr)
-      
+
       end subroutine shuffle_h2v_4D_v1
-      
+
 c---------------------------------------------------------
 c      Slaves exchange data:  - old format is v-columns (for sending)
 c                             - new format is h-slices (for receiving)
 c	using copying, sending blocks (single message to each proc)
 c---------------------------------------------------------
-      subroutine shuffle_v2h_4D_v1(ix,iy,iz,izloc,icloc,Ns,s_h,s_v)  
-c      
+      subroutine shuffle_v2h_4D_v1(ix,iy,iz,izloc,icloc,Ns,s_h,s_v)
+c
       implicit none
 c
       integer,intent(in) :: ix, iy, iz, izloc, icloc, Ns
@@ -2650,29 +2650,29 @@ c
       integer :: i, ierr, p
       integer :: status(MPI_STATUS_SIZE)
       integer :: sstatus(MPI_STATUS_SIZE,NHworkers),srequest(NHworkers)
-      real, pointer, dimension(:,:,:,:),save    :: sbuf
-      real, pointer, dimension(:,:,:),save    :: rbuf
+      real, allocatable, dimension(:,:,:,:),save    :: sbuf
+      real, allocatable, dimension(:,:,:),save    :: rbuf
 
       if (VWorker) then
         if (.not.allocated(sbuf)) then
           allocate( sbuf(icloc,izloc,Ns,NHworkers),STAT=ierr )
         endif
-c      
+c
         do p=1,NHworkers
 	  sbuf(1:icloc,1:no_of_hslices(p),1:Ns,p)=
      &	      s_v(1,1:icloc,owned_hslices(p,1:no_of_hslices(p)),1:Ns)
-          call MPI_ISEND(sbuf(1,1,1,p), icloc*izloc*Ns, MPI_REAL, 
-     &          p, p,  
+          call MPI_ISEND(sbuf(1,1,1,p), icloc*izloc*Ns, MPI_REAL,
+     &          p, p,
      &          MPI_COMM_WORLD, srequest(p), ierr)
         end do
       end if
-      
-      if (HWorker) then      
+
+      if (HWorker) then
         if (.not.allocated(rbuf)) then
           allocate( rbuf(icloc,izloc,Ns),STAT=ierr )
         endif
         do p=1,NVworkers
-          call MPI_RECV(rbuf, icloc*izloc*Ns, MPI_REAL, 
+          call MPI_RECV(rbuf, icloc*izloc*Ns, MPI_REAL,
      &           p, myid, MPI_COMM_WORLD, status, ierr)
           do i = 1,no_of_vcols(p)
             s_h(planar_vcol_id(global_vcol_id(p,i),1),
@@ -2689,10 +2689,10 @@ c
       end subroutine shuffle_v2h_4D_v1
 
 c--------------------------------------------------------------------------
-c  Master distributes a 2D (ix.iy) array of data in h-slice format 
+c  Master distributes a 2D (ix.iy) array of data in h-slice format
 c  to all workers - not necessary for STEM-III
 c--------------------------------------------------------------------------
-c      
+c
       subroutine distrib_h_2D_v1(ix,iy,s)
 
       implicit none
@@ -2700,17 +2700,17 @@ c
       integer :: ix, iy
       real :: s(ix,iy)
       integer :: ierr
-c      
+c
       call MPI_BCAST(s, ix*iy, MPI_REAL, 0, MPI_COMM_WORLD, ierr)
       call MPI_BARRIER(MPI_COMM_WORLD, ierr)
 c
       end subroutine  distrib_h_2D_v1
-      
+
 c--------------------------------------------------------------------------
-c  Master distributes a 2D (ix.iy) array of data in v-column format 
-c  to all workers 
+c  Master distributes a 2D (ix.iy) array of data in v-column format
+c  to all workers
 c--------------------------------------------------------------------------
-c      
+c
       subroutine distrib_v_2D_v1(ix,iy,icloc,s,s_v)
 
       implicit none
@@ -2724,8 +2724,8 @@ c
 
       if (Master) then
         do i=1,ix*iy
-          call MPI_SEND(s(planar_vcol_id(i,1),planar_vcol_id(i,2)), 
-     &		1, MPI_REAL, 
+          call MPI_SEND(s(planar_vcol_id(i,1),planar_vcol_id(i,2)),
+     &		1, MPI_REAL,
      &         owner_of_vcol(i), i,  MPI_COMM_WORLD, ierr)
           if (ierr.ne.MPI_SUCCESS) then
 	    print*, 'Error: distrib_v_2D: send failed'
@@ -2734,8 +2734,8 @@ c
 	end do
       else if (VWorker) then
         do i=1, no_of_vcols(myid)
-          call MPI_IRECV(s_v(1,i), 1, MPI_REAL, 0, 
-     &			global_vcol_id(myid,i), 
+          call MPI_IRECV(s_v(1,i), 1, MPI_REAL, 0,
+     &			global_vcol_id(myid,i),
      &                 MPI_COMM_WORLD, request(i), ierr)
           if (ierr.ne.MPI_SUCCESS) then
 	    print*, 'Error: distrib_v_2D: receive failed'
@@ -2746,12 +2746,12 @@ c
       end if
 c
       end subroutine  distrib_v_2D_v1
-      
+
 c-------------------------------------------------------------------------
-c  Master distributes a BDz (ix.iy.is) array of data in v-column format 
+c  Master distributes a BDz (ix.iy.is) array of data in v-column format
 c   to all workers - only needed for v-transport
 c-------------------------------------------------------------------------
-c      
+c
       subroutine distrib_v_BDz_v1(ix,iy,icloc,Ns,s,s_v)
 
       implicit none
@@ -2765,26 +2765,26 @@ c
 
       if (Master) then
         do j=1,ix*iy
-        call MPI_SEND(s(planar_vcol_id(j,1),planar_vcol_id(j,2),1), 
-     &		1, GLOBAL_BDz_VCOL, 
+        call MPI_SEND(s(planar_vcol_id(j,1),planar_vcol_id(j,2),1),
+     &		1, GLOBAL_BDz_VCOL,
      &         owner_of_vcol(j), j,  MPI_COMM_WORLD, ierr)
 	end do
       else if (VWorker) then
         do j=1, no_of_vcols(myid)
-        call MPI_IRECV(s_v(1,j,1), 1, LOCAL_BDz_VCOL, 0, 
-     &			global_vcol_id(myid,j), 
+        call MPI_IRECV(s_v(1,j,1), 1, LOCAL_BDz_VCOL, 0,
+     &			global_vcol_id(myid,j),
      &          	MPI_COMM_WORLD, request(j), ierr)
 	end do
 	call MPI_WAITALL(no_of_vcols(MyId), request, status, ierr)
       end if
 c
       end subroutine  distrib_v_BDz_v1
-      
+
 c-------------------------------------------------------------------------
-c  Master distributes a 3D (ix.iy.iz) array of data in h-slice format 
+c  Master distributes a 3D (ix.iy.iz) array of data in h-slice format
 c   to all workers
 c-------------------------------------------------------------------------
-c      
+c
       subroutine distrib_h_3D_v1(ix,iy,iz,izloc,s,s_h)
 
       implicit none
@@ -2798,7 +2798,7 @@ c
 
       if (Master) then
         do i=1,iz
-          call MPI_SEND(s(1,1,i), ix*iy, MPI_REAL, 
+          call MPI_SEND(s(1,1,i), ix*iy, MPI_REAL,
      &         owner_of_hslice(i), i,  MPI_COMM_WORLD, ierr)
           if (ierr.ne.MPI_SUCCESS) then
 	    print*, 'Error: distrib_h_3D: send failed'
@@ -2807,8 +2807,8 @@ c
 	end do
       else if (HWorker) then
         do i=1, no_of_hslices(myid)
-          call MPI_IRECV(s_h(1,1,i), ix*iy, MPI_REAL, 0, 
-     &			global_hslice_id(myid,i), 
+          call MPI_IRECV(s_h(1,1,i), ix*iy, MPI_REAL, 0,
+     &			global_hslice_id(myid,i),
      &                 MPI_COMM_WORLD, request(i), ierr)
           if (ierr.ne.MPI_SUCCESS) then
 	    print*, 'Error: distrib_h_3D: receive failed'
@@ -2818,18 +2818,18 @@ c
 	call MPI_WAITALL(no_of_hslices(MyId), request, status, ierr)
       end if
 c
-      end subroutine  distrib_h_3D_v1    
+      end subroutine  distrib_h_3D_v1
 
-      
+
 c--------------------------------------------------------------------------
-c  Master distributes a 3D (ix.iy.iz) array of data in v-column format 
+c  Master distributes a 3D (ix.iy.iz) array of data in v-column format
 c   to all workers
 c--------------------------------------------------------------------------
 c
       subroutine distrib_v_3D_v1(ix,iy,iz,icloc,s,s_v)
 
       implicit none
-c      
+c
       integer :: ix, iy, iz, icloc
       real   :: s(ix,iy,iz)
       real   :: s_v(1,icloc,iz)
@@ -2839,26 +2839,26 @@ c
 
       if (Master) then
         do i=1,ix*iy
-           call MPI_SEND(s(planar_vcol_id(i,1),planar_vcol_id(i,2),1), 
+           call MPI_SEND(s(planar_vcol_id(i,1),planar_vcol_id(i,2),1),
      &		1, GLOBAL_3D_VCOL,
      &         owner_of_vcol(i), i,  MPI_COMM_WORLD, ierr)
         end do
       else if (VWorker) then
         do i=1, no_of_vcols(myid)
-           call MPI_IRECV(s_v(1,i,1), 1, LOCAL_3D_VCOL, 0, 
-     &			global_vcol_id(myid,i), 
+           call MPI_IRECV(s_v(1,i,1), 1, LOCAL_3D_VCOL, 0,
+     &			global_vcol_id(myid,i),
      &                 MPI_COMM_WORLD, request(i), ierr)
         end do
 	call MPI_WAITALL(no_of_vcols(MyId), request, status, ierr)
       endif
-c	
+c
       return
-      end subroutine distrib_v_3D_v1 
+      end subroutine distrib_v_3D_v1
 
 c---------------------------------------------------------------------------
 c  Master distributes the y-boundary array BDy
 c---------------------------------------------------------------------------
-c      
+c
       subroutine distrib_h_BDy_v1(ix,iz,izloc,Ns,s,sloc)
 
       implicit none
@@ -2872,26 +2872,26 @@ c
 
       if (Master) then
         do j=1,iz
-        call MPI_SEND(s(1,j,1), 1, GLOBAL_BDy_HSLICE, 
+        call MPI_SEND(s(1,j,1), 1, GLOBAL_BDy_HSLICE,
      &         owner_of_hslice(j), j,  MPI_COMM_WORLD, ierr)
 	end do
       else if (HWorker) then
         do j=1, no_of_hslices(myid)
-        call MPI_IRECV(sloc(1,j,1), 1, LOCAL_BDy_HSLICE, 0, 
-     &			global_hslice_id(myid,j), 
+        call MPI_IRECV(sloc(1,j,1), 1, LOCAL_BDy_HSLICE, 0,
+     &			global_hslice_id(myid,j),
      &                 MPI_COMM_WORLD, request(j), ierr)
 	end do
 	call MPI_WAITALL(no_of_hslices(MyId), request, status, ierr)
       end if
 c
       end subroutine  distrib_h_BDy_v1
-      
+
 c---------------------------------------------------------------------------
-c  Master distributes the y-boundary array BDy2 
+c  Master distributes the y-boundary array BDy2
 c  - careful, X is used from
 c  former different naming BDx...
 c---------------------------------------------------------------------------
-c      
+c
       subroutine distrib_xh_BD_v1(ix,iz,izloc,Ns,s,sloc)
 
       implicit none
@@ -2905,24 +2905,24 @@ c
 
       if (Master) then
         do j=1,iz
-        call MPI_SEND(s(1,j,1,1), 1, GLOBAL_BD_XHSLICE, 
+        call MPI_SEND(s(1,j,1,1), 1, GLOBAL_BD_XHSLICE,
      &         owner_of_hslice(j), j,  MPI_COMM_WORLD, ierr)
 	end do
       else if (HWorker) then
         do j=1, no_of_hslices(myid)
-        call MPI_IRECV(sloc(1,j,1,1), 1, LOCAL_BD_XHSLICE, 0, 
-     &			global_hslice_id(myid,j), 
+        call MPI_IRECV(sloc(1,j,1,1), 1, LOCAL_BD_XHSLICE, 0,
+     &			global_hslice_id(myid,j),
      &                 MPI_COMM_WORLD, request(j), ierr)
 	end do
 	call MPI_WAITALL(no_of_hslices(MyId), request, status, ierr)
       end if
 c
       end subroutine  distrib_xh_BD_v1
-      
+
 c---------------------------------------------------------------------------
 c  Master distributes the x-boundary array BDx
 c---------------------------------------------------------------------------
-c      
+c
       subroutine distrib_h_BDx_v1(iy,iz,izloc,Ns,s,sloc)
 
       implicit none
@@ -2936,13 +2936,13 @@ c
 
       if (Master) then
         do i=1,iz
-        call MPI_SEND(s(1,i,1), 1, GLOBAL_BDx_HSLICE, 
+        call MPI_SEND(s(1,i,1), 1, GLOBAL_BDx_HSLICE,
      &         owner_of_hslice(i), i,  MPI_COMM_WORLD, ierr)
 	end do
       else if (HWorker) then
         do i=1, no_of_hslices(myid)
         call MPI_IRECV(sloc(1,i,1), 1, LOCAL_BDx_HSLICE, 0,
-     &			global_hslice_id(myid,i), 
+     &			global_hslice_id(myid,i),
      &                 MPI_COMM_WORLD, request(i), ierr)
 	end do
 	call MPI_WAITALL(no_of_hslices(MyId), request, status, ierr)
@@ -2955,7 +2955,7 @@ c  Master distributes the x-boundary array BDx2
 c  - careful, Y is used from
 c  former different naming BDy...
 c---------------------------------------------------------------------------
-c      
+c
       subroutine distrib_yh_BD_v1(iy,iz,izloc,Ns,s,sloc)
 
       implicit none
@@ -2969,13 +2969,13 @@ c
 
       if (Master) then
         do i=1,iz
-        call MPI_SEND(s(1,i,1,1), 1, GLOBAL_BD_YHSLICE, 
+        call MPI_SEND(s(1,i,1,1), 1, GLOBAL_BD_YHSLICE,
      &         owner_of_hslice(i), i,  MPI_COMM_WORLD, ierr)
 	end do
       else if (HWorker) then
         do i=1, no_of_hslices(myid)
         call MPI_IRECV(sloc(1,i,1,1), 1, LOCAL_BD_YHSLICE, 0,
-     &			global_hslice_id(myid,i), 
+     &			global_hslice_id(myid,i),
      &                 MPI_COMM_WORLD, request(i), ierr)
 	end do
 	call MPI_WAITALL(no_of_hslices(MyId), request, status, ierr)
@@ -2989,7 +2989,7 @@ c *******************************************************************
 
 
 c-----------------------------------------------------------------
-c  Master distributes a 4D array of data in h-slice 
+c  Master distributes a 4D array of data in h-slice
 c     format to all workers
 c Less communication than other versions - one message to each proc
 c-----------------------------------------------------------------
@@ -3005,10 +3005,10 @@ c
       if (Master) then
         do i=1,NHworkers
  	  if (no_of_hslices(i) .eq. izloc) then
-            call MPI_SEND(s(1,1,i,1), 1, GLOBAL_LARGE_4D_HSLICES, 
+            call MPI_SEND(s(1,1,i,1), 1, GLOBAL_LARGE_4D_HSLICES,
      &         owner_of_hslice(i), i,  MPI_COMM_WORLD, ierr)
 	  else
-            call MPI_SEND(s(1,1,i,1), 1, GLOBAL_SMALL_4D_HSLICES, 
+            call MPI_SEND(s(1,1,i,1), 1, GLOBAL_SMALL_4D_HSLICES,
      &         owner_of_hslice(i), i,  MPI_COMM_WORLD, ierr)
 	  end if
 	end do
@@ -3021,7 +3021,7 @@ c
      &		myid, MPI_COMM_WORLD, status, ierr)
         end if
       end if
-      
+
       end subroutine  distrib_h_4D_v2
 
 c-----------------------------------------------------------------
@@ -3029,7 +3029,7 @@ c  Master distributes a 4D array of data in v-column format to all workers
 c  all in one message
 c-----------------------------------------------------------------
       subroutine distrib_v_4D_v2(ix,iy,iz,icloc,Ns,s,s_v)
-c      
+c
       implicit none
 c
       integer :: ix, iy, iz, icloc, Ns
@@ -3042,21 +3042,21 @@ c
 	  if (no_of_vcols(i) .eq. icloc) then
 c	print*,'send to',owner_of_vcol(i),'no',i,'large'
 	    call MPI_SEND(s(planar_vcol_id(i,1),
-     &		planar_vcol_id(i,2),1,1), 1, GLOBAL_LARGE_4D_VCOLS, 
+     &		planar_vcol_id(i,2),1,1), 1, GLOBAL_LARGE_4D_VCOLS,
      &         owner_of_vcol(i), i,  MPI_COMM_WORLD, ierr)
 	  else
 c	print*,'send to',owner_of_vcol(i),'no',i,'small'
 	    call MPI_SEND(s(planar_vcol_id(i,1),
-     &		planar_vcol_id(i,2),1,1), 1, GLOBAL_SMALL_4D_VCOLS, 
+     &		planar_vcol_id(i,2),1,1), 1, GLOBAL_SMALL_4D_VCOLS,
      &         owner_of_vcol(i), i,  MPI_COMM_WORLD, ierr)
           end if
 	end do
       else if (VWorker) then
 	if (no_of_vcols(myid) .eq. icloc) then
-          call MPI_RECV(s_v(1,1,1,1), 1, LOCAL_LARGE_4D_VCOLS, 0, 
+          call MPI_RECV(s_v(1,1,1,1), 1, LOCAL_LARGE_4D_VCOLS, 0,
      &		myid, MPI_COMM_WORLD, status, ierr)
 	else
-          call MPI_RECV(s_v(1,1,1,1), 1, LOCAL_SMALL_4D_VCOLS, 0, 
+          call MPI_RECV(s_v(1,1,1,1), 1, LOCAL_SMALL_4D_VCOLS, 0,
      &		myid, MPI_COMM_WORLD, status, ierr)
         end if
       end if
@@ -3067,31 +3067,31 @@ c-----------------------------------------------------------------
 c  Master gathers a 4D array of data in h-slice format from all workers
 c-----------------------------------------------------------------
       subroutine gather_h_4D_v2(ix,iy,iz,izloc,Ns,s,s_h)
-c      
+c
       implicit none
 c
       integer :: ix, iy, iz, izloc, Ns
       real   :: s(ix,iy,iz,Ns)
       real   :: s_h(ix,iy,izloc,Ns)
       integer :: i, ierr
-      integer,pointer,dimension(:,:),save :: status
-      integer,pointer,dimension(:),save :: request
-      
+      integer,allocatable,dimension(:,:),save :: status
+      integer,allocatable,dimension(:),save :: request
+
       if (Master) then
         if (.not. allocated(status)) then
   	  allocate( status(MPI_STATUS_SIZE,NHworkers),STAT=ierr )
 	end if
 	if (.not. allocated(request)) then
-          allocate( request(NHworkers),STAT=ierr )      
+          allocate( request(NHworkers),STAT=ierr )
 	end if
         do i=1,NHworkers
 	  if ( no_of_hslices(i) .eq. izloc) then
-	    call MPI_IRECV(s(1,1,i,1), 1, GLOBAL_LARGE_4D_HSLICES, 
-     &         owner_of_hslice(i), i,  MPI_COMM_WORLD, 
+	    call MPI_IRECV(s(1,1,i,1), 1, GLOBAL_LARGE_4D_HSLICES,
+     &         owner_of_hslice(i), i,  MPI_COMM_WORLD,
      &         request(i), ierr)
      	  else
-	    call MPI_IRECV(s(1,1,i,1), 1, GLOBAL_SMALL_4D_HSLICES, 
-     &         owner_of_hslice(i), i,  MPI_COMM_WORLD, 
+	    call MPI_IRECV(s(1,1,i,1), 1, GLOBAL_SMALL_4D_HSLICES,
+     &         owner_of_hslice(i), i,  MPI_COMM_WORLD,
      &         request(i), ierr)
      	  end if
 	end do
@@ -3099,47 +3099,47 @@ c
 
       else if (HWorker) then
       	if (no_of_hslices(myid) .eq. izloc) then
-	  call MPI_SEND(s_h(1,1,1,1), 1, LOCAL_LARGE_4D_HSLICES, 
-     &                 0, myid, 
+	  call MPI_SEND(s_h(1,1,1,1), 1, LOCAL_LARGE_4D_HSLICES,
+     &                 0, myid,
      &                 MPI_COMM_WORLD, ierr)
         else
-	  call MPI_SEND(s_h(1,1,1,1), 1, LOCAL_SMALL_4D_HSLICES, 
-     &                 0, myid, 
+	  call MPI_SEND(s_h(1,1,1,1), 1, LOCAL_SMALL_4D_HSLICES,
+     &                 0, myid,
      &                 MPI_COMM_WORLD, ierr)
      	end if
       end if
-      
+
       end subroutine  gather_h_4D_v2
 
 c-----------------------------------------------------------------
 c  Master gathers a 4D array of data in v-column format from all workers
 c-----------------------------------------------------------------
       subroutine gather_v_4D_v2(ix,iy,iz,icloc,Ns,s,s_v)
-c      
+c
       implicit none
 c
       integer :: ix, iy, iz, icloc, Ns
       real   :: s(ix,iy,iz,Ns)
       real   :: s_v(1,icloc,iz,Ns)
       integer :: i, ierr
-      integer,pointer,dimension(:,:),save :: status
-      integer,pointer,dimension(:),save :: request
-      
+      integer,allocatable,dimension(:,:),save :: status
+      integer,allocatable,dimension(:),save :: request
+
       if (Master) then
         if (.not. allocated(status)) then
           allocate( status(MPI_STATUS_SIZE,NVworkers),STAT=ierr )
 	end if
 	if (.not. allocated(request)) then
-          allocate( request(NVworkers),STAT=ierr )      
+          allocate( request(NVworkers),STAT=ierr )
 	end if
         do i=1,NVworkers
 	  if ( no_of_vcols(i) .eq. icloc) then
-	    call MPI_IRECV(s(i,1,1,1), 1, GLOBAL_LARGE_4D_VCOLS, 
-     &         owner_of_vcol(i), i,  MPI_COMM_WORLD, 
+	    call MPI_IRECV(s(i,1,1,1), 1, GLOBAL_LARGE_4D_VCOLS,
+     &         owner_of_vcol(i), i,  MPI_COMM_WORLD,
      &         request(i), ierr)
      	  else
-	    call MPI_IRECV(s(i,1,1,1), 1, GLOBAL_SMALL_4D_VCOLS, 
-     &         owner_of_vcol(i), i,  MPI_COMM_WORLD, 
+	    call MPI_IRECV(s(i,1,1,1), 1, GLOBAL_SMALL_4D_VCOLS,
+     &         owner_of_vcol(i), i,  MPI_COMM_WORLD,
      &         request(i), ierr)
      	  end if
 	end do
@@ -3147,24 +3147,24 @@ c
 
       else if (VWorker) then
       	if ( no_of_vcols(myid) .eq. icloc ) then
-          call MPI_SEND(s_v(1,1,1,1), 1, LOCAL_LARGE_4D_VCOLS, 
-     &                 0, myid, 
+          call MPI_SEND(s_v(1,1,1,1), 1, LOCAL_LARGE_4D_VCOLS,
+     &                 0, myid,
      &                 MPI_COMM_WORLD, ierr)
         else
-          call MPI_SEND(s_v(1,1,1,1), 1, LOCAL_SMALL_4D_VCOLS, 
-     &                 0, myid, 
+          call MPI_SEND(s_v(1,1,1,1), 1, LOCAL_SMALL_4D_VCOLS,
+     &                 0, myid,
      &                 MPI_COMM_WORLD, ierr)
 	end if
       end if
-      
-      end subroutine  gather_v_4D_v2  
+
+      end subroutine  gather_v_4D_v2
 
 c---------------------------------------------------------
 c      Slaves exchange data:  - old format is h-slices (for sending)
 c                             - new format is v-columns (for receiving)
 c---------------------------------------------------------
-      subroutine shuffle_h2v_4D_v2(ix,iy,iz,izloc,icloc,Ns,s_h,s_v)  
-c      
+      subroutine shuffle_h2v_4D_v2(ix,iy,iz,izloc,icloc,Ns,s_h,s_v)
+c
       implicit none
 c
       integer :: ix, iy, iz, izloc, icloc, Ns
@@ -3174,7 +3174,7 @@ c
       integer :: status(MPI_STATUS_SIZE,NHworkers)
       integer :: request(NHworkers)
 
-      if (VWorker) then      
+      if (VWorker) then
       if (no_of_vcols(myid) .eq. icloc) then
         do j=1, NHworkers
 	  if (no_of_hslices(j) .eq. izloc) then
@@ -3189,7 +3189,7 @@ c	print*,'proc',myid,'receives SHLV from',j
 	end do
       else
         do j=1, NHworkers
-	  if (no_of_hslices(j) .eq. izloc) then	
+	  if (no_of_hslices(j) .eq. izloc) then
 c 	print*,'proc',myid,'receives LHSV from',j
     	    call MPI_IRECV(s_v(1,1,j,1),1,LOCAL_4D_LHSV_VCOLS,
      &		j, j, MPI_COMM_WORLD, request(j), ierr)
@@ -3201,14 +3201,14 @@ c	print*,'proc',myid,'receives SHSV from',j
 	end do
       end if
       end if
-	
+
       if (HWorker) then
       if (no_of_hslices(myid) .eq. izloc) then
         do i=1, NVworkers
 	  if (no_of_vcols(i) .eq. icloc) then
 c	print*,'proc',myid,'sends LHLV to',i
        	    call MPI_SEND(s_h(i,1,1,1),1,LOCAL_4D_LHLV_HCOLS,
-     &		i, myid, MPI_COMM_WORLD, ierr)	  	
+     &		i, myid, MPI_COMM_WORLD, ierr)
      	  else
 c	print*,'proc',myid,'sends LHSV to',i
        	    call MPI_SEND(s_h(i,1,1,1),1,LOCAL_4D_LHSV_HCOLS,
@@ -3218,7 +3218,7 @@ c	print*,'proc',myid,'sends LHSV to',i
       else
         do i=1, NVworkers
 c	print*,'proc',myid,'sends SHLV to',i
-	  if (no_of_vcols(i) .eq. icloc) then	
+	  if (no_of_vcols(i) .eq. icloc) then
        	    call MPI_SEND(s_h(i,1,1,1),1,LOCAL_4D_SHLV_HCOLS,
      &		i, myid, MPI_COMM_WORLD, ierr)
      	  else
@@ -3238,8 +3238,8 @@ c---------------------------------------------------------
 c      Slaves exchange data:  - old format is v-columns (for sending)
 c                             - new format is h-slices (for receiving)
 c---------------------------------------------------------
-      subroutine shuffle_v2h_4D_v2(ix,iy,iz,izloc,icloc,Ns,s_h,s_v)  
-c      
+      subroutine shuffle_v2h_4D_v2(ix,iy,iz,izloc,icloc,Ns,s_h,s_v)
+c
       implicit none
 c
       integer :: ix, iy, iz, izloc, icloc, Ns
@@ -3255,7 +3255,7 @@ c
 	  if (no_of_vcols(i) .eq. icloc) then
 c	print*,'proc',myid,'receives LHLV from',i
        	    call MPI_IRECV(s_h(i,1,1,1),1,LOCAL_4D_LHLV_HCOLS,
-     &		i, i, MPI_COMM_WORLD, request(i), ierr)	  	
+     &		i, i, MPI_COMM_WORLD, request(i), ierr)
      	  else
 c	print*,'proc',myid,'receives LHSV from',i
        	    call MPI_IRECV(s_h(i,1,1,1),1,LOCAL_4D_LHSV_HCOLS,
@@ -3265,7 +3265,7 @@ c	print*,'proc',myid,'receives LHSV from',i
       else
         do i=1, NVworkers
 c	print*,'proc',myid,'receives SHLV from',i
-	  if (no_of_vcols(i) .eq. icloc) then	
+	  if (no_of_vcols(i) .eq. icloc) then
        	    call MPI_IRECV(s_h(i,1,1,1),1,LOCAL_4D_SHLV_HCOLS,
      &		i, i, MPI_COMM_WORLD, request(i), ierr)
      	  else
@@ -3276,7 +3276,7 @@ c	print*,'proc',myid,'receives SHSV from',i
 	end do
       end if
       end if
-      
+
       if (VWorker) then
       if (no_of_vcols(myid) .eq. icloc) then
         do j=1, NHworkers
@@ -3292,7 +3292,7 @@ c	print*,'proc',myid,'sends SHLV to',j
 	end do
       else
         do j=1, NHworkers
-	  if (no_of_hslices(j) .eq. izloc) then	
+	  if (no_of_hslices(j) .eq. izloc) then
 c 	print*,'proc',myid,'sends LHSV to',j
     	    call MPI_SEND(s_v(1,1,j,1),1,LOCAL_4D_LHSV_VCOLS,
      &		j, myid, MPI_COMM_WORLD, ierr)
@@ -3310,10 +3310,10 @@ c	print*,'proc',myid,'sends SHSV to',j
       end subroutine shuffle_v2h_4D_v2
 
 c--------------------------------------------------------------------------
-c  Master distributes a 2D (ix.iy) array of data in vcolumn format 
-c  to all workers 
+c  Master distributes a 2D (ix.iy) array of data in vcolumn format
+c  to all workers
 c--------------------------------------------------------------------------
-c      
+c
       subroutine distrib_v_2D_v2(ix,iy,icloc,s,s_v)
 
       implicit none
@@ -3322,34 +3322,34 @@ c
       real :: s(ix,iy)
       real :: s_v(1,icloc)
       integer :: i, ierr, status(MPI_STATUS_SIZE)
-c      
+c
       if (Master) then
         do i=1,NVworkers
 	  if (no_of_vcols(i) .eq. icloc) then
-            call MPI_SEND(s(i,1), 1, GLOBAL_LARGE_2D_VCOLS, 
+            call MPI_SEND(s(i,1), 1, GLOBAL_LARGE_2D_VCOLS,
      &         owner_of_vcol(i), i,  MPI_COMM_WORLD, ierr)
           else
-            call MPI_SEND(s(i,1), 1, GLOBAL_SMALL_2D_VCOLS, 
+            call MPI_SEND(s(i,1), 1, GLOBAL_SMALL_2D_VCOLS,
      &         owner_of_vcol(i), i,  MPI_COMM_WORLD, ierr)
           end if
 	end do
       else if (VWorker) then
         if (no_of_vcols(myid) .eq. icloc) then
-          call MPI_RECV(s_v(1,1), 1, LOCAL_LARGE_2D_VCOLS, 0, 
+          call MPI_RECV(s_v(1,1), 1, LOCAL_LARGE_2D_VCOLS, 0,
      &			myid, MPI_COMM_WORLD, status, ierr)
         else
-          call MPI_RECV(s_v(1,1), 1, LOCAL_SMALL_2D_VCOLS, 0, 
+          call MPI_RECV(s_v(1,1), 1, LOCAL_SMALL_2D_VCOLS, 0,
      &			myid, MPI_COMM_WORLD, status, ierr)
 	end if
       end if
 c
       end subroutine  distrib_v_2D_v2
-      
+
 c-------------------------------------------------------------------------
-c  Master distributes a BDz (ix.iy.is) array of data in vcolumn format 
+c  Master distributes a BDz (ix.iy.is) array of data in vcolumn format
 c   to all workers - only needed for v-transport
 c-------------------------------------------------------------------------
-c      
+c
       subroutine distrib_v_BDz_v2(ix,iy,icloc,Ns,s,s_v)
 
       implicit none
@@ -3358,34 +3358,34 @@ c
       real   :: s(ix,iy,Ns)
       real   :: s_v(1,icloc,Ns)
       integer :: j, ierr, status(MPI_STATUS_SIZE)
-c      
+c
       if (Master) then
         do j=1,NVworkers
 	  if (no_of_vcols(j) .eq. icloc) then
-            call MPI_SEND(s(j,1,1), 1, GLOBAL_LARGE_BDz_VCOLS, 
+            call MPI_SEND(s(j,1,1), 1, GLOBAL_LARGE_BDz_VCOLS,
      &         owner_of_vcol(j), j,  MPI_COMM_WORLD, ierr)
           else
-            call MPI_SEND(s(j,1,1), 1, GLOBAL_SMALL_BDz_VCOLS, 
+            call MPI_SEND(s(j,1,1), 1, GLOBAL_SMALL_BDz_VCOLS,
      &         owner_of_vcol(j), j,  MPI_COMM_WORLD, ierr)
 	  end if
 	end do
       else if (VWorker) then
         if (no_of_vcols(myid) .eq. icloc) then
-          call MPI_RECV(s_v(1,1,1), 1, LOCAL_LARGE_BDz_VCOLS, 0, 
+          call MPI_RECV(s_v(1,1,1), 1, LOCAL_LARGE_BDz_VCOLS, 0,
      &			myid, MPI_COMM_WORLD, status, ierr)
         else
-          call MPI_RECV(s_v(1,1,1), 1, LOCAL_SMALL_BDz_VCOLS, 0, 
+          call MPI_RECV(s_v(1,1,1), 1, LOCAL_SMALL_BDz_VCOLS, 0,
      &			myid, MPI_COMM_WORLD, status, ierr)
 	end if
       end if
 c
       end subroutine  distrib_v_BDz_v2
-      
+
 c-------------------------------------------------------------------------
-c  Master distributes a 3D (ix.iy.iz) array of data in h-slice format 
+c  Master distributes a 3D (ix.iy.iz) array of data in h-slice format
 c   to all workers
 c-------------------------------------------------------------------------
-c      
+c
       subroutine distrib_h_3D_v2(ix,iy,iz,izloc,s,s_h)
 
       implicit none
@@ -3394,44 +3394,44 @@ c
       real :: s(ix,iy,iz)
       real :: s_h(ix,iy,izloc)
       integer :: i, ierr, status(MPI_STATUS_SIZE)
-c      
+c
       if (Master) then
         do i=1,NHworkers
 	  if (no_of_hslices(i) .eq. izloc) then
-            call MPI_SEND(s(1,1,i), 1, GLOBAL_LARGE_3D_HSLICES, 
+            call MPI_SEND(s(1,1,i), 1, GLOBAL_LARGE_3D_HSLICES,
      &         owner_of_hslice(i), i,  MPI_COMM_WORLD, ierr)
           else
-            call MPI_SEND(s(1,1,i), 1, GLOBAL_SMALL_3D_HSLICES, 
+            call MPI_SEND(s(1,1,i), 1, GLOBAL_SMALL_3D_HSLICES,
      &         owner_of_hslice(i), i,  MPI_COMM_WORLD, ierr)
           end if
 	end do
       else if (HWorker) then
 	if (no_of_hslices(myid) .eq. izloc) then
-          call MPI_RECV(s_h(1,1,1), 1, LOCAL_LARGE_3D_HSLICES, 0, 
+          call MPI_RECV(s_h(1,1,1), 1, LOCAL_LARGE_3D_HSLICES, 0,
      &			myid, MPI_COMM_WORLD, status, ierr)
         else
-          call MPI_RECV(s_h(1,1,1), 1, LOCAL_SMALL_3D_HSLICES, 0, 
+          call MPI_RECV(s_h(1,1,1), 1, LOCAL_SMALL_3D_HSLICES, 0,
      &			myid, MPI_COMM_WORLD, status, ierr)
 	end if
       end if
 c
-      end subroutine  distrib_h_3D_v2   
+      end subroutine  distrib_h_3D_v2
 
-      
+
 c--------------------------------------------------------------------------
-c  Master distributes a 3D (ix.iy.iz) array of data in v-column format 
+c  Master distributes a 3D (ix.iy.iz) array of data in v-column format
 c   to all workers
 c--------------------------------------------------------------------------
 c
       subroutine distrib_v_3D_v2(ix,iy,iz,icloc,s,s_v)
 
       implicit none
-c      
+c
       integer :: ix, iy, iz, icloc
       real   :: s(ix,iy,iz)
       real   :: s_v(1,icloc,iz)
       integer :: i, ierr, status(MPI_STATUS_SIZE)
-c      
+c
       if (Master) then
         do i=1,NVworkers
  	  if (no_of_vcols(i) .eq. icloc) then
@@ -3444,21 +3444,21 @@ c
         end do
       else if (VWorker) then
         if (no_of_vcols(myid) .eq. icloc) then
-           call MPI_RECV(s_v(1,1,1), 1, LOCAL_LARGE_3D_VCOLS, 0, 
+           call MPI_RECV(s_v(1,1,1), 1, LOCAL_LARGE_3D_VCOLS, 0,
      &			myid, MPI_COMM_WORLD, status, ierr)
         else
-           call MPI_RECV(s_v(1,1,1), 1, LOCAL_SMALL_3D_VCOLS, 0, 
+           call MPI_RECV(s_v(1,1,1), 1, LOCAL_SMALL_3D_VCOLS, 0,
      &			myid, MPI_COMM_WORLD, status, ierr)
         end if
       endif
-c	
+c
       return
       end subroutine distrib_v_3D_v2
 
 c---------------------------------------------------------------------------
 c  Master distributes the y-boundary array BDy
 c---------------------------------------------------------------------------
-c      
+c
       subroutine distrib_h_BDy_v2(ix,iz,izloc,Ns,s,sloc)
 
       implicit none
@@ -3467,35 +3467,35 @@ c
       real :: s(ix,iz,Ns)
       real :: sloc(ix,izloc,Ns)
       integer :: j, ierr, status(MPI_STATUS_SIZE)
-c      
+c
       if (Master) then
         do j=1,NHworkers
 	  if (no_of_hslices(j) .eq. izloc) then
-            call MPI_SEND(s(1,j,1), 1, GLOBAL_LARGE_BDy_HSLICES, 
+            call MPI_SEND(s(1,j,1), 1, GLOBAL_LARGE_BDy_HSLICES,
      &         owner_of_hslice(j), j,  MPI_COMM_WORLD, ierr)
           else
-            call MPI_SEND(s(1,j,1), 1, GLOBAL_SMALL_BDy_HSLICES, 
+            call MPI_SEND(s(1,j,1), 1, GLOBAL_SMALL_BDy_HSLICES,
      &         owner_of_hslice(j), j,  MPI_COMM_WORLD, ierr)
           end if
 	end do
       else if (HWorker) then
 	if (no_of_hslices(myid) .eq. izloc) then
-          call MPI_RECV(sloc(1,1,1), 1, LOCAL_LARGE_BDy_HSLICES, 0, 
+          call MPI_RECV(sloc(1,1,1), 1, LOCAL_LARGE_BDy_HSLICES, 0,
      &			myid, MPI_COMM_WORLD, status, ierr)
         else
-          call MPI_RECV(sloc(1,1,1), 1, LOCAL_SMALL_BDy_HSLICES, 0, 
+          call MPI_RECV(sloc(1,1,1), 1, LOCAL_SMALL_BDy_HSLICES, 0,
      &			myid, MPI_COMM_WORLD, status, ierr)
 	end if
       end if
 c
       end subroutine  distrib_h_BDy_v2
- 
+
 c---------------------------------------------------------------------------
 c  Master distributes the y-boundary array BDy2
 c  - careful, X is used from
 c  former different naming BDx...
 c---------------------------------------------------------------------------
-c      
+c
       subroutine distrib_xh_BD_v2(ix,iz,izloc,Ns,s,sloc)
 
       implicit none
@@ -3504,33 +3504,33 @@ c
       real :: s(ix,iz,2,Ns)
       real :: sloc(ix,izloc,2,Ns)
       integer :: j, ierr, status(MPI_STATUS_SIZE)
-c      
+c
       if (Master) then
         do j=1,NHworkers
 	  if (no_of_hslices(j) .eq. izloc) then
-            call MPI_SEND(s(1,j,1,1), 1, GLOBAL_LARGE_BD_XHSLICES, 
+            call MPI_SEND(s(1,j,1,1), 1, GLOBAL_LARGE_BD_XHSLICES,
      &         owner_of_hslice(j), j,  MPI_COMM_WORLD, ierr)
           else
-            call MPI_SEND(s(1,j,1,1), 1, GLOBAL_SMALL_BD_XHSLICES, 
+            call MPI_SEND(s(1,j,1,1), 1, GLOBAL_SMALL_BD_XHSLICES,
      &         owner_of_hslice(j), j,  MPI_COMM_WORLD, ierr)
           end if
 	end do
       else if (HWorker) then
 	if (no_of_hslices(myid) .eq. izloc) then
-          call MPI_RECV(sloc(1,1,1,1), 1, LOCAL_LARGE_BD_XHSLICES, 0, 
+          call MPI_RECV(sloc(1,1,1,1), 1, LOCAL_LARGE_BD_XHSLICES, 0,
      &			myid, MPI_COMM_WORLD, status, ierr)
         else
-          call MPI_RECV(sloc(1,1,1,1), 1, LOCAL_SMALL_BD_XHSLICES, 0, 
+          call MPI_RECV(sloc(1,1,1,1), 1, LOCAL_SMALL_BD_XHSLICES, 0,
      &			myid, MPI_COMM_WORLD, status, ierr)
 	end if
       end if
 c
       end subroutine  distrib_xh_BD_v2
-      
+
 c---------------------------------------------------------------------------
 c  Master distributes the x-boundary array BDx
 c---------------------------------------------------------------------------
-c      
+c
       subroutine distrib_h_BDx_v2(iy,iz,izloc,Ns,s,sloc)
 
       implicit none
@@ -3539,14 +3539,14 @@ c
       real :: s(iy,iz,Ns)
       real :: sloc(iy,izloc,Ns)
       integer :: i, ierr, status(MPI_STATUS_SIZE)
-c      
+c
       if (Master) then
         do i=1,NHworkers
 	  if (no_of_hslices(i) .eq. izloc) then
-            call MPI_SEND(s(1,i,1), 1, GLOBAL_LARGE_BDx_HSLICES, 
+            call MPI_SEND(s(1,i,1), 1, GLOBAL_LARGE_BDx_HSLICES,
      &         owner_of_hslice(i), i,  MPI_COMM_WORLD, ierr)
           else
-            call MPI_SEND(s(1,i,1), 1, GLOBAL_SMALL_BDx_HSLICES, 
+            call MPI_SEND(s(1,i,1), 1, GLOBAL_SMALL_BDx_HSLICES,
      &         owner_of_hslice(i), i,  MPI_COMM_WORLD, ierr)
           end if
      	end do
@@ -3563,11 +3563,11 @@ c
       end subroutine  distrib_h_BDx_v2
 
 c---------------------------------------------------------------------------
-c  Master distributes the x-boundary array 
+c  Master distributes the x-boundary array
 c  - careful, Y is used from
 c  former different naming BDy...
 c---------------------------------------------------------------------------
-c      
+c
       subroutine distrib_yh_BD_v2(iy,iz,izloc,Ns,s,sloc)
 
       implicit none
@@ -3576,14 +3576,14 @@ c
       real :: s(iy,iz,2,Ns)
       real :: sloc(iy,izloc,2,Ns)
       integer :: i, ierr, status(MPI_STATUS_SIZE)
-c      
+c
       if (Master) then
         do i=1,NHworkers
 	  if (no_of_hslices(i) .eq. izloc) then
-            call MPI_SEND(s(1,i,1,1), 1, GLOBAL_LARGE_BD_YHSLICES, 
+            call MPI_SEND(s(1,i,1,1), 1, GLOBAL_LARGE_BD_YHSLICES,
      &         owner_of_hslice(i), i,  MPI_COMM_WORLD, ierr)
           else
-            call MPI_SEND(s(1,i,1,1), 1, GLOBAL_SMALL_BD_YHSLICES, 
+            call MPI_SEND(s(1,i,1,1), 1, GLOBAL_SMALL_BD_YHSLICES,
      &         owner_of_hslice(i), i,  MPI_COMM_WORLD, ierr)
           end if
      	end do
@@ -3604,7 +3604,7 @@ c ***************** collective communication ************************
 c *******************************************************************
 
 c-----------------------------------------------------------------
-c  Master distributes a 4D array of data in h-slice 
+c  Master distributes a 4D array of data in h-slice
 c     format to all workers
 c   using scatterv
 c-----------------------------------------------------------------
@@ -3635,12 +3635,12 @@ c The master scatters the h-slices in two calls
 c First everybody gets the minimal size everybody has, then
 c the rest processors get their further slices (max. one more)
       if (no_of_hslices(NHworkers) .eq. izloc) then
-        call MPI_SCATTERV(s(1,1,1,1), sendcounts, displs, 
+        call MPI_SCATTERV(s(1,1,1,1), sendcounts, displs,
      &		GLOB_LARGE_4D_HSLICES, s_h(1,1,1,1),
      &		recvcount, LOCAL_LARGE_4D_HSLICES, 0,
      &		MPI_COMM_WORLD, ierr)
       else
-        call MPI_SCATTERV(s(1,1,1,1), sendcounts, displs, 
+        call MPI_SCATTERV(s(1,1,1,1), sendcounts, displs,
      &		GLOB_SMALL_4D_HSLICES, s_h(1,1,1,1),
      &		recvcount, LOCAL_SMALL_4D_HSLICES, 0,
      &		MPI_COMM_WORLD, ierr)
@@ -3649,7 +3649,7 @@ c the rest processors get their further slices (max. one more)
         if (MyId .gt. mod(iz,NHworkers)) then
           recvcount = 0
         end if
-        call MPI_SCATTERV(s(1,1,NHworkers*(izloc-1)+1,1), sendcounts,  
+        call MPI_SCATTERV(s(1,1,NHworkers*(izloc-1)+1,1), sendcounts,
      &		displs, GLOB_4D_HSLICE, s_h(1,1,izloc,1),
      &		recvcount, LOCAL_4D_HSLICE, 0,
      &		MPI_COMM_WORLD, ierr)
@@ -3662,7 +3662,7 @@ c  Master distributes a 4D array of data in v-column format to all workers
 c  using scatterv
 c-----------------------------------------------------------------
       subroutine distrib_v_4D_v3(ix,iy,iz,icloc,Ns,s,s_v)
-c      
+c
       implicit none
 c
       integer :: ix, iy, iz, icloc, Ns
@@ -3688,12 +3688,12 @@ c The master scatters the v-columns in two calls
 c First everybody gets the minimal size everybody has, then
 c the rest processors get their further slices (max. one more)
       if (no_of_vcols(NVworkers) .eq. icloc) then
-        call MPI_SCATTERV(s(1,1,1,1), sendcounts, displs, 
+        call MPI_SCATTERV(s(1,1,1,1), sendcounts, displs,
      &		GLOB_LARGE_4D_VCOLS, s_v(1,1,1,1),
      &		recvcount, LOCAL_LARGE_4D_VCOLS, 0,
      &		MPI_COMM_WORLD, ierr)
       else
-        call MPI_SCATTERV(s(1,1,1,1), sendcounts, displs, 
+        call MPI_SCATTERV(s(1,1,1,1), sendcounts, displs,
      &		GLOB_SMALL_4D_VCOLS, s_v(1,1,1,1),
      &		recvcount, LOCAL_SMALL_4D_VCOLS, 0,
      &		MPI_COMM_WORLD, ierr)
@@ -3702,7 +3702,7 @@ c the rest processors get their further slices (max. one more)
         if (MyId .gt. mod(ix*iy,NVworkers)) then
           recvcount = 0
         end if
-        call MPI_SCATTERV(s(NVworkers*(icloc-1)+1,1,1,1), sendcounts,  
+        call MPI_SCATTERV(s(NVworkers*(icloc-1)+1,1,1,1), sendcounts,
      &		displs, GLOB_4D_VCOL, s_v(1,icloc,1,1),
      &		recvcount, LOCAL_4D_VCOL, 0,
      &		MPI_COMM_WORLD, ierr)
@@ -3714,7 +3714,7 @@ c-----------------------------------------------------------------
 c  Master gathers a 4D array of data in h-slice format from all workers
 c-----------------------------------------------------------------
       subroutine gather_h_4D_v3(ix,iy,iz,izloc,Ns,s,s_h)
-c      
+c
       implicit none
 c
       integer :: ix, iy, iz, izloc, Ns
@@ -3734,7 +3734,7 @@ c The master scatters the h-slices in two calls
       end do
       if (HWorker) then
         sendcount = 1
-      else 
+      else
         sendcount = 0
       end if
 c First everybody gets the minimal size everybody has, then
@@ -3760,13 +3760,13 @@ c the rest processors get their further slices (max. one more)
      &		MPI_COMM_WORLD, ierr)
       end if
 c
-      end subroutine  gather_h_4D_v3  
+      end subroutine  gather_h_4D_v3
 
 c-----------------------------------------------------------------
 c  Master gathers a 4D array of data in vcolumn format from all workers
 c-----------------------------------------------------------------
       subroutine gather_v_4D_v3(ix,iy,iz,icloc,Ns,s,s_v)
-c      
+c
       implicit none
 c
       integer :: ix, iy, iz, icloc, Ns
@@ -3812,7 +3812,7 @@ c the rest processors get their further slices (max. one more)
      &		MPI_COMM_WORLD, ierr)
       end if
 c
-      end subroutine  gather_v_4D_v3  
+      end subroutine  gather_v_4D_v3
 
 
 c---------------------------------------------------------
@@ -3820,8 +3820,8 @@ c      Slaves exchange data:  - old format is h-slices (for sending)
 c                             - new format is v-columns (for receiving)
 c 	using MPI_ALLTOALL and copying
 c---------------------------------------------------------
-      subroutine shuffle_h2v_4D_v3(ix,iy,iz,izloc,icloc,Ns,s_h,s_v)  
-c      
+      subroutine shuffle_h2v_4D_v3(ix,iy,iz,izloc,icloc,Ns,s_h,s_v)
+c
       implicit none
 c
       integer,intent(in) :: ix, iy, iz, izloc, icloc, Ns
@@ -3829,15 +3829,15 @@ c
       real,intent(out)    :: s_v(1,icloc,iz,Ns)
       integer :: i,ierr, p, lk
       integer :: status(MPI_STATUS_SIZE)
-      real,pointer, dimension(:,:,:,:), save :: sbuf,rbuf
+      real,allocatable, dimension(:,:,:,:), save :: sbuf,rbuf
 
       if (HWorker .or. VWorker) then
         if (.not.allocated(sbuf)) then
-          allocate( sbuf(icloc,izloc,Ns,max(NHworkers,NVworkers)), 
+          allocate( sbuf(icloc,izloc,Ns,max(NHworkers,NVworkers)),
      &		STAT=ierr)
         endif
         if (.not.allocated(rbuf)) then
-          allocate( rbuf(icloc,izloc,Ns,max(NHworkers,NVworkers)), 
+          allocate( rbuf(icloc,izloc,Ns,max(NHworkers,NVworkers)),
      &		STAT=ierr )
         endif
 
@@ -3845,24 +3845,24 @@ c
 
         do i=1,ix*iy
 	  lk = local_vcol_id(i)
-	  sbuf(lk,1:no_of_hslices(MyId),1:Ns,owner_of_vcol(i)) = 
+	  sbuf(lk,1:no_of_hslices(MyId),1:Ns,owner_of_vcol(i)) =
      &		s_h(planar_vcol_id(i,1),
      &		planar_vcol_id(i,2), 1:no_of_hslices(MyId),1:Ns)
         end do
       end if
 
-      call MPI_ALLTOALL(sbuf, icloc*izloc*Ns, MPI_REAL, 
-     &          rbuf, icloc*izloc*Ns, MPI_REAL, 
+      call MPI_ALLTOALL(sbuf, icloc*izloc*Ns, MPI_REAL,
+     &          rbuf, icloc*izloc*Ns, MPI_REAL,
      &          MPI_COMM_WORKERS, ierr)
-     
+
       if (VWorker) then
         do p=1,NHworkers
   	  s_v(1,1:icloc,owned_hslices(p,1:no_of_hslices(p)),1:Ns)=
      &	            rbuf(1:icloc,1:no_of_hslices(p),1:Ns,p)
         enddo
-      end if	
       end if
-      
+      end if
+
       end subroutine shuffle_h2v_4D_v3
 
 c---------------------------------------------------------
@@ -3870,8 +3870,8 @@ c      Slaves exchange data:  - old format is v-columns (for sending)
 c                             - new format is h-slices (for receiving)
 c	using MPI_ALLTOALLV and copying
 c---------------------------------------------------------
-      subroutine shuffle_v2h_4D_v3(ix,iy,iz,izloc,icloc,Ns,s_h,s_v)  
-c      
+      subroutine shuffle_v2h_4D_v3(ix,iy,iz,izloc,icloc,Ns,s_h,s_v)
+c
       implicit none
 c
       integer,intent(in)  :: ix, iy, iz, izloc, icloc, Ns
@@ -3879,7 +3879,7 @@ c
       real,intent(in)   :: s_v(1,icloc,iz,Ns)
       integer :: i, ierr, p, lk
       integer :: status(MPI_STATUS_SIZE)
-      real,pointer, dimension(:,:,:,:),save    :: sbuf,rbuf
+      real,allocatable, dimension(:,:,:,:),save    :: sbuf,rbuf
 
       if (HWorker .or. VWorker) then
         if (.not.allocated(sbuf)) then
@@ -3897,11 +3897,11 @@ c
      &	      s_v(1,1:icloc,owned_hslices(p,1:no_of_hslices(p)),1:Ns)
         end do
       end if
-	
-      call MPI_ALLTOALL(sbuf, icloc*izloc*Ns, MPI_REAL, 
-     &          rbuf, icloc*izloc*Ns, MPI_REAL, 
+
+      call MPI_ALLTOALL(sbuf, icloc*izloc*Ns, MPI_REAL,
+     &          rbuf, icloc*izloc*Ns, MPI_REAL,
      &          MPI_COMM_WORKERS, ierr)
-     
+
       if (HWorker) then
         do p=1,NVworkers
           do i = 1,no_of_vcols(p)
@@ -3911,7 +3911,7 @@ c
      &	        rbuf(i,1:no_of_hslices(MyId),1:Ns,p)
           enddo
         end do
-	
+
       end if
       end if
 
@@ -3922,7 +3922,7 @@ c  Master distributes a 2D array of data in v-column format to all workers
 c  using scatterv
 c-----------------------------------------------------------------
       subroutine distrib_v_2D_v3(ix,iy,icloc,s,s_v)
-c      
+c
       implicit none
 c
       integer :: ix, iy, icloc
@@ -3948,12 +3948,12 @@ c The master scatters the v-columns in two calls
 c First everybody gets the minimal size everybody has, then
 c the rest processors get their further slices (max. one more)
       if (no_of_vcols(NVworkers) .eq. icloc) then
-        call MPI_SCATTERV(s(1,1), sendcounts, displs, 
+        call MPI_SCATTERV(s(1,1), sendcounts, displs,
      &		GLOB_LARGE_2D_VCOLS, s_v(1,1),
      &		recvcount, LOCAL_LARGE_2D_VCOLS, 0,
      &		MPI_COMM_WORLD, ierr)
       else
-        call MPI_SCATTERV(s(1,1), sendcounts, displs, 
+        call MPI_SCATTERV(s(1,1), sendcounts, displs,
      &		GLOB_SMALL_2D_VCOLS, s_v(1,1),
      &		recvcount, LOCAL_SMALL_2D_VCOLS, 0,
      &		MPI_COMM_WORLD, ierr)
@@ -3962,7 +3962,7 @@ c the rest processors get their further slices (max. one more)
         if (MyId .gt. mod(ix*iy,NVworkers)) then
           recvcount = 0
         end if
-        call MPI_SCATTERV(s(NVworkers*(icloc-1)+1,1), sendcounts,  
+        call MPI_SCATTERV(s(NVworkers*(icloc-1)+1,1), sendcounts,
      &		displs, MPI_REAL, s_v(1,icloc),
      &		recvcount, MPI_REAL, 0,
      &		MPI_COMM_WORLD, ierr)
@@ -3975,7 +3975,7 @@ c  Master distributes a BDz array of data in v-column format to all workers
 c  using scatterv
 c-----------------------------------------------------------------
       subroutine distrib_v_BDz_v3(ix,iy,icloc,Ns,s,s_v)
-c      
+c
       implicit none
 c
       integer :: ix, iy, icloc, Ns
@@ -4001,12 +4001,12 @@ c The master scatters the v-columns in two calls
 c First everybody gets the minimal size everybody has, then
 c the rest processors get their further slices (max. one more)
       if (no_of_vcols(NVworkers) .eq. icloc) then
-        call MPI_SCATTERV(s(1,1,1), sendcounts, displs, 
+        call MPI_SCATTERV(s(1,1,1), sendcounts, displs,
      &		GLOB_LARGE_BDz_VCOLS, s_v(1,1,1),
      &		recvcount, LOCAL_LARGE_BDz_VCOLS, 0,
      &		MPI_COMM_WORLD, ierr)
       else
-        call MPI_SCATTERV(s(1,1,1), sendcounts, displs, 
+        call MPI_SCATTERV(s(1,1,1), sendcounts, displs,
      &		GLOB_SMALL_BDz_VCOLS, s_v(1,1,1),
      &		recvcount, LOCAL_SMALL_BDz_VCOLS, 0,
      &		MPI_COMM_WORLD, ierr)
@@ -4015,7 +4015,7 @@ c the rest processors get their further slices (max. one more)
         if (MyId .gt. mod(ix*iy,NVworkers)) then
           recvcount = 0
         end if
-        call MPI_SCATTERV(s(NVworkers*(icloc-1)+1,1,1), sendcounts,  
+        call MPI_SCATTERV(s(NVworkers*(icloc-1)+1,1,1), sendcounts,
      &		displs, GLOB_BDz_VCOL, s_v(1,icloc,1),
      &		recvcount, LOCAL_BDz_VCOL, 0,
      &		MPI_COMM_WORLD, ierr)
@@ -4024,7 +4024,7 @@ c the rest processors get their further slices (max. one more)
       end subroutine  distrib_v_BDz_v3
 
 c-----------------------------------------------------------------
-c  Master distributes a 3D array of data in h-slice 
+c  Master distributes a 3D array of data in h-slice
 c     format to all workers
 c   using scatterv
 c-----------------------------------------------------------------
@@ -4055,12 +4055,12 @@ c The master scatters the h-slices in two calls
 c First everybody gets the minimal size everybody has, then
 c the rest processors get their further slices (max. one more)
       if (no_of_hslices(NHworkers) .eq. izloc) then
-        call MPI_SCATTERV(s(1,1,1), sendcounts, displs, 
+        call MPI_SCATTERV(s(1,1,1), sendcounts, displs,
      &		GLOB_LARGE_3D_HSLICES, s_h(1,1,1),
      &		recvcount, LOCAL_LARGE_3D_HSLICES, 0,
      &		MPI_COMM_WORLD, ierr)
       else
-        call MPI_SCATTERV(s(1,1,1), sendcounts, displs, 
+        call MPI_SCATTERV(s(1,1,1), sendcounts, displs,
      &		GLOB_SMALL_3D_HSLICES, s_h(1,1,1),
      &		recvcount, LOCAL_SMALL_3D_HSLICES, 0,
      &		MPI_COMM_WORLD, ierr)
@@ -4071,7 +4071,7 @@ c the rest processors get their further slices (max. one more)
         if (MyId .gt. mod(iz,NHworkers)) then
           recvcount = 0
         end if
-        call MPI_SCATTERV(s(1,1,NHworkers*(izloc-1)+1), sendcounts,  
+        call MPI_SCATTERV(s(1,1,NHworkers*(izloc-1)+1), sendcounts,
      &		displs, MPI_REAL, s_h(1,1,izloc),
      &		recvcount, MPI_REAL, 0,
      &		MPI_COMM_WORLD, ierr)
@@ -4084,7 +4084,7 @@ c  Master distributes a 3D array of data in v-column format to all workers
 c  using scatterv
 c-----------------------------------------------------------------
       subroutine distrib_v_3D_v3(ix,iy,iz,icloc,s,s_v)
-c      
+c
       implicit none
 c
       integer :: ix, iy, iz, icloc
@@ -4110,12 +4110,12 @@ c The master scatters the v-columns in two calls
 c First everybody gets the minimal size everybody has, then
 c the rest processors get their further slices (max. one more)
       if (no_of_vcols(NVworkers) .eq. icloc) then
-        call MPI_SCATTERV(s(1,1,1), sendcounts, displs, 
+        call MPI_SCATTERV(s(1,1,1), sendcounts, displs,
      &		GLOB_LARGE_3D_VCOLS, s_v(1,1,1),
      &		recvcount, LOCAL_LARGE_3D_VCOLS, 0,
      &		MPI_COMM_WORLD, ierr)
       else
-        call MPI_SCATTERV(s(1,1,1), sendcounts, displs, 
+        call MPI_SCATTERV(s(1,1,1), sendcounts, displs,
      &		GLOB_SMALL_3D_VCOLS, s_v(1,1,1),
      &		recvcount, LOCAL_SMALL_3D_VCOLS, 0,
      &		MPI_COMM_WORLD, ierr)
@@ -4124,7 +4124,7 @@ c the rest processors get their further slices (max. one more)
         if (MyId .gt. mod(ix*iy,NVworkers)) then
           recvcount = 0
         end if
-        call MPI_SCATTERV(s(NVworkers*(icloc-1)+1,1,1), sendcounts,  
+        call MPI_SCATTERV(s(NVworkers*(icloc-1)+1,1,1), sendcounts,
      &		displs, GLOB_3D_VCOL, s_v(1,icloc,1),
      &		recvcount, LOCAL_3D_VCOL, 0,
      &		MPI_COMM_WORLD, ierr)
@@ -4133,7 +4133,7 @@ c the rest processors get their further slices (max. one more)
       end subroutine  distrib_v_3D_v3
 
 c-----------------------------------------------------------------
-c  Master distributes a BDy array of data in h-slice 
+c  Master distributes a BDy array of data in h-slice
 c     format to all workers
 c   using scatterv
 c-----------------------------------------------------------------
@@ -4164,12 +4164,12 @@ c The master scatters the h-slices in two calls
 c First everybody gets the minimal size everybody has, then
 c the rest processors get their further slices (max. one more)
       if (no_of_hslices(NHworkers) .eq. izloc) then
-        call MPI_SCATTERV(s(1,1,1), sendcounts, displs, 
+        call MPI_SCATTERV(s(1,1,1), sendcounts, displs,
      &		GLOB_LARGE_BDy_HSLICES, s_h(1,1,1),
      &		recvcount, LOCAL_LARGE_BDy_HSLICES, 0,
      &		MPI_COMM_WORLD, ierr)
       else
-        call MPI_SCATTERV(s(1,1,1), sendcounts, displs, 
+        call MPI_SCATTERV(s(1,1,1), sendcounts, displs,
      &		GLOB_SMALL_BDy_HSLICES, s_h(1,1,1),
      &		recvcount, LOCAL_SMALL_BDy_HSLICES, 0,
      &		MPI_COMM_WORLD, ierr)
@@ -4178,7 +4178,7 @@ c the rest processors get their further slices (max. one more)
         if (MyId .gt. mod(iz,NHworkers)) then
           recvcount = 0
         end if
-        call MPI_SCATTERV(s(1,NHworkers*(izloc-1)+1,1), sendcounts,  
+        call MPI_SCATTERV(s(1,NHworkers*(izloc-1)+1,1), sendcounts,
      &		displs, GLOB_BDy_HSLICE, s_h(1,izloc,1),
      &		recvcount, LOCAL_BDy_HSLICE, 0,
      &		MPI_COMM_WORLD, ierr)
@@ -4187,7 +4187,7 @@ c the rest processors get their further slices (max. one more)
       end subroutine  distrib_h_BDy_v3
 
 c-----------------------------------------------------------------
-c  Master distributes a BDy array of data in h-slice 
+c  Master distributes a BDy array of data in h-slice
 c     format to all workers
 c   using scatterv
 c  - careful, X is used from
@@ -4220,12 +4220,12 @@ c The master scatters the h-slices in two calls
 c First everybody gets the minimal size everybody has, then
 c the rest processors get their further slices (max. one more)
       if (no_of_hslices(NHworkers) .eq. izloc) then
-        call MPI_SCATTERV(s(1,1,1,1), sendcounts, displs, 
+        call MPI_SCATTERV(s(1,1,1,1), sendcounts, displs,
      &		GLOB_LARGE_BD_XHSLICES, s_h(1,1,1,1),
      &		recvcount, LOCAL_LARGE_BD_XHSLICES, 0,
      &		MPI_COMM_WORLD, ierr)
       else
-        call MPI_SCATTERV(s(1,1,1,1), sendcounts, displs, 
+        call MPI_SCATTERV(s(1,1,1,1), sendcounts, displs,
      &		GLOB_SMALL_BD_XHSLICES, s_h(1,1,1,1),
      &		recvcount, LOCAL_SMALL_BD_XHSLICES, 0,
      &		MPI_COMM_WORLD, ierr)
@@ -4234,7 +4234,7 @@ c the rest processors get their further slices (max. one more)
         if (MyId .gt. mod(iz,NHworkers)) then
           recvcount = 0
         end if
-        call MPI_SCATTERV(s(1,NHworkers*(izloc-1)+1,1,1), sendcounts,  
+        call MPI_SCATTERV(s(1,NHworkers*(izloc-1)+1,1,1), sendcounts,
      &		displs, GLOB_BD_XHSLICE, s_h(1,izloc,1,1),
      &		recvcount, LOCAL_BD_XHSLICE, 0,
      &		MPI_COMM_WORLD, ierr)
@@ -4243,7 +4243,7 @@ c the rest processors get their further slices (max. one more)
       end subroutine  distrib_xh_BD_v3
 
 c-----------------------------------------------------------------
-c  Master distributes a BDx array of data in h-slice 
+c  Master distributes a BDx array of data in h-slice
 c     format to all workers
 c   using scatterv
 c-----------------------------------------------------------------
@@ -4274,12 +4274,12 @@ c The master scatters the h-slices in two calls
 c First everybody gets the minimal size everybody has, then
 c the rest processors get their further slices (max. one more)
       if (no_of_hslices(NHworkers) .eq. izloc) then
-        call MPI_SCATTERV(s(1,1,1), sendcounts, displs, 
+        call MPI_SCATTERV(s(1,1,1), sendcounts, displs,
      &		GLOB_LARGE_BDx_HSLICES, s_h(1,1,1),
      &		recvcount, LOCAL_LARGE_BDx_HSLICES, 0,
      &		MPI_COMM_WORLD, ierr)
       else
-        call MPI_SCATTERV(s(1,1,1), sendcounts, displs, 
+        call MPI_SCATTERV(s(1,1,1), sendcounts, displs,
      &		GLOB_SMALL_BDx_HSLICES, s_h(1,1,1),
      &		recvcount, LOCAL_SMALL_BDx_HSLICES, 0,
      &		MPI_COMM_WORLD, ierr)
@@ -4288,7 +4288,7 @@ c the rest processors get their further slices (max. one more)
         if (MyId .gt. mod(iz,NHworkers)) then
           recvcount = 0
         end if
-        call MPI_SCATTERV(s(1,NHworkers*(izloc-1)+1,1), sendcounts,  
+        call MPI_SCATTERV(s(1,NHworkers*(izloc-1)+1,1), sendcounts,
      &		displs, GLOB_BDx_HSLICE, s_h(1,izloc,1),
      &		recvcount, LOCAL_BDx_HSLICE, 0,
      &		MPI_COMM_WORLD, ierr)
@@ -4297,7 +4297,7 @@ c the rest processors get their further slices (max. one more)
       end subroutine  distrib_h_BDx_v3
 
 c-----------------------------------------------------------------
-c  Master distributes a BDx array of data in h-slice 
+c  Master distributes a BDx array of data in h-slice
 c     format to all workers
 c   using scatterv
 c  - careful, Y is used from
@@ -4330,12 +4330,12 @@ c The master scatters the h-slices in two calls
 c First everybody gets the minimal size everybody has, then
 c the rest processors get their further slices (max. one more)
       if (no_of_hslices(NHworkers) .eq. izloc) then
-        call MPI_SCATTERV(s(1,1,1,1), sendcounts, displs, 
+        call MPI_SCATTERV(s(1,1,1,1), sendcounts, displs,
      &		GLOB_LARGE_BD_YHSLICES, s_h(1,1,1,1),
      &		recvcount, LOCAL_LARGE_BD_YHSLICES, 0,
      &		MPI_COMM_WORLD, ierr)
       else
-        call MPI_SCATTERV(s(1,1,1,1), sendcounts, displs, 
+        call MPI_SCATTERV(s(1,1,1,1), sendcounts, displs,
      &		GLOB_SMALL_BD_YHSLICES, s_h(1,1,1,1),
      &		recvcount, LOCAL_SMALL_BD_YHSLICES, 0,
      &		MPI_COMM_WORLD, ierr)
@@ -4344,7 +4344,7 @@ c the rest processors get their further slices (max. one more)
         if (MyId .gt. mod(iz,NHworkers)) then
           recvcount = 0
         end if
-        call MPI_SCATTERV(s(1,NHworkers*(izloc-1)+1,1,1), sendcounts,  
+        call MPI_SCATTERV(s(1,NHworkers*(izloc-1)+1,1,1), sendcounts,
      &		displs, GLOB_BD_YHSLICE, s_h(1,izloc,1,1),
      &		recvcount, LOCAL_BD_YHSLICE, 0,
      &		MPI_COMM_WORLD, ierr)
@@ -4354,4 +4354,3 @@ c the rest processors get their further slices (max. one more)
 
 
       end module HVCommunicationLibrary
-

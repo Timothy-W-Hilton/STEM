@@ -35,7 +35,7 @@
 * ___ SECTION 1: VARIABLES AND PARAMETERS ______________________________
 
       real cclean, cblock, cfull
-      data cclean,cblock,cfull/0.15,0.5,0.85/ 
+      data cclean,cblock,cfull/0.15,0.5,0.85/
            !cloud coverage for defining clean sky, broken cloud with blocked cloud
 	   ! and near-full cloud coverage
 
@@ -43,18 +43,18 @@
       integer nzstem              ! stem vertical grid number
       real zstem(nzstem),o3stem(nzstem),so2stem(nzstem),no2stem(nzstem),
      1 airstem(nzstem),tempstem(nzstem),cldod(nzstem),ccover(nzstem),
-     2 mssaero(nzstem,5), rhu(nzstem) 
+     2 mssaero(nzstem,5), rhu(nzstem)
         ! stem Z-grid (km), o3(mole/cm3),so2, no2, air desity(mole/cm3), 
 	! temperature (K), cloud optic depth, cloud coverage
 	! aerosol concentration in molecular/cm3 (ug/m3),  1=dust,2=watersoluble(50%sulfate),
         !          3=black carbon, 4=sea salt,   5=organic carbon
-        ! relative humidity 
-         
-* additional output dimension	
+        ! relative humidity
+
+* additional output dimension
       real aerod(nzstem,6)  ! aerosol extinction coefficient
                             ! 6 represent total aerosol depth counted from top layer
 			    ! 7 is the Single Scatter Albedo
-       
+
 * wavelength grid:
 
       INTEGER nw, iw
@@ -86,11 +86,11 @@
       REAL xso2(kz,kw)
 
 * SO2 absorption cross section
-     
+
       REAL xsso2(kw)
 
 * NO2 absorption cross section
-     
+
       REAL xsno2(kw)
 
 * atmospheric optical parameters:
@@ -112,7 +112,7 @@
 
       INTEGER ns, is
       REAL sw(ks,kw), rate(ks), dose(ks)
-      REAL sirrad, sprate 
+      REAL sirrad, sprate
       CHARACTER*40 label(ks)
 
 *! j-values:
@@ -128,7 +128,7 @@
 
 * Location and time
 
-      REAL alat, along 
+      REAL alat, along
       INTEGER idate
       REAL dtime, ut, ut0
 
@@ -141,7 +141,7 @@
 
       integer nzen
       real  sav(100,kz), sza(100)
-      
+
       logical first
       save first
       data first/.true./
@@ -154,7 +154,7 @@
 * wavelengths
 
       if(first) CALL gridw(nw,wl,wc,wu)
-      
+
 * for version B only (no sr bands):  limit  to wavelengths longer than 250 nm.
 
 C      IF (wl(iw) .LE. 250.) STOP
@@ -166,22 +166,22 @@ C      IF (wl(iw) .LE. 250.) STOP
        do while(z(nz).le.78)  ! set top to 82km
         nz=nz+1
 	z(nz)=z(nz-1)+2         ! set vertical interval 2km while above stem layers
-       enddo 	
+       enddo
 c       write(kout,"(' total z grid number:',i2)")nz
-c       write(kout,"('Z grid ', 20f7.3)")z(1:nz)  
+c       write(kout,"('Z grid ', 20f7.3)")z(1:nz)
 c       z(1) = 0.
 c       CALL gridz(nz,z)
 
 * ___ SECTION 3: SPECTRAL DATA ____________________________
 
 * read (and grid) extra terrestrial flux data:
-      
+
       if(first) then
       CALL rdetfl(nw,wl,f)
 
-* read cross section data for 
+* read cross section data for
 *    ozone (temperature-dependent)
-*    SO2 
+*    SO2
 *    NO2
 
       CALL rdo3xs(nw,wl,xso3,s226,s263,s298)
@@ -203,7 +203,7 @@ c       CALL gridz(nz,z)
      $     nz,z,nw,wl,
      $     airlev,dtrl,colinc,airstem,nzstem)
 
-* Photo-chemical and photo-biological weigting functions. 
+* Photo-chemical and photo-biological weigting functions.
 * For pchem, need to know temperature and pressure profiles.
 * Output:
 * from pbiol:  s(ks,kw) - for each weigting function label(ks)
@@ -271,11 +271,11 @@ c      alat = 22.3
 c      along = 113.9
 c      WRITE(kout,*)'lat = ',alat,' long = ',along
 
-* below, can  chose between specific time (solar zenith angle is calculated) 
-* or can set zenith angle to arbitrary value(s).  Loop DO 20 allows calculation 
+* below, can  chose between specific time (solar zenith angle is calculated)
+* or can set zenith angle to arbitrary value(s).  Loop DO 20 allows calculation
 * at multiple solar zenith angles  (or multiple times).
 
-* Set starting time (ut = Universal Time, hrs.), and 
+* Set starting time (ut = Universal Time, hrs.), and
 * time increment (dtime, in seconds)
 
 c      ut0 = 0.
@@ -336,7 +336,7 @@ c       CALL sjo2(nz,nw,xso2,1,sj)  ! do not output O2 J-value
      $        dtcld, omcld, gcld,
      $        dtaer,omaer,gaer,
      $        edir, edn, eup, fdir, fdn, fup)  ! edir, edn: direct beam, down-welling
-                                               ! diffuse light 
+                                               ! diffuse light
         if(ccover(1).gt.cclean) then	    ! cloud takes effect
 	  dtcld(1:nzstem,iw)=cldod(1:nzstem)   ! load cloud optical depth from STEM
 	  CALL rtlink(nz,z,
@@ -364,15 +364,15 @@ c	   fup(iz)=fup2(iz)
 	   fdn(iz)=fdn2(iz)
 	   fup(iz)=fup2(iz)
 	  enddo
-	endif   
-	   
+	endif
+
 ** surface irradiance and weighted radiation
 
-         iz = 1 
+         iz = 1
          sirrad = etf(iw) * (edir(iz) + edn(iz))
 
          DO 15, is = 1, ns
-            sprate = sirrad * sw(is,iw) 
+            sprate = sirrad * sw(is,iw)
             rate(is) = rate(is) + sprate * (wu(iw) - wl(iw))
  15      CONTINUE
 
@@ -397,9 +397,9 @@ c	   fup(iz)=fup2(iz)
                print*,'dtaer = ', dtaer(1:nz,iw)
 	       print*,'nz,z= ',nz,z(1:nz)
 	       stop
-	     endif 
+	     endif
  16         CONTINUE
-            
+
  17      CONTINUE
 
  10   CONTINUE
@@ -428,7 +428,7 @@ c 36   CONTINUE
  99   FORMAT(I4,1X,A40,1X,1PE10.3)
 
 *^^^^^^^^^^^^^^^^ end zenith loop
-      first=.false. 
+      first=.false.
 
 *_______________________________________________________________________
 
@@ -526,10 +526,10 @@ C-----------------------------------------------------------------------
 * otherwise, insert <xnew,ynew> at position INSERT
 
       IF ( xnew .GT. x(n) ) THEN
- 
+
          x(n+1) = xnew
          y(n+1) = ynew
-  
+
       ELSE
 
 * shift all existing points one index up
@@ -543,7 +543,7 @@ C-----------------------------------------------------------------------
 
          x(insert) = xnew
          y(insert) = ynew
-  
+
       ENDIF
 
 * increase total number of elements in x, y
@@ -607,7 +607,7 @@ C-----------------------------------------------------------------------
       REAL dsdh(0:kz,kz)
       REAL cz(kz)
 
-* output: 
+* output:
 
       REAL vcol(kz), scol(kz)
 
@@ -637,7 +637,7 @@ c	       if(cz(nz-j).lt.0.or.dsdh(id,j).lt.0) then
 c	        print*,'wrong cz or dsdh =',id,nz-j,cz(nz-j),dsdh(id,j)
 c     1		  ,sum
 c		stop
-c	       endif	
+c	       endif
             ENDDO
 
 * double pass layers:
@@ -648,19 +648,19 @@ c	       endif
 
          ENDIF
          scol(nz - id) = sum
-	 	 
+
 c         if(id.gt.0.and.scol(nz-id+1).gt.sum) then
 c	  print*,'scol in wrong sequence ',nz-id, sum, scol(nz-id+1),
 c     1	    id, dsdh(id,j-1), dsdh(id,j),cz(nz-j),cz(nz-j+1)
 c          print*,'nid=',nid
 c	  stop
-c	 endif   
+c	 endif
       ENDDO
-ctyh      
+ctyh
        DO id = nz-2, nz-1
-        if(scol(id).le.scol(id+1)) 
+        if(scol(id).le.scol(id+1))
      1   scol(id+1)=scol(id)-0.5*(scol(id-1)-scol(id))  ! correct the unknown error
-       enddo	
+       enddo
       RETURN
       END
 
@@ -704,7 +704,7 @@ ctyh
       IMPLICIT NONE
 
 * input:
-      REAL w 
+      REAL w
 
 * function value:
       REAL fery
@@ -926,7 +926,7 @@ C outside the ery spectrum range
          ok = .false.
 c         WRITE(kout,100)
          RETURN
-      ENDIF         
+      ENDIF
   100 FORMAT('Number of data exceeds dimension')
 
       IF (n .LT. 2) THEN
@@ -1108,7 +1108,7 @@ c            WRITE(kout,110)
  2    CONTINUE
       nw = 0
       OPEN(unit=kin,file='DATAE1/GRIDS/isaksen.grid',status='old')
-      DO iw = 1, 2 
+      DO iw = 1, 2
          READ(kin,*)
       ENDDO
       DO iw = 1, 130
@@ -1179,7 +1179,7 @@ c      write(kout,*), 'nw,wu,wc,wl=',nw-1,wu(nw-1),wc(nw-1),wl(nw-1)
         nw = nw+1
         wl(nw) = wl(nw-1)+0.5
       ENDDO
-c      write(kout,*), 'nw,wu,wc,wl=',nw-1,wu(nw-1),wc(nw-1),wl(nw-1)      
+c      write(kout,*), 'nw,wu,wc,wl=',nw-1,wu(nw-1),wc(nw-1),wl(nw-1)
 * define wavelength intervals of width 1 nm from 494 - 900 nm:
 
       do while(wu(nw-1).le.900)
@@ -1267,9 +1267,9 @@ c         WRITE(kout,*)'STOP in GRIDW:  The w-grid does not make sense'
 * Note "levels" are vertical points
 *      "layers" are vertical distances between levels
 
-* set atmospheric level altitudes (in real km), including 
+* set atmospheric level altitudes (in real km), including
 * top-most level.
-* non-uniform spacing is possible 
+* non-uniform spacing is possible
 * z(1) is the elevation of the surface (km asl), and can be specified either
 * here or in the main progarm.
 
@@ -1456,7 +1456,7 @@ c         WRITE(kout,*)'STOP in GRIDZ:  The z-grid does not make sense'
 	    write(*,*)x
             RETURN
          ENDIF
-   10 CONTINUE     
+   10 CONTINUE
 
       DO i = 2, ng
         IF (xg(i) .LE. xg(i-1)) THEN
@@ -1479,8 +1479,8 @@ c         WRITE(kout,*)'STOP in GRIDZ:  The z-grid does not make sense'
           STOP
       ENDIF
 
-*  find the integral of each grid interval and use this to 
-*  calculate the average y value for the interval      
+*  find the integral of each grid interval and use this to
+*  calculate the average y value for the interval
 *  xgl and xgu are the lower and upper limits of the grid interval
 
       jstart = 1
@@ -1493,7 +1493,7 @@ c         WRITE(kout,*)'STOP in GRIDZ:  The z-grid does not make sense'
             xgl = xg(i)
             xgu = xg(i+1)
 
-*  discard data before the first grid interval and after the 
+*  discard data before the first grid interval and after the
 *  last grid interval
 *  for internal grid intervals, start calculating area by interpolating
 *  between the last point which lies in the previous interval and the
@@ -1514,7 +1514,7 @@ c         WRITE(kout,*)'STOP in GRIDZ:  The z-grid does not make sense'
 *  if the last point is beyond the end of the grid, complete and go to the next
 *  grid
    40         CONTINUE
-                 IF ((k .LE. n-1) .AND. (x(k) .LT. xgu)) THEN          
+                 IF ((k .LE. n-1) .AND. (x(k) .LT. xgu)) THEN
 
                     jstart = k-1
 
@@ -1540,7 +1540,7 @@ c         WRITE(kout,*)'STOP in GRIDZ:  The z-grid does not make sense'
                     area = area + darea
 
 * go to next point
-              
+
                     k = k+1
                     GO TO 40
 
@@ -1618,7 +1618,7 @@ c         WRITE(kout,*)'STOP in GRIDZ:  The z-grid does not make sense'
 *-----------------------------------------------------------------------------*
 
       IMPLICIT NONE
-      
+
 * input:
       INTEGER n, ng
       REAL xg(ng)
@@ -1660,7 +1660,7 @@ c         WRITE(kout,*)'STOP in GRIDZ:  The z-grid does not make sense'
                 jstart = j
                 j = j+1
                 IF (j .LE. n-1) GO TO 20
-             ENDIF               
+             ENDIF
 
    25      CONTINUE
 
@@ -1675,7 +1675,7 @@ c         WRITE(kout,*)'STOP in GRIDZ:  The z-grid does not make sense'
 
              ENDIF
 
-           yg(i) = sum 
+           yg(i) = sum
 
          ENDIF
 
@@ -1690,7 +1690,7 @@ c         WRITE(kout,*)'STOP in GRIDZ:  The z-grid does not make sense'
          a1 = xg(ng)     ! upper limit of last interpolated bin
          a2 = x(j+1)     ! upper limit of last input bin considered
 
-*        do folding only if grids don't match up and there is more input 
+*        do folding only if grids don't match up and there is more input
          IF ((a2 .GT. a1) .OR. (j+1 .LT. n)) THEN
            tail = y(j) * (a2-a1)/(x(j+1)-x(j))
            DO k = j+1, n-1
@@ -1765,7 +1765,7 @@ c         WRITE(kout,*)'STOP in GRIDZ:  The z-grid does not make sense'
 *-----------------------------------------------------------------------------*
 
       IMPLICIT NONE
-      
+
 * input:
       INTEGER n, ng
       REAL xg(ng)
@@ -1807,7 +1807,7 @@ c         WRITE(kout,*)'STOP in GRIDZ:  The z-grid does not make sense'
                 jstart = j
                 j = j+1
                 IF (j .LE. n-1) GO TO 20
-             ENDIF               
+             ENDIF
 
    25      CONTINUE
 
@@ -1838,7 +1838,7 @@ c         WRITE(kout,*)'STOP in GRIDZ:  The z-grid does not make sense'
          a1 = xg(ng)     ! upper limit of last interpolated bin
          a2 = x(j+1)     ! upper limit of last input bin considered
 
-*        do folding only if grids don't match up and there is more input 
+*        do folding only if grids don't match up and there is more input
          IF ((a2 .GT. a1) .OR. (j+1 .LT. n)) THEN
            tail = y(j) * (a2-a1)/(x(j+1)-x(j))
            DO k = j+1, n-1
@@ -1932,12 +1932,12 @@ C calculate effective O2 optical depths and effective O2 cross sections
             IF (ro2(iz) .GT. 1.D-100) THEN
                xso2la(iz,1) = ro2(iz)/rm(iz)
             ELSE
-               xso2la(iz,1) = 0.               
+               xso2la(iz,1) = 0.
             ENDIF
 
             IF (rm(iz+1) .GT. 0.) THEN
 
-               dto2la(iz,1) = LOG(rm(iz+1)) / secchi(iz+1) 
+               dto2la(iz,1) = LOG(rm(iz+1)) / secchi(iz+1)
      $                      - LOG(rm(iz))   / secchi(iz)
 
             ELSE
@@ -2042,7 +2042,7 @@ C do top layer separate
 *_______________________________________________________________________
 
 ********* UV-B (280-315 nm)
- 
+
       j = j + 1
       label(j) = 'UV-B, 280-315 nm'
       DO iw = 1, nw-1
@@ -2054,7 +2054,7 @@ C do top layer separate
       ENDDO
 
 ********* UV-B* (280-320 nm)
- 
+
       j = j + 1
       label(j) = 'UV-B*, 280-320 nm'
       DO iw = 1, nw-1
@@ -2066,7 +2066,7 @@ C do top layer separate
       ENDDO
 
 ********* UV-A (315-400 nm)
- 
+
       j = j + 1
       label(j) = 'UV-A, 315-400 nm'
       DO iw = 1, nw-1
@@ -2078,7 +2078,7 @@ C do top layer separate
       ENDDO
 
 ********* visible+ (> 400 nm)
- 
+
       j = j + 1
       label(j) = 'vis+, > 400 nm'
       DO iw = 1, nw-1
@@ -2089,7 +2089,7 @@ C do top layer separate
          ENDIF
       ENDDO
 
-********** unity raf constant slope:  
+********** unity raf constant slope:
 
       j = j + 1
       label(j) = 'decay, 14 nm/10'
@@ -2098,13 +2098,13 @@ C do top layer separate
       ENDDO
 
 ************ DNA damage action spectrum
-* from: Setlow, R. B., The wavelengths in sunlight effective in 
-*       producing skin cancer: a theoretical analysis, Proceedings 
+* from: Setlow, R. B., The wavelengths in sunlight effective in
+*       producing skin cancer: a theoretical analysis, Proceedings
 *       of the National Academy of Science, 71, 3363 -3366, 1974.
 * normalize to unity at 300 nm
 * Data read from original hand-drawn plot by Setlow
 * received from R. Setlow in May 1995
-* data is per quantum (confirmed with R. Setlow in May 1995).  
+* data is per quantum (confirmed with R. Setlow in May 1995).
 * Therefore must put on energy basis if irradiance is is energy
 * (rather than quanta) units.
 
@@ -2136,10 +2136,10 @@ C do top layer separate
       ENDDO
 
 ********* skin cancer in mice,  Utrecht/Phildelphia study
-*from de Gruijl, F. R., H. J. C. M. Sterenborg, P. D. Forbes, 
+*from de Gruijl, F. R., H. J. C. M. Sterenborg, P. D. Forbes,
 *     R. E. Davies, C. Cole, G. Kelfkens, H. van Weelden, H. Slaper,
-*     and J. C. van der Leun, Wavelength dependence of skin cancer 
-*     induction by ultraviolet irradiation of albino hairless mice, 
+*     and J. C. van der Leun, Wavelength dependence of skin cancer
+*     induction by ultraviolet irradiation of albino hairless mice,
 *     Cancer Res., 53, 53-60, 1993.
 * normalize at 300 nm.
 
@@ -2148,7 +2148,7 @@ C do top layer separate
       DO iw = 1, nw-1
          s(j,iw) =  futr(wc(iw)) / futr(300.)
       ENDDO
-         
+
 *********** Utrecht mice spectrum corrected for humans skin.
 
       j = j + 1
@@ -2168,17 +2168,17 @@ C do top layer separate
          WRITE(*,*) ierr, label(j)
          STOP
       ENDIF
-            
+
       DO iw = 1, nw-1
          s(j,iw) = yg(iw)
       ENDDO
       CLOSE (kin)
-      
+
 ***************** compute ery action spectrum
 *from
-* McKinlay, A. F., and B. L. Diffey, A reference action spectrum for 
-* ultraviolet induced erythema in human skin, in Human Exposure to 
-* Ultraviolet Radiation: Risks and Regulations, W. R. Passchler 
+* McKinlay, A. F., and B. L. Diffey, A reference action spectrum for
+* ultraviolet induced erythema in human skin, in Human Exposure to
+* Ultraviolet Radiation: Risks and Regulations, W. R. Passchler
 * and B. F. M. Bosnajokovic, (eds.), Elsevier, Amsterdam, 1987.
 
       j = j + 1
@@ -2221,7 +2221,7 @@ C do top layer separate
          WRITE(*,*) ierr, label(j)
          STOP
       ENDIF
-            
+
       DO iw = 1, nw-1
          s(j,iw) = yg(iw)
       ENDDO
@@ -2229,7 +2229,7 @@ C do top layer separate
 
 ********* read 1991-92 acgih threshold limit values
 * from
-* ACGIH, 1991-1992 Threshold Limit Values, American Conference 
+* ACGIH, 1991-1992 Threshold Limit Values, American Conference
 *  of Governmental and Industrial Hygienists, 1992.
 
       j = j + 1
@@ -2250,7 +2250,7 @@ C do top layer separate
          WRITE(*,*) ierr, label(j)
          STOP
       ENDIF
-            
+
       DO iw = 1, nw-1
          s(j,iw) = yg(iw)
       ENDDO
@@ -2269,7 +2269,7 @@ C do top layer separate
       DO i = 1, n
          READ(kin,*) x1(i), y1(i)
       ENDDO
-      
+
       CALL addpnt(x1,y1,kdata,n,x1(1)*(1.-deltax),y1(1))
       CALL addpnt(x1,y1,kdata,n,          0.,y1(1))
       CALL addpnt(x1,y1,kdata,n,x1(n)*(1.+deltax),   0.)
@@ -2279,16 +2279,16 @@ C do top layer separate
          WRITE(*,*) ierr, label(j)
          STOP
       ENDIF
-            
+
       DO iw = 1, nw-1
          s(j,iw) = yg(iw)
       ENDDO
       CLOSE (kin)
 
-********* phytoplankton, Boucher et al. (1994) 
+********* phytoplankton, Boucher et al. (1994)
 * from Boucher, N., Prezelin, B.B., Evens, T., Jovine, R., Kroon, B., Moline, M.A.,
 * and Schofield, O., Icecolors '93: Biological weighting function for the ultraviolet
-*  inhibition  of carbon fixation in a natural antarctic phytoplankton community, 
+*  inhibition  of carbon fixation in a natural antarctic phytoplankton community,
 * Antarctic Journal, Review 1994, pp. 272-275, 1994.
 * In original paper, value of b and m (em below are given as positive.  Correct values
 * are negative. Also, limit to positive values.
@@ -2309,7 +2309,7 @@ C do top layer separate
       ENDDO
 
 ********* phytoplankton, Cullen et al.
-* Cullen, J.J., Neale, P.J., and Lesser, M.P., Biological weighting function for the  
+* Cullen, J.J., Neale, P.J., and Lesser, M.P., Biological weighting function for the
 *  inhibition of phytoplankton photosynthesis by ultraviolet radiation, Science, 25,
 *  646-649, 1992.
 * phaeo
@@ -2477,7 +2477,7 @@ C do top layer separate
 
       INTEGER nw
       REAL wl(kw)
-      
+
       INTEGER nz
 
       REAL tlev(kz)
@@ -2506,10 +2506,10 @@ C do top layer separate
 *____________________________________________________________________________
 
 C O2 + hv -> O + O
-* reserve first position.  Cross section parameterization in Schumman-Runge and 
-* Lyman-alpha regions are zenith-angle dependent, will be written in 
+* reserve first position.  Cross section parameterization in Schumman-Runge and
+* Lyman-alpha regions are zenith-angle dependent, will be written in
 * subroutine sto2xs(nz,nw,xso2,nj,sj).
- 
+
       j = 0
 
 C NO2 + hv -> NO + O(3P)
@@ -2522,7 +2522,7 @@ C O3 + hv ->  (both channels)
       CALL rn_O3(nw,wl,wc,nz,tlev,airlev,j,sq,jlabel)
 
 C HNO2 + hv -> OH + NO
-C HNO2 + hv -> HO2 + NO2 
+C HNO2 + hv -> HO2 + NO2
       CALL rn_HNO2(nw,wl,wc,nz,tlev,airlev,j,sq,jlabel)
 
 C HNO3 + hv -> OH + NO2
@@ -2536,7 +2536,7 @@ C H2O2 + hv -> 2 OH
 
 C CH2O + hv -> (both channels)
       CALL rn_HCHO(nw,wl,wc,nz,tlev,airlev,j,sq,jlabel)
-     
+
 C CH3CHO + hv -> CO + HO2 + C-O2
       CALL rn_CCHO(nw,wl,wc,nz,tlev,airlev,j,sq,jlabel)
 
@@ -2551,7 +2551,7 @@ C MEK + hv -> Products and PROD2
       jlabeltmp=jlabel(j)      ! move PROD2 to the 27th
       do iw=1,nw-1
         sqtmp(1:nz,iw)=sq(j,1:nz,iw)
-      enddo 	
+      enddo
       j=j-1
 
 C CH3OOH + hv -> CH3O + OH and ROOH
@@ -2560,7 +2560,7 @@ C CH3OOH + hv -> CH3O + OH and ROOH
 C GLY + hv -> Products (both channels)
       CALL rn_GLY(nw,wl,wc,nz,tlev,airlev,j,sq,jlabel)
 
-C MGLY + hv -> Products 
+C MGLY + hv -> Products
       CALL rn_MGLY(nw,wl,wc,nz,tlev,airlev,j,sq,jlabel)
 
 C BACL + hv -> Products (two channels)
@@ -2568,22 +2568,22 @@ C BACL + hv -> Products (two channels)
 
 C ACROLEIN (four channels)
       CALL rn_ACROLEIN(nw,wl,wc,nz,tlev,airlev,j,sq,jlabel)
-      jlabel(30)=jlabel(j)              ! move DCB3 to the last 
-      do iw=1,nw-1       
+      jlabel(30)=jlabel(j)              ! move DCB3 to the last
+      do iw=1,nw-1
        sq(30,1:nz,iw)=sq(j,1:nz,iw)
        sq(27,1:nz,iw)=sqtmp(1:nz,iw)
-      enddo 
+      enddo
       jlabel(27)=jlabeltmp              ! move PROD2 to the 27th
       j=27
-      
+
 C RNO3 -> products
       CALL rn_RNO3(nw,wl,wc,nz,tlev,airlev,j,sq,jlabel)
 
 C DCB2 -> products
       CALL rn_DCB2(nw,wl,wc,nz,tlev,airlev,j,sq,jlabel)
-      
+
       j=30
-       
+
 ****************************************************************
 
       IF (j .GT. kj) STOP '1002'
@@ -2699,7 +2699,7 @@ C DCB2 -> products
 * in delta-function, modified quadrature, hemispheric constant,
 * Hybrid modified Eddington-delta function metods, p633,Table1.
 * W.E.Meador and W.R.Weaver, GAS,1980,v37,p.630
-* W.J.Wiscombe and G.W. Grams, GAS,1976,v33,p2440, 
+* W.J.Wiscombe and G.W. Grams, GAS,1976,v33,p2440,
 * uncomment the following two lines and the appropriate statements further
 * down.
 C     REAL YLM0, YLM2, YLM4, YLM6, YLM8, YLM10, YLM12, YLMS, BETA0,
@@ -2713,7 +2713,7 @@ C    >     BETA1, BETAn, amu1, subd
 
 * Some additional program constants:
       REAL eps, precis
-      PARAMETER (eps = 1.E-3, precis = 1.E-7) 
+      PARAMETER (eps = 1.E-3, precis = 1.E-7)
 *_______________________________________________________________________
 
 * MU = cosine of solar zenith angle
@@ -2727,7 +2727,7 @@ C    >     BETA1, BETAn, amu1, subd
 
 * initial conditions:  pi*solar flux = 1;  diffuse incidence = 0
 
-      pifs = 1.      
+      pifs = 1.
       fdn0 = 0.
 
       nlayer = nlevel - 1
@@ -2755,23 +2755,23 @@ C    >     BETA1, BETAn, amu1, subd
            omi(i) = omu(i)
            taun(i) = tauu(i)
          ENDDO
-       ELSE 
+       ELSE
 
-* delta-scaling. Have to be done for delta-Eddington approximation, 
+* delta-scaling. Have to be done for delta-Eddington approximation,
 * delta discrete ordinate, Practical Improved Flux Method, delta function,
 * and Hybrid modified Eddington-delta function methods approximations
 
          DO i = 1, nlayer
            f = gu(i)*gu(i)
            gi(i) = (gu(i) - f)/(1 - f)
-           omi(i) = (1 - f)*omu(i)/(1 - omu(i)*f)       
+           omi(i) = (1 - f)*omu(i)/(1 - omu(i)*f)
            taun(i) = (1 - omu(i)*f)*tauu(i)
          ENDDO
         END IF
 
 *
 * calculate slant optical depth at the top of the atmosphere when zen>90.
-* in this case, higher altitude of the top layer is recommended which can 
+* in this case, higher altitude of the top layer is recommended which can
 * be easily changed in gridz.f.
 *
          IF(zen .GT. 90.0) THEN
@@ -2782,10 +2782,10 @@ C    >     BETA1, BETAn, amu1, subd
              DO j = 1, nid(0)
               sum = sum + 2.*taun(j)*dsdh(0,j)
              END DO
-             tausla(0) = sum 
+             tausla(0) = sum
            END IF
          END IF
-  
+
 *
         DO 11, i = 1, nlayer
 
@@ -2801,7 +2801,7 @@ C    >     BETA1, BETAn, amu1, subd
 
 
 * calculate slant optical depth
-*              
+*
           IF(nid(i) .LT. 0) THEN
             tausla(i) = largest
           ELSE
@@ -2812,7 +2812,7 @@ C    >     BETA1, BETAn, amu1, subd
             DO j = MIN(nid(i),i)+1,nid(i)
                sum = sum + 2.*taun(j)*dsdh(i,j)
             ENDDO
-            tausla(i) = sum 
+            tausla(i) = sum
             IF(tausla(i) .EQ. tausla(i-1)) THEN
               mu2(i) = SQRT(largest)
             ELSE
@@ -2840,7 +2840,7 @@ c          gam2 = 1.7320508*om*(1. - g)/2.
 c          gam3 = (1. - 1.7320508*g*mu)/2.
 c          gam4 = 1. - gam3
 c          mu1(i) = 1./sqrt(3.)
-         
+
 * hemispheric mean (Toon et al., 1089, JGR, 94, 16287):
 
 c          gam1 = 2. - om*(1. + g)
@@ -2935,18 +2935,18 @@ c         mu1(i) = 0.5
 
 * lambda = pg 16,290 equation 21
 * big gamma = pg 16,290 equation 22
- 
+
          lam(i) = sqrt(gam1*gam1 - gam2*gam2)
 	 if( gam2.ne.0) then
           bgam(i) = (gam1 - lam(i))/gam2
 	 else
 	  bgam(i) = 0.
-	 endif  
+	 endif
 
          expon = EXP(-lam(i)*taun(i))
 
 * e1 - e4 = pg 16,292 equation 44
-         
+
          e1(i) = 1. + bgam(i)*expon
          e2(i) = 1. - bgam(i)*expon
          e3(i) = bgam(i) + expon
@@ -2960,7 +2960,7 @@ c         mu1(i) = 0.5
      1	  taun(i),gam1,gam2,gam3,gam4
           write(*,*)'g,om,mu, mu2=',g,om,mu,mu2(i)
 	  stop 2001
-	 endif 
+	 endif
 
 * the following sets up for the C equations 23, and 24
 * found on page 16,290
@@ -2969,14 +2969,14 @@ c         mu1(i) = 0.5
 
          expon0 = EXP(-tausla(i-1))
          expon1 = EXP(-tausla(i))
-          
+
          divisr = lam(i)*lam(i) - 1./(mu2(i)*mu2(i))
          temp = AMAX1(eps,abs(divisr))
          divisr = SIGN(temp,divisr)
 
          up = om*pifs*((gam1 - 1./mu2(i))*gam3 + gam4*gam2)/divisr
          dn = om*pifs*((gam1 + 1./mu2(i))*gam4 + gam2*gam3)/divisr
-         
+
 * cup and cdn are when tau is equal to zero
 * cuptn and cdntn are when tau is equal to taun
 
@@ -2989,16 +2989,16 @@ c     1	 abs(cuptn(i)).gt.largest.or.abs(cdntn(i)).gt.largest) then
 c         print*,'something overflow in ps2str, i, nlayer=',i, nlayer
 c	 print*,'cup(i),cdn(i),cuptn(i),cdntn(i)=',cup(i),cdn(i),
 c     1	   cuptn(i),cdntn(i)
-c         print*,'taun=',taun 
+c         print*,'taun=',taun
 c	 print*,'dsdh=',dsdh(i,1:kz)
 c	 print*,'omu=',omu
 c	 print*,'gu=',gu
-c         print*,'expon0, expon1, nid(i), tausla(i), tausla=',expon0, 
+c         print*,'expon0, expon1, nid(i), tausla(i), tausla=',expon0,
 c     1	 expon1,nid(i), tausla(i),tausla
 c	 print*,'up,dn,divisr,om,pifs,gam1,gam2,gam3,gam4,mu2(i)=',
 c     1	  up,dn,divisr,om,pifs,gam1,gam2,gam3,gam4,mu2(i)
 c         stop
-c	endif  
+c	endif
    11 CONTINUE
 
 ***************** set up matrix ******
@@ -3008,8 +3008,8 @@ c	endif
 
 * MROWS = the number of rows in the matrix
 
-      mrows = 2*nlayer     
-      
+      mrows = 2*nlayer
+
 * the following are from pg 16,292  equations 39 - 43.
 * set up first row of matrix:
 
@@ -3029,11 +3029,11 @@ c	endif
          a(row) = e2(i)*e3(i) - e4(i)*e1(i)
          b(row) = e1(i)*e1(i + 1) - e3(i)*e3(i + 1)
          d(row) = e3(i)*e4(i + 1) - e1(i)*e2(i + 1)
-         e(row) = e3(i)*(cup(i + 1) - cuptn(i)) + 
+         e(row) = e3(i)*(cup(i + 1) - cuptn(i)) +
      $        e1(i)*(cdntn(i) - cdn(i + 1))
    20 CONTINUE
 
-* set up even rows 2 thru (MROWS - 2): 
+* set up even rows 2 thru (MROWS - 2):
 
       i = 0
       DO 30, row = 2, mrows - 2, 2
@@ -3041,7 +3041,7 @@ c	endif
          a(row) = e2(i + 1)*e1(i) - e3(i)*e4(i + 1)
          b(row) = e2(i)*e2(i + 1) - e4(i)*e4(i + 1)
          d(row) = e1(i + 1)*e4(i + 1) - e2(i + 1)*e3(i + 1)
-         e(row) = (cup(i + 1) - cuptn(i))*e2(i + 1) - 
+         e(row) = (cup(i + 1) - cuptn(i))*e2(i + 1) -
      $        (cdn(i + 1) - cdntn(i))*e4(i + 1)
    30 CONTINUE
 
@@ -3049,7 +3049,7 @@ c	endif
 
       row = mrows
       i = nlayer
-      
+
       a(row) = e1(i) - rsfc*e3(i)
       b(row) = e2(i) - rsfc*e4(i)
       d(row) = 0.
@@ -3068,13 +3068,13 @@ c	 print*,'e=',e
 c	 print*,'y=',y
 c	 stop
 c	endif
-c       enddo	 
+c       enddo
 **** unfold solution of matrix, compute output fluxes:
 
-      row = 1 
+      row = 1
       lev = 1
       j = 1
-      
+
 * the following equations are from pg 16,291  equations 31 & 32
 
       fdr(lev) = EXP( -tausla(0) )
@@ -3100,7 +3100,7 @@ c     1	   y(row+1)
 c	  print*,'j,e1(j),e2(j),e3(j),e4(j),cuptn(j),cdntn(j),mu1(j)=',
 c     1	   j,e1(j),e2(j),e3(j),e4(j),cuptn(j),cdntn(j),mu1(j)
 c          stop
-c	 endif 
+c	 endif
          row = row + 2
          j = j + 1
    60 CONTINUE
@@ -3138,13 +3138,13 @@ c	 endif
       IF (b(1) .EQ. 0.) STOP 1001
       bet   = b(1)
       u(1) = r(1)/bet
-      DO 11, j = 2, n   
+      DO 11, j = 2, n
          gam(j) = c(j - 1)/bet
          bet = b(j) - a(j)*gam(j)
-         IF (bet .EQ. 0.) STOP 2002 
+         IF (bet .EQ. 0.) STOP 2002
          u(j) = (r(j) - a(j)*u(j - 1))/bet
    11 CONTINUE
-      DO 12, j = n - 1, 1, -1  
+      DO 12, j = n - 1, 1, -1
          u(j) = u(j) - gam(j + 1)*u(j + 1)
    12 CONTINUE
 *_______________________________________________________________________
@@ -3167,48 +3167,48 @@ C      SUBROUTINE DISORT( dsdh, nid,
      &                   DELTAM, PLANK, ONLYFL, ACCUR, PRNT, HEADER,
      &                   MAXCLY, MAXULV, MAXUMU, MAXCMU, MAXPHI, RFLDIR,
      &                   RFLDN, FLUP, DFDT, UAVG, UU, U0U, ALBMED,
-     &                   TRNMED, uavgso, uavgup, uavgdn, 
+     &                   TRNMED, uavgso, uavgup, uavgdn,
      &                   sindir, sinup, sindn )
 
 c Improved handling of numerical instabilities. Bernhard Mayer on 5/3/99.
 c  disort seems to produce unstable results for certain combinations
-c  of single scattering albedo and phase function. A temporary fix has been 
-c  introduced to avoid this problem: The original instability check in 
-c  UPBEAM fails on certain compiler/machine combinations (e.g., gcc/LINUX, 
+c  of single scattering albedo and phase function. A temporary fix has been
+c  introduced to avoid this problem: The original instability check in
+c  UPBEAM fails on certain compiler/machine combinations (e.g., gcc/LINUX,
 c  or xlf/IBM RS6000). This check has therefore been replaced by a new one.
-c  Whenever UPBEAM reports an instability, the single scattering albedo 
-c  of the respective layer is changed by a small amount, and the 
-c  calculation is repeated until numerically stable conditions are reached 
-c  (all the necessary changes are confined to the new subroutine SOLVEC 
-c  and the slighly changed subroutine UPBEAM). To check for potential 
+c  Whenever UPBEAM reports an instability, the single scattering albedo
+c  of the respective layer is changed by a small amount, and the
+c  calculation is repeated until numerically stable conditions are reached
+c  (all the necessary changes are confined to the new subroutine SOLVEC
+c  and the slighly changed subroutine UPBEAM). To check for potential
 c  instabilities, the variable 'RCOND' returned by SGECO is compared to
-c  a machine-dependent constant, 'MINRCOND'. The value of this constant 
-c  determines (a) if really all instabilities are caught; and (b) the 
-c  amount by which the single scattering albedo has to be changed. The 
-c  value of 'MINRCOND' is therefore a compromise between numerical 
-c  stability on the one hand and uncertainties introduced by changing 
-c  the atmospheric conditions and increased computational time on the 
+c  a machine-dependent constant, 'MINRCOND'. The value of this constant
+c  determines (a) if really all instabilities are caught; and (b) the
+c  amount by which the single scattering albedo has to be changed. The
+c  value of 'MINRCOND' is therefore a compromise between numerical
+c  stability on the one hand and uncertainties introduced by changing
+c  the atmospheric conditions and increased computational time on the
 c  other hand (an increase of MINRCOND will lead to the detection of
-c  more potential numerical instabilities, and thus to an increase in 
+c  more potential numerical instabilities, and thus to an increase in
 c  computational time; by changing the atmospheric conditions, that is,
-c  the single scattering albedo, the result might however be changed 
-c  unfavourably, if the change is too large). From a limited number 
-c  of experiments we found that 'MINRCOND = 5000. * R1MACH(4)' seems 
-c  to be a good choice if high accuracy is required (more tests are 
-c  definitely neccessary!). If an instability is encountered, a message 
-c  is printed telling about neccessary changes to the single scattering 
-c  albedo. This message may be switched off by setting 'DEBUG = .FALSE.' 
-c  in subroutine SOLVEC. 
+c  the single scattering albedo, the result might however be changed
+c  unfavourably, if the change is too large). From a limited number
+c  of experiments we found that 'MINRCOND = 5000. * R1MACH(4)' seems
+c  to be a good choice if high accuracy is required (more tests are
+c  definitely neccessary!). If an instability is encountered, a message
+c  is printed telling about neccessary changes to the single scattering
+c  albedo. This message may be switched off by setting 'DEBUG = .FALSE.'
+c  in subroutine SOLVEC.
 c
 c
 c modified to calculate sine-weighted intensities. Bernhard Mayer on 2/12/99.
 c modified to handle some numerical instabilities. Chris Fischer on 1/22/99.
 c modified by adding pseudo-spherical correction. Jun Zeng on 3/11/97.
-c dsdh: slant path of direct beam through each layer crossed  
-c       when travelling from the top of the atmosphere to layer i;    
+c dsdh: slant path of direct beam through each layer crossed
+c       when travelling from the top of the atmosphere to layer i;
 c       dsdh(i,j), i = 0..nlyr, j = 1..nlyr;
-c nid:  number of layers crossed by the direct beam when   
-c       travelling from the top of the atmosphere to layer i; 
+c nid:  number of layers crossed by the direct beam when
+c       travelling from the top of the atmosphere to layer i;
 c       NID(i), i = 0..nlyr.
 c uavgso, uvagup, and uvagdn are direct, downward diffuse, and upward
 c diffuse actinic flux (mean intensity).
@@ -3506,7 +3506,7 @@ c     .. Array Arguments ..
      &          RFLDN( MAXULV ), SSALB( MAXCLY ), TEMPER( 0:MAXCLY ),
      &          TRNMED( MAXUMU ), U0U( MAXUMU, MAXULV ), UAVG( MAXULV ),
      &          UMU( MAXUMU ), CWT( MAXCMU ), UTAU( MAXULV ),
-     &          UU( MAXUMU, MAXULV, MAXPHI ), 
+     &          UU( MAXUMU, MAXULV, MAXPHI ),
      &          uavgso( maxulv ), uavgup( maxulv ), uavgdn( maxulv ),
      &          sindir( maxulv ), sinup( maxulv ),  sindn ( maxulv )
 c     ..
@@ -3579,7 +3579,7 @@ c                            ** Must dither more on Cray (14-digit prec)
          RPD  = PI / 180.0
          PASS1 = .FALSE.
       END IF
- 
+
    10 CONTINUE
 
 c                                  ** Calculate cumulative optical depth
@@ -3716,8 +3716,8 @@ c ===================  BEGIN LOOP ON COMPUTATIONAL LAYERS  =============
          DO 60 LC = 1, NCUT
 
             CALL SOLVEC( AMB, APB, ARRAY, CMU, CWT, GL( 0,LC ), MI,
-     &           MAZIM, MXCMU, NN, NSTR, YLM0, YLMC, CC, 
-     &           EVECC, EVAL, KK( 1,LC ), GC( 1,1,LC ), AAD, EVECCD, 
+     &           MAZIM, MXCMU, NN, NSTR, YLM0, YLMC, CC,
+     &           EVECC, EVAL, KK( 1,LC ), GC( 1,1,LC ), AAD, EVECCD,
      &           EVALD, WK, WKD, DELM0, FBEAM, IPVT, PI, UMU0,
      &           ZJ, ZZ(1,LC), OPRIM(LC), LC, DITHER, mu2(lc),
      &           glsave, dgl)
@@ -4415,7 +4415,7 @@ c                ** Look for two consecutive small sub-diagonal elements
 
 C inhibit vectorization by CF77, as this will cause a run time error
 
-CDIR$ NEXTSCALAR
+C DIR$ NEXTSCALAR
       DO 480 J = LB, N2
          I  = N2 + LB - J
          Z  = AAD( I, I )
@@ -5050,12 +5050,12 @@ c                                                ** this level
          END IF
 
          IF( FBEAM.GT.0.0 ) THEN
- 
+
             FACT  = EXP( - tausla(LU-1) )
             DIRINT       = FBEAM*FACT
             FLDIR( LU )  = UMU0*( FBEAM*FACT )
             RFLDIR( LU ) = UMU0*FBEAM * EXP( -tauslau(lu-1) )
-            sindir( LU ) = SQRT(1.-UMU0*UMU0)*FBEAM * 
+            sindir( LU ) = SQRT(1.-UMU0*UMU0)*FBEAM *
      $                     EXP( -tauslau(lu-1) )
 
          ELSE
@@ -5092,7 +5092,7 @@ c                                                ** this level
      &                      ZPLK1( IQ, LYU )*UTAUPR( LU )
             UAVG( LU ) = UAVG( LU ) + CWT( NN + 1 - IQ )*U0C( IQ, LU )
             uavgdn(lu) = uavgdn(lu) + cwt(nn+1-iq) * u0c( iq,lu )
-            sindn(lu)  = sindn(lu)  + cwt(nn+1-iq) * 
+            sindn(lu)  = sindn(lu)  + cwt(nn+1-iq) *
      &                   SQRT(1.-CMU(NN+1-IQ)*CMU(NN+1-IQ))*
      &                   U0C( IQ, LU )
             FLDN( LU ) = FLDN( LU ) + CWT( NN + 1 - IQ )*
@@ -5124,7 +5124,7 @@ c                                                ** this level
      &                      ZPLK1( IQ, LYU )*UTAUPR( LU )
             UAVG( LU ) = UAVG( LU ) + CWT( IQ - NN )*U0C( IQ, LU )
             uavgup(lu) = uavgup(lu) + cwt(iq-nn) * u0c( iq,lu )
-            sinup (lu) = sinup(lu)  + cwt(iq-nn) * 
+            sinup (lu) = sinup(lu)  + cwt(iq-nn) *
      &                   SQRT(1.-CMU(IQ-NN)*CMU(IQ-NN))*
      &                   U0C( IQ, LU )
             FLUP( LU ) = FLUP( LU ) + CWT( IQ - NN )*CMU( IQ - NN )*
@@ -5623,7 +5623,7 @@ c     ..
      &                       UMU(1), (UU(1, LU, J), J = JMIN, JMAX)
 
             DO 10 IU = 2, NUMU
-               WRITE( *, '(10X,F8.4,1P,10E11.3)' ) 
+               WRITE( *, '(10X,F8.4,1P,10E11.3)' )
      &                 UMU( IU ), ( UU( IU, LU, J ), J = JMIN, JMAX )
    10       CONTINUE
 
@@ -5945,9 +5945,9 @@ c                                    ** Do delta-M transformation
          EXPBEA( LC ) = 0.0
 
    40 CONTINUE
-c 
+c
 * calculate slant optical depth
-*              
+*
          IF(umu0 .LT. 0.0) THEN
            IF(nid(0) .LT. 0) THEN
              tausla(0) = largest
@@ -5959,8 +5959,8 @@ c
                sum = sum + 2.*dtaucp(lc)*dsdh(0,lc)
                sumu = sumu + 2.*dtauc(lc)*dsdh(0,lc)
              END DO
-             tausla(0) = sum 
-             tauslau(0) = sumu 
+             tausla(0) = sum
+             tauslau(0) = sumu
            END IF
          END IF
 
@@ -5982,8 +5982,8 @@ c
                sum = sum + 2.*dtaucp(lu)*dsdh(lc,lu)
                sumu = sumu + 2.*dtauc(lu)*dsdh(lc,lu)
             ENDDO
-            tausla(lc) = sum 
-            tauslau(lc) = sumu 
+            tausla(lc) = sum
+            tauslau(lc) = sumu
             IF(tausla(lc) .EQ. tausla(lc-1)) THEN
               mu2(lc) = largest
             ELSE
@@ -6046,12 +6046,12 @@ c     IF( FBEAM.GT.0.0 ) THEN
 c                               ** Compare beam angle to comput. angles
          DO 90 IQ = 1, NN
 
-C                      ** Dither mu2 if it is close to one of the 
+C                      ** Dither mu2 if it is close to one of the
 C                         quadrature angles.
 
          DO  lc = 1, nlyr
           IF (  ABS(mu2(lc)) .lt. 1.E5 ) THEN
-            IF( ABS( 1. - ABS(mu2(lc))/CMU( IQ ) ) .LT. 0.05 ) 
+            IF( ABS( 1. - ABS(mu2(lc))/CMU( IQ ) ) .LT. 0.05 )
      &           mu2(lc) = mu2(lc)*0.999
           ENDIF
          END DO
@@ -7106,18 +7106,18 @@ c                                  user angles UMU.
       END
 
 
-*bm  SOLVEC calls SOLEIG and UPBEAM; if UPBEAM reports a potenially 
-*bm  unstable solution, the calculation is repeated with a slightly 
-*bm  changed single scattering albedo; this process is iterates 
-*bm  until a stable solution is found; as stable solutions may be 
-*bm  reached either by increasing or by decreasing the single 
+*bm  SOLVEC calls SOLEIG and UPBEAM; if UPBEAM reports a potenially
+*bm  unstable solution, the calculation is repeated with a slightly
+*bm  changed single scattering albedo; this process is iterates
+*bm  until a stable solution is found; as stable solutions may be
+*bm  reached either by increasing or by decreasing the single
 *bm  scattering albedo, both directions are explored ('upward' and
-*bm  'downward' iteration); the solution which required the smaller 
-*bm  change in the single scattering albedo is finally returned 
+*bm  'downward' iteration); the solution which required the smaller
+*bm  change in the single scattering albedo is finally returned
 *bm  by SOLVEC.
 
       SUBROUTINE SOLVEC( AMB, APB, ARRAY, CMU, CWT, GL, MI,
-     &     MAZIM, MXCMU, NN, NSTR, YLM0, YLMC, CC, 
+     &     MAZIM, MXCMU, NN, NSTR, YLM0, YLMC, CC,
      &     EVECC, EVAL, KK, GC, AAD, EVECCD, EVALD,
      &     WK, WKD, DELM0, FBEAM, IPVT, PI, UMU0, ZJ, ZZ,
      &     OPRIM, LC, DITHER, mu2, glsave, dgl)
@@ -7135,11 +7135,11 @@ c     ..
 c     .. Array Arguments ..
 
       INTEGER   IPVT( * )
-      
+
       REAL      AMB( MI, MI ), APB( MI, MI ), ARRAY( MI, * ),
      &     CC( MXCMU, MXCMU ), CMU( MXCMU ), CWT( MXCMU ),
      &     EVAL( MI ), EVECC( MXCMU, MXCMU ), GC( MXCMU, MXCMU ),
-     &     GL( 0:MXCMU ), KK( MXCMU ), 
+     &     GL( 0:MXCMU ), KK( MXCMU ),
      &     YLM0( 0:MXCMU ), YLMC( 0:MXCMU, MXCMU ),
      &     WK( MXCMU ), ZJ( MXCMU ), ZZ( MXCMU )
 
@@ -7147,13 +7147,13 @@ c     .. Array Arguments ..
      &                 WKD( MXCMU )
 
 *bm   Variables for instability fix
-      
+
       INTEGER UAGAIN, DAGAIN
       REAL MINRCOND, ADD, UADD, DADD, SSA, DSSA, FACTOR
       REAL GLSAVE( 0:MXCMU ), DGL( 0:MXCMU )
-      
+
       LOGICAL  DONE, NOUP, NODN, DEBUG, INSTAB
-      
+
 *bm   reset parameters
 
       DONE = .FALSE.
@@ -7161,18 +7161,18 @@ c     .. Array Arguments ..
       NODN = .FALSE.
 
 
-*bm   flag for printing debugging output      
+*bm   flag for printing debugging output
 *      DEBUG  = .TRUE.
       DEBUG  = .FALSE.
 
-*bm   instability parameter; the solution is considered 
-*bm   unstable, if the RCOND reported by SGECO is smaller 
+*bm   instability parameter; the solution is considered
+*bm   unstable, if the RCOND reported by SGECO is smaller
 *bm   than MINRCOND
       MINRCOND = 5000. * R1MACH(4)
 
 *bm   if an instability is detected, the single scattering albedo
-*bm   is iterated downwards in steps of DADD and upwards in steps 
-*bm   of UADD; in practice, MINRCOND and -MINRCOND should 
+*bm   is iterated downwards in steps of DADD and upwards in steps
+*bm   of UADD; in practice, MINRCOND and -MINRCOND should
 *bm   be reasonable choices for these parameters
       DADD    = -MINRCOND
       UADD    = MINRCOND
@@ -7180,21 +7180,21 @@ c     .. Array Arguments ..
       UAGAIN = 0
       DAGAIN = 0
       ADD   = DADD
-      
 
-*bm   save array GL( ) because it will be 
+
+*bm   save array GL( ) because it will be
 *bm   changed if an iteration should be neccessary
       DO K = MAZIM, NSTR - 1
          GLSAVE( K ) =  GL( K )
       ENDDO
-      
+
       SSA = OPRIM
 
 
 *bm   in case of an instability reported by UPBEAM (INSTAB)
-*bm   the single scattering albedo will be changed by a small 
-*bm   amount (ADD); this is indicated by DAGAIN or UAGAIN 
-*bm   being larger than 0; a change in the single scattering 
+*bm   the single scattering albedo will be changed by a small
+*bm   amount (ADD); this is indicated by DAGAIN or UAGAIN
+*bm   being larger than 0; a change in the single scattering
 *bm   albedo is equivalent to scaling the array GL( )
 
  666  IF ( DAGAIN .GT. 0 .OR. UAGAIN .GT. 0)  THEN
@@ -7204,9 +7204,9 @@ c     .. Array Arguments ..
          ENDDO
 
          SSA = SSA + ADD
-         
+
 *bm   if the single scattering albedo is now smaller than 0
-*bm   the downward iteration is stopped and upward iteration 
+*bm   the downward iteration is stopped and upward iteration
 *bm   is forced instead
 
          IF( SSA .LT. DITHER) THEN
@@ -7215,8 +7215,8 @@ c     .. Array Arguments ..
             goto 778
          ENDIF
 
-*bm   if the single scattering albedo is now larger than its maximum 
-*bm   allowed value (1.0 - DITHER), the upward iteration is 
+*bm   if the single scattering albedo is now larger than its maximum
+*bm   allowed value (1.0 - DITHER), the upward iteration is
 *bm   stopped and downward iteration is forced instead
 
          IF( SSA .GT. 1.0 - DITHER) THEN
@@ -7244,13 +7244,13 @@ c        q.SS(18) for incident beam source
      $        IPVT, MAZIM, MXCMU, NN, NSTR, PI, UMU0, WK,
      $        YLM0, YLMC, ZJ, ZZ, MINRCOND, INSTAB)
       ENDIF
-      
+
 c     ** Calculate particular solutions of
 c        Eq. SS(15) for thermal emission source
 c        (not available in psndo.f)
-      
+
 *bm   finished if the result is stable on the first try
-      IF ( (.NOT. INSTAB) .AND. 
+      IF ( (.NOT. INSTAB) .AND.
      $     (UAGAIN .EQ. 0) .AND. (DAGAIN .EQ. 0)) THEN
          goto 999
       ENDIF
@@ -7260,7 +7260,7 @@ c        (not available in psndo.f)
          DAGAIN = DAGAIN + 1
          GOTO 666
       ENDIF
-      
+
 *bm   upward iteration
       IF( INSTAB .AND. UAGAIN .GT. 0 )  THEN
          UAGAIN = UAGAIN + 1
@@ -7269,11 +7269,11 @@ c        (not available in psndo.f)
 
 
 *bm   ( DAGAIN .NE. 0 ) at this place means that the downward
-*bm   iteration is finished 
+*bm   iteration is finished
 
  778  IF (DAGAIN .NE. 0 .AND. UAGAIN .EQ. 0) THEN
-         
-*bm   save downward iteration data for later use and 
+
+*bm   save downward iteration data for later use and
 *bm   restore original input data
          DO K = MAZIM, NSTR - 1
             DGL( K ) =  GL( K )
@@ -7295,18 +7295,18 @@ c        (not available in psndo.f)
       ENDIF
 
 
-*bm  if neither upward nor downward iteration converged, the 
-*bm  original conditions are restored and SOLEIG/UPBEAM 
-*bm  is called for the last time 
-         
+*bm  if neither upward nor downward iteration converged, the
+*bm  original conditions are restored and SOLEIG/UPBEAM
+*bm  is called for the last time
+
       IF (NOUP .AND. NODN) THEN
-         
+
          DO K = MAZIM, NSTR - 1
             GL( K ) =  GLSAVE( K )
          ENDDO
-         
+
          SSA = OPRIM
-         
+
          IF (DEBUG) THEN
             write (*,*) '! *** Neither upward nor downward iteration'
             write (*,*) '! *** converged; using original result.'
@@ -7322,9 +7322,9 @@ c        (not available in psndo.f)
          DO K = MAZIM, NSTR - 1
             GL( K ) =  DGL( K )
          ENDDO
-         
+
          SSA = DSSA
-         
+
          IF (DEBUG) THEN
             write (*,*) '! *** The upward iteration did not converge.'
             write (*,*) '! *** Had to iterate ', DAGAIN,
@@ -7338,7 +7338,7 @@ c        (not available in psndo.f)
          GOTO 777
       ENDIF
 
-*bm  if downward iteration did not converge, we are done 
+*bm  if downward iteration did not converge, we are done
 *bm  (the result of the upward iteration will be used)
       IF (NODN) THEN
          IF (DEBUG) THEN
@@ -7349,24 +7349,24 @@ c        (not available in psndo.f)
      $           OPRIM, ' to ', SSA,','
             write (*,*) '! *** by a factor of ', SSA/OPRIM
          ENDIF
-         
+
          DONE = .TRUE.
          GOTO 998
       ENDIF
 
-      
-*bm   if both iterations converged, and if the upward iteration 
-*bm   required more steps than the downward iteration, the stable 
-*bm   downward conditions are restored and SOLEIG/UPBEAM is 
-*bm   called for the last time 
-         
+
+*bm   if both iterations converged, and if the upward iteration
+*bm   required more steps than the downward iteration, the stable
+*bm   downward conditions are restored and SOLEIG/UPBEAM is
+*bm   called for the last time
+
       IF (UAGAIN .GT. DAGAIN) THEN
          DO K = MAZIM, NSTR - 1
             GL( K ) =  DGL( K )
          ENDDO
-         
+
          SSA = DSSA
-         
+
          IF (DEBUG) THEN
             write (*,*) '! *** Both iterations converged;',
      $           ' using downward.'
@@ -7380,7 +7380,7 @@ c        (not available in psndo.f)
          DONE = .TRUE.
          GOTO 777
       ELSE
-         
+
          IF (DEBUG) THEN
             write (*,*) '! *** Both iterations converged;',
      $           ' using upward.'
@@ -7394,12 +7394,12 @@ c        (not available in psndo.f)
          DONE = .TRUE.
          goto 998
       ENDIF
-      
+
 *bm   finally restore original input data
  998  DO K = MAZIM, NSTR - 1
          GL( K ) =  GLSAVE( K )
       ENDDO
-      
+
  999  CONTINUE
       END
 
@@ -7994,7 +7994,7 @@ c       percent error from the correct value;  return  'FALSE'.
       END
 	SUBROUTINE  SGBCO( ABD, LDA, N, ML, MU, IPVT, RCOND, Z )
 
-C         FACTORS A REAL BAND MATRIX BY GAUSSIAN ELIMINATION 
+C         FACTORS A REAL BAND MATRIX BY GAUSSIAN ELIMINATION
 C         AND ESTIMATES THE CONDITION OF THE MATRIX.
 
 C         REVISION DATE:  8/1/82
@@ -8313,7 +8313,7 @@ C                                  ** FIND L = PIVOT INDEX
 	   IPVT(K) = L + K - M
 
 	   IF (ABD(L,K) .EQ. 0.0E0) THEN
-C                                      ** ZERO PIVOT IMPLIES THIS COLUMN 
+C                                      ** ZERO PIVOT IMPLIES THIS COLUMN
 C                                      ** ALREADY TRIANGULARIZED
 	      INFO = K
 	   ELSE
@@ -8698,7 +8698,7 @@ C                                            ** FIND L = PIVOT INDEX
 	   IPVT(K) = L
 
 	   IF (A(L,K) .EQ. 0.0E0) THEN
-C                                     ** ZERO PIVOT IMPLIES THIS COLUMN 
+C                                     ** ZERO PIVOT IMPLIES THIS COLUMN
 C                                     ** ALREADY TRIANGULARIZED
 	      INFO = K
 	   ELSE
@@ -8858,7 +8858,7 @@ C                                          ** NON-UNIT INCREMENTS
 C                                          ** UNIT INCREMENTS
 	   M = MOD(N,6)
 	   IF( M.NE.0 ) THEN
-C                             ** CLEAN-UP LOOP SO REMAINING VECTOR 
+C                             ** CLEAN-UP LOOP SO REMAINING VECTOR
 C                             ** LENGTH IS A MULTIPLE OF 6.
 	      DO 30  I = 1, M
 	        SASUM = SASUM + ABS(SX(I))
@@ -8886,8 +8886,8 @@ C       SY  SING-PREC ARRAY CONTAINING VECTOR 'Y'
 C     INCY  SPACING OF ELEMENTS OF VECTOR 'Y' IN 'SY'
 
 C --OUTPUT--
-C       SY   FOR I = 0 TO N-1, OVERWRITE  SY(LY+I*INCY) WITH 
-C                 SA*SX(LX+I*INCX) + SY(LY+I*INCY), 
+C       SY   FOR I = 0 TO N-1, OVERWRITE  SY(LY+I*INCY) WITH
+C                 SA*SX(LX+I*INCX) + SY(LY+I*INCY),
 C            WHERE LX = 1          IF INCX .GE. 0,
 C                     = (-INCX)*N  IF INCX .LT. 0
 C            AND LY IS DEFINED IN A SIMILAR WAY USING INCY.
@@ -8951,7 +8951,7 @@ C     INCY  SPACING OF ELEMENTS OF VECTOR 'Y' IN 'SY'
 
 C --OUTPUT--
 C     SDOT   SUM FOR I = 0 TO N-1 OF  SX(LX+I*INCX) * SY(LY+I*INCY),
-C            WHERE  LX = 1          IF INCX .GE. 0, 
+C            WHERE  LX = 1          IF INCX .GE. 0,
 C                      = (-INCX)*N  IF INCX .LT. 0,
 C            AND LY IS DEFINED IN A SIMILAR WAY USING INCY.
 
@@ -9010,7 +9010,7 @@ C            SA  SINGLE PRECISION SCALE FACTOR
 C            SX  SING-PREC ARRAY, LENGTH 1+(N-1)*INCX, CONTAINING VECTOR
 C          INCX  SPACING OF VECTOR ELEMENTS IN 'SX'
 
-C --OUTPUT-- SX  REPLACE  SX(1+I*INCX)  WITH  SA * SX(1+I*INCX) 
+C --OUTPUT-- SX  REPLACE  SX(1+I*INCX)  WITH  SA * SX(1+I*INCX)
 C                FOR I = 0 TO N-1
 
 	REAL SA, SX(*)
@@ -9063,7 +9063,7 @@ C       SX  INPUT VECTOR SY (UNCHANGED IF N .LE. 0)
 C       SY  INPUT VECTOR SX (UNCHANGED IF N .LE. 0)
 
 C     FOR I = 0 TO N-1, INTERCHANGE  SX(LX+I*INCX) AND SY(LY+I*INCY),
-C     WHERE LX = 1          IF INCX .GE. 0, 
+C     WHERE LX = 1          IF INCX .GE. 0,
 C              = (-INCX)*N  IF INCX .LT. 0
 C     AND LY IS DEFINED IN A SIMILAR WAY USING INCY.
 
@@ -9188,12 +9188,12 @@ C                         ABS(SX(1+(I-1)*INCX))
 
       DOUBLE PRECISION d1mach
       INTEGER i
-   
+
       LOGICAL doinit
       DATA doinit/.TRUE./
       SAVE doinit
 
-      DOUBLE PRECISION dmach(4) 
+      DOUBLE PRECISION dmach(4)
       SAVE dmach
 
       IF (( i .GE. 1 ) .AND. ( i .LE. 4 )) THEN
@@ -9444,12 +9444,12 @@ C---------- LAST CARD OF T665D ----------
 
       REAL r1mach
       INTEGER i
-   
+
       LOGICAL doinit
       DATA doinit/.TRUE./
       SAVE doinit
 
-      REAL rmach(4) 
+      REAL rmach(4)
       SAVE rmach
 
       IF (( i .GE. 1 ) .AND. ( i .LE. 4 )) THEN
@@ -9827,14 +9827,14 @@ C---------- LAST CARD OF T665R ----------
 *  3 =   modtran1.flx:  Modtran (Gail Anderson, priv. comm.)
 *                       200.55-949.40, 0.05 nm steps
 *  4 =   nicolarv.flx:  wvl<300 nm from Nicolet, Plan. Sp. Sci., 29,  951-974, 1981.
-*                       wvl>300 nm supplied by Thekaekera, Arvesen Applied Optics 8, 
+*                       wvl>300 nm supplied by Thekaekera, Arvesen Applied Optics 8,
 *                       11, 2215-2232, 1969 (also see Thekaekera, Applied Optics, 13,
 *                       3, 518, 1974) but with corrections recommended by:
 *                       Nicolet, Plan. Sp. Sci., 37, 1249-1289, 1989.
 *                       270.0-299.0 nm in 0.5 nm steps
 *                       299.6-340.0 nm in ca. 0.4 nm steps
 *                       340.0-380.0 nm in ca. 0.2 nm steps
-*                       380.0-470.0 nm in ca. 0.1 nm steps   
+*                       380.0-470.0 nm in ca. 0.1 nm steps
 *  5 =  solstice.flx:  From:   MX%"ROTTMAN@virgo.hao.ucar.edu" 12-OCT-1994 13:03:01.62
 *                      Original data gave Wavelength in vacuum
 *                      (Converted to wavelength in air using Pendorf, 1967, J. Opt. Soc. Am.)
@@ -9862,14 +9862,14 @@ C---------- LAST CARD OF T665R ----------
 *                  per nm.
 * 12 = combine susim_hi.flx for .lt. 350 nm, neckel.flx for .gt. 350 nm.
 *
-* 13 = combine 
+* 13 = combine
 *     for wl(iw) .lt. 150.01                                susim_hi.flx
-*     for wl(iw) .ge. 150.01 and wl(iw) .le. 400            atlas3.flx 
-*     for wl(iw) .gt. 400                                   Neckel & Labs 
+*     for wl(iw) .ge. 150.01 and wl(iw) .le. 400            atlas3.flx
+*     for wl(iw) .gt. 400                                   Neckel & Labs
 
       msun = 13
 
-* simple files are read and interpolated here in-line. Reading of 
+* simple files are read and interpolated here in-line. Reading of
 * more complex files may be done with longer code in a read#.f subroutine.
 
       IF (msun .EQ. 1) THEN
@@ -9893,7 +9893,7 @@ c         write(kout,*) fil
          IF (ierr .NE. 0) THEN
             WRITE(*,*) ierr, fil
             STOP
-         ENDIF         
+         ENDIF
          DO iw = 1, nw-1
             f(iw) = yg1(iw)
          ENDDO
@@ -9919,7 +9919,7 @@ c         write(kout,*) fil
          IF (ierr .NE. 0) THEN
             WRITE(*,*) ierr, fil
             STOP
-         ENDIF         
+         ENDIF
          DO iw = 1, nw-1
             f(iw) = yg1(iw)
          ENDDO
@@ -9945,7 +9945,7 @@ c         write(kout,*) fil
          IF (ierr .NE. 0) THEN
             WRITE(*,*) ierr, fil
             STOP
-         ENDIF         
+         ENDIF
          DO iw = 1, nw-1
             f(iw) = yg1(iw)
          ENDDO
@@ -9971,7 +9971,7 @@ c         write(kout,*) fil
          IF (ierr .NE. 0) THEN
             WRITE(*,*) ierr, fil
             STOP
-         ENDIF         
+         ENDIF
          DO iw = 1, nw-1
             f(iw) = yg1(iw)
          ENDDO
@@ -9998,7 +9998,7 @@ c         write(kout,*) fil
          IF (ierr .NE. 0) THEN
             WRITE(*,*) ierr, fil
             STOP
-         ENDIF         
+         ENDIF
          DO iw = 1, nw-1
             f(iw) = yg1(iw)
          ENDDO
@@ -10026,7 +10026,7 @@ c         write(kout,*) fil
          IF (ierr .NE. 0) THEN
             WRITE(*,*) ierr, fil
             STOP
-         ENDIF         
+         ENDIF
          DO iw = 1, nw-1
             f(iw) = yg1(iw)
          ENDDO
@@ -10084,7 +10084,7 @@ c         write(kout,*) fil
          IF (ierr .NE. 0) THEN
             WRITE(*,*) ierr, fil
             STOP
-         ENDIF         
+         ENDIF
          DO iw = 1, nw-1
             f(iw) = yg1(iw)
          ENDDO
@@ -10110,7 +10110,7 @@ c         write(kout,*) fil
          IF (ierr .NE. 0) THEN
             WRITE(*,*) ierr, fil
             STOP
-         ENDIF         
+         ENDIF
          DO iw = 1, nw-1
             f(iw) = yg1(iw)
          ENDDO
@@ -10186,7 +10186,7 @@ c         WRITE(kout,*) 'DATAE1/SUN/susim_hi.flx'
          IF (ierr .NE. 0) THEN
             WRITE(*,*) ierr, fil
             STOP
-         ENDIF         
+         ENDIF
 
          fil = 'DATAE1/SUN/neckel.flx'
 	 call read_neck(x1,y1,kdata,n)         ! read neckel extra-terrestrial data
@@ -10210,7 +10210,7 @@ c         WRITE(kout,*) 'DATAE1/SUN/susim_hi.flx'
       ENDIF
 
 
-      
+
 *_______________________________________________________________________
 
       RETURN
@@ -10271,7 +10271,7 @@ c         WRITE(kout,*) 'DATAE1/SUN/susim_hi.flx'
       integer nno2
       parameter(nno2=750)
       REAL x1(kdata)
-      REAL y1(kdata),y2(kdata),y3(kdata)       
+      REAL y1(kdata),y2(kdata),y3(kdata)
       data x1(1:nno2)/263.80,264.30,264.80,265.30,265.80,
      A 266.40,266.90,267.40,267.90,268.40,268.90,269.40,270.00,270.50,
      A 271.00,271.50,272.00,272.50,273.00,273.60,274.10,274.60,275.10,
@@ -10568,7 +10568,7 @@ c         WRITE(kout,*) 'DATAE1/SUN/susim_hi.flx'
       REAL wl(kw)
 
 * output:
-* ozone absorption cross section at three different 
+* ozone absorption cross section at three different
 * temperatures: 226, 263, 298 Kelvin.  Can interpolate
 * to different temperatures. Units are cm2 molecule-1
 
@@ -10576,11 +10576,11 @@ c         WRITE(kout,*) 'DATAE1/SUN/susim_hi.flx'
 
 * local:
       integer nwmo,ns
-      parameter(nwmo=158,ns=220) 
+      parameter(nwmo=158,ns=220)
       REAL x1(kdata),x2(kdata),x3(kdata),xs1wmo(kdata),ys1wmo(kdata)
       REAL xs1(kdata),xs2(kdata),xs3(kdata),ys1(kdata),
-     1 ys2(kdata),ys3(kdata)       
-      
+     1 ys2(kdata),ys3(kdata)
+
       data xs1wmo(1:nwmo)/176.2,177.8,179.4,181.0,182.7,184.3,185.7,
      1 187.4,189.6,191.4,193.2,195.1,197.0,199.0,
      2 201.0,203.1,205.1,207.3,209.4,211.6,213.9,
@@ -10780,7 +10780,7 @@ c         WRITE(kout,*) 'DATAE1/SUN/susim_hi.flx'
          WRITE(*,*) ierr, fil
          STOP
       ENDIF
-            
+
       DO 13, iw = 1, nw-1
          xso3(iw) = yg(iw)
    13 CONTINUE
@@ -11121,7 +11121,7 @@ c         WRITE(kout,*) 'DATAE1/SUN/susim_hi.flx'
          WRITE(*,*) ierr, fil
          STOP
       ENDIF
-      
+
       DO 13, l = 1, nw-1
          xsso2(l) = yg(l)
    13 CONTINUE
@@ -11134,7 +11134,7 @@ c         WRITE(kout,*) 'DATAE1/SUN/susim_hi.flx'
       SUBROUTINE read1(nw,wl,f)
 
 *-----------------------------------------------------------------------------*
-*=  PURPOSE:                                                                 =*
+*=  PURPOSE:
 *=  Read extra-terrestrial flux data.  Re-grid data to match specified       =*
 *=  working wavelength grid.                                                 =*
 *-----------------------------------------------------------------------------*
@@ -11146,27 +11146,6 @@ c         WRITE(kout,*) 'DATAE1/SUN/susim_hi.flx'
 *=  F      - REAL, spectral irradiance at the top of the atmosphere at    (O)=*
 *=           each specified wavelength                                       =*
 *-----------------------------------------------------------------------------*
-*=  EDIT HISTORY:                                                            =*
-*=  02/97  Changed offset for grid-end interpolation to relative number      =*
-*=         (x * (1 +- deltax))                                               =*
-*-----------------------------------------------------------------------------*
-*= This program is free software;  you can redistribute it and/or modify     =*
-*= it under the terms of the GNU General Public License as published by the  =*
-*= Free Software Foundation;  either version 2 of the license, or (at your   =*
-*= option) any later version.                                                =*
-*= The TUV package is distributed in the hope that it will be useful, but    =*
-*= WITHOUT ANY WARRANTY;  without even the implied warranty of MERCHANTIBI-  =*
-*= LITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public     =*
-*= License for more details.                                                 =*
-*= To obtain a copy of the GNU General Public License, write to:             =*
-*= Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.   =*
-*-----------------------------------------------------------------------------*
-*= To contact the authors, please mail to:                                   =*
-*= Sasha Madronich, NCAR/ACD, P.O.Box 3000, Boulder, CO, 80307-3000, USA  or =*
-*= send email to:  sasha@ucar.edu                                            =*
-*-----------------------------------------------------------------------------*
-*= Copyright (C) 1994,95,96  University Corporation for Atmospheric Research =*
-*-----------------------------------------------------------------------------*
 
       IMPLICIT NONE
       INCLUDE 'tuv.params'
@@ -11174,947 +11153,13 @@ c         WRITE(kout,*) 'DATAE1/SUN/susim_hi.flx'
 * input: (wavelength grid)
       INTEGER nw
       REAL wl(kw)
-      INTEGER iw
 
 * output: (extra terrestrial solar flux)
       REAL f(kw)
 
 * local:
-      integer nsusim
-      parameter(nsusim=5590)
+
       REAL lambda_hi(10000),irrad_hi(10000)
-       data irrad_hi(1:nsusim)/.6525E-01,.2662E+00,.5396E+00,.5506E+00,
-     A .3325E+00,.5456E-01,.5860E-01,.6201E-01,.5934E-01,.6588E-01,
-     A .6787E-01,.8138E-01,.8514E-01,.1009E+00,.1272E+00,.1409E+00,
-     A .1875E+00,.3042E+00,.5199E+00,.1469E+01,.6272E+01,.1400E+02,
-     A .2645E+02,.2873E+02,.1863E+02,.6863E+01,.1381E+01,.4207E+00,
-     A .3229E+00,.2668E+00,.1765E+00,.1098E+00,.8889E-01,.8038E-01,
-     A .6954E-01,.5756E-01,.4989E-01,.4755E-01,.4633E-01,.3926E-01,
-     A .3735E-01,.3612E-01,.3001E-01,.3038E-01,.2856E-01,.2802E-01,
-     A .2865E-01,.2814E-01,.2651E-01,.2626E-01,.2577E-01,.2378E-01,
-     A .2152E-01,.2070E-01,.2084E-01,.2112E-01,.2122E-01,.1988E-01,
-     A .2006E-01,.1868E-01,.1921E-01,.1972E-01,.2055E-01,.2020E-01,
-     A .1961E-01,.1664E-01,.3151E-01,.5076E-01,.6939E-01,.4579E-01,
-     A .2100E-01,.1886E-01,.1938E-01,.2038E-01,.3138E-01,.4421E-01,
-     A .4507E-01,.2842E-01,.1492E-01,.1453E-01,.1477E-01,.1654E-01,
-     A .1496E-01,.1512E-01,.1931E-01,.1759E-01,.1478E-01,.1514E-01,
-     A .1533E-01,.1526E-01,.1865E-01,.2031E-01,.1695E-01,.1254E-01,
-     A .1234E-01,.1606E-01,.2126E-01,.2602E-01,.2098E-01,.1556E-01,
-     A .1403E-01,.1755E-01,.2363E-01,.2201E-01,.1753E-01,.1818E-01,
-     A .2366E-01,.3283E-01,.3711E-01,.4311E-01,.5027E-01,.4084E-01,
-     A .2634E-01,.1812E-01,.1471E-01,.9788E-02,.1084E-01,.3914E-01,
-     A .8849E-01,.1015E+00,.4607E-01,.2981E-01,.2373E-01,.2186E-01,
-     A .1755E-01,.1231E-01,.1225E-01,.1165E-01,.1072E-01,.1255E-01,
-     A .1221E-01,.1257E-01,.1345E-01,.1050E-01,.1163E-01,.1095E-01,
-     A .1139E-01,.1562E-01,.1928E-01,.2403E-01,.2547E-01,.2053E-01,
-     A .2124E-01,.2473E-01,.2479E-01,.1914E-01,.1561E-01,.1617E-01,
-     A .1914E-01,.2501E-01,.2105E-01,.1789E-01,.1548E-01,.1397E-01,
-     A .1888E-01,.1915E-01,.1883E-01,.2021E-01,.1900E-01,.1753E-01,
-     A .1462E-01,.1410E-01,.1486E-01,.1229E-01,.1376E-01,.2190E-01,
-     A .3000E-01,.2177E-01,.2008E-01,.1981E-01,.1648E-01,.1494E-01,
-     A .1392E-01,.1306E-01,.1302E-01,.1233E-01,.1151E-01,.1445E-01,
-     A .1617E-01,.1631E-01,.2081E-01,.2509E-01,.2367E-01,.1748E-01,
-     A .1444E-01,.1478E-01,.1952E-01,.2902E-01,.2574E-01,.2263E-01,
-     A .2445E-01,.3403E-01,.9062E-01,.1774E+00,.2312E+00,.1893E+00,
-     A .8462E-01,.3443E-01,.1105E+00,.2424E+00,.2968E+00,.3120E+00,
-     A .2960E+00,.1898E+00,.6908E-01,.1702E-01,.1476E-01,.3080E-01,
-     A .5714E-01,.7034E-01,.4775E-01,.2319E-01,.2641E-01,.3111E-01,
-     A .2686E-01,.2085E-01,.2240E-01,.2512E-01,.1888E-01,.1369E-01,
-     A .1459E-01,.1775E-01,.2639E-01,.3201E-01,.3118E-01,.2551E-01,
-     A .2162E-01,.2280E-01,.2998E-01,.2733E-01,.1349E-01,.1325E-01,
-     A .1163E-01,.1107E-01,.1132E-01,.1346E-01,.1299E-01,.1736E-01,
-     A .2097E-01,.1822E-01,.1716E-01,.1118E-01,.1105E-01,.1455E-01,
-     A .1795E-01,.1827E-01,.1440E-01,.1587E-01,.2382E-01,.3352E-01,
-     A .2879E-01,.1945E-01,.1503E-01,.1534E-01,.1475E-01,.1599E-01,
-     A .1237E-01,.1136E-01,.6356E-01,.2897E+00,.5284E+00,.5910E+00,
-     A .6725E+00,.4339E+00,.9271E-01,.3915E-01,.1607E-01,.1720E-01,
-     A .1534E-01,.1237E-01,.1478E-01,.1589E-01,.1583E-01,.1665E-01,
-     A .1980E-01,.2100E-01,.1761E-01,.1828E-01,.2007E-01,.1679E-01,
-     A .1470E-01,.1749E-01,.1789E-01,.1846E-01,.2181E-01,.1990E-01,
-     A .1958E-01,.1739E-01,.1937E-01,.2132E-01,.1939E-01,.1855E-01,
-     A .3103E-01,.5343E-01,.5397E-01,.3402E-01,.2322E-01,.2148E-01,
-     A .2398E-01,.3002E-01,.5305E-01,.8904E-01,.8065E-01,.4746E-01,
-     A .3437E-01,.3091E-01,.4061E-01,.5062E-01,.4852E-01,.4130E-01,
-     A .2762E-01,.2379E-01,.2958E-01,.3144E-01,.2788E-01,.2173E-01,
-     A .2212E-01,.2968E-01,.3500E-01,.3352E-01,.2461E-01,.2137E-01,
-     A .2201E-01,.2200E-01,.2469E-01,.2523E-01,.2710E-01,.2611E-01,
-     A .2707E-01,.2811E-01,.2769E-01,.3155E-01,.3084E-01,.3007E-01,
-     A .3166E-01,.2961E-01,.2698E-01,.2663E-01,.2842E-01,.2880E-01,
-     A .2577E-01,.2518E-01,.2551E-01,.2764E-01,.2751E-01,.2540E-01,
-     A .2707E-01,.2631E-01,.2791E-01,.3022E-01,.2816E-01,.2760E-01,
-     A .3082E-01,.3316E-01,.2903E-01,.2685E-01,.2794E-01,.2532E-01,
-     A .2608E-01,.3049E-01,.2658E-01,.2732E-01,.2561E-01,.2894E-01,
-     A .3353E-01,.2849E-01,.2801E-01,.2895E-01,.2640E-01,.2777E-01,
-     A .2919E-01,.2700E-01,.2631E-01,.2870E-01,.3879E-01,.7091E-01,
-     A .1449E+00,.2934E+00,.2967E+00,.9113E-01,.4227E-01,.3434E-01,
-     A .3272E-01,.3456E-01,.3210E-01,.3025E-01,.3266E-01,.3620E-01,
-     A .3877E-01,.3953E-01,.4595E-01,.6574E-01,.6243E-01,.7330E-01,
-     A .1252E+00,.1783E+00,.1213E+00,.5062E-01,.4826E-01,.4723E-01,
-     A .4512E-01,.4325E-01,.4120E-01,.3491E-01,.3862E-01,.4219E-01,
-     A .3752E-01,.3801E-01,.3576E-01,.3334E-01,.3763E-01,.3993E-01,
-     A .4072E-01,.4044E-01,.4178E-01,.4262E-01,.4033E-01,.3888E-01,
-     A .3604E-01,.3475E-01,.3812E-01,.4050E-01,.4254E-01,.4256E-01,
-     A .3853E-01,.3535E-01,.3447E-01,.3752E-01,.4052E-01,.3776E-01,
-     A .3507E-01,.3588E-01,.3890E-01,.3917E-01,.3823E-01,.3813E-01,
-     A .4022E-01,.4424E-01,.6461E-01,.7802E-01,.6645E-01,.5313E-01,
-     A .4047E-01,.4078E-01,.4182E-01,.4167E-01,.4066E-01,.3998E-01,
-     A .4041E-01,.4000E-01,.4118E-01,.4309E-01,.4869E-01,.6081E-01,
-     A .6687E-01,.6283E-01,.6106E-01,.5276E-01,.4347E-01,.4997E-01,
-     A .5148E-01,.4691E-01,.5192E-01,.5378E-01,.5141E-01,.4960E-01,
-     A .4481E-01,.4254E-01,.4232E-01,.4276E-01,.4821E-01,.5080E-01,
-     A .4835E-01,.4845E-01,.5251E-01,.5307E-01,.4949E-01,.5244E-01,
-     A .5429E-01,.5302E-01,.5303E-01,.5110E-01,.5599E-01,.5393E-01,
-     A .5057E-01,.5013E-01,.5094E-01,.4768E-01,.4971E-01,.5072E-01,
-     A .4695E-01,.4598E-01,.4685E-01,.4622E-01,.4953E-01,.5204E-01,
-     A .5209E-01,.5407E-01,.5689E-01,.5587E-01,.5751E-01,.5748E-01,
-     A .5295E-01,.4759E-01,.5185E-01,.5410E-01,.5584E-01,.5889E-01,
-     A .5693E-01,.5355E-01,.5541E-01,.5950E-01,.5565E-01,.5174E-01,
-     A .5672E-01,.6284E-01,.6859E-01,.6612E-01,.5806E-01,.5729E-01,
-     A .5822E-01,.5940E-01,.6289E-01,.7520E-01,.8892E-01,.9071E-01,
-     A .8056E-01,.6741E-01,.6243E-01,.6809E-01,.7086E-01,.6596E-01,
-     A .6634E-01,.7142E-01,.9957E-01,.1382E+00,.1422E+00,.1414E+00,
-     A .1141E+00,.9059E-01,.6669E-01,.6287E-01,.6457E-01,.6491E-01,
-     A .6415E-01,.6301E-01,.6312E-01,.5980E-01,.5974E-01,.5944E-01,
-     A .6259E-01,.8395E-01,.1109E+00,.1235E+00,.1030E+00,.9986E-01,
-     A .9631E-01,.7233E-01,.7046E-01,.7452E-01,.7807E-01,.9309E-01,
-     A .9472E-01,.8904E-01,.8616E-01,.7531E-01,.6988E-01,.7000E-01,
-     A .7012E-01,.6890E-01,.7054E-01,.7273E-01,.7591E-01,.7103E-01,
-     A .8591E-01,.8651E-01,.7515E-01,.7627E-01,.7531E-01,.7568E-01,
-     A .7408E-01,.7428E-01,.7596E-01,.7428E-01,.7395E-01,.7905E-01,
-     A .8245E-01,.7662E-01,.7932E-01,.8283E-01,.8404E-01,.8406E-01,
-     A .8030E-01,.8875E-01,.8763E-01,.8456E-01,.8382E-01,.8541E-01,
-     A .8794E-01,.8510E-01,.8572E-01,.8681E-01,.8622E-01,.8505E-01,
-     A .8472E-01,.8301E-01,.8501E-01,.8714E-01,.8786E-01,.9348E-01,
-     A .8528E-01,.1100E+00,.1098E+00,.1054E+00,.9757E-01,.8746E-01,
-     A .9173E-01,.9614E-01,.8344E-01,.8795E-01,.9245E-01,.9174E-01,
-     A .9108E-01,.8811E-01,.8758E-01,.9153E-01,.9323E-01,.9232E-01,
-     A .9658E-01,.9831E-01,.8579E-01,.9206E-01,.9464E-01,.9631E-01,
-     A .9530E-01,.9868E-01,.1033E+00,.1054E+00,.1016E+00,.9994E-01,
-     A .9918E-01,.1032E+00,.1458E+00,.2007E+00,.2054E+00,.1649E+00,
-     A .1056E+00,.1110E+00,.1103E+00,.1049E+00,.9826E-01,.1031E+00,
-     A .1088E+00,.1126E+00,.1091E+00,.1443E+00,.1950E+00,.2183E+00,
-     A .1894E+00,.1350E+00,.1146E+00,.1062E+00,.1056E+00,.1160E+00,
-     A .1461E+00,.1415E+00,.1238E+00,.1041E+00,.9938E-01,.1006E+00,
-     A .1111E+00,.1300E+00,.1462E+00,.1408E+00,.1348E+00,.1115E+00,
-     A .9608E-01,.9929E-01,.1040E+00,.1153E+00,.1247E+00,.1193E+00,
-     A .1184E+00,.9577E-01,.1766E+00,.4678E+00,.6565E+00,.6417E+00,
-     A .3351E+00,.1256E+00,.2067E+00,.3868E+00,.4074E+00,.2281E+00,
-     A .1591E+00,.1361E+00,.1059E+00,.1035E+00,.9743E-01,.1057E+00,
-     A .1231E+00,.1194E+00,.1130E+00,.1200E+00,.1161E+00,.1232E+00,
-     A .1641E+00,.2015E+00,.2270E+00,.2461E+00,.2910E+00,.3284E+00,
-     A .3568E+00,.2963E+00,.1710E+00,.1209E+00,.1400E+00,.1671E+00,
-     A .1582E+00,.1281E+00,.1218E+00,.1165E+00,.1299E+00,.1456E+00,
-     A .1573E+00,.1550E+00,.1513E+00,.1374E+00,.1439E+00,.1838E+00,
-     A .1975E+00,.1715E+00,.1609E+00,.1494E+00,.1366E+00,.1444E+00,
-     A .1583E+00,.1868E+00,.2309E+00,.2407E+00,.2184E+00,.1762E+00,
-     A .1437E+00,.1495E+00,.1518E+00,.1431E+00,.1335E+00,.1310E+00,
-     A .1202E+00,.1264E+00,.1635E+00,.1872E+00,.1713E+00,.1404E+00,
-     A .1241E+00,.1351E+00,.1460E+00,.1499E+00,.1677E+00,.1835E+00,
-     A .1769E+00,.1623E+00,.1551E+00,.1502E+00,.1546E+00,.1842E+00,
-     A .2099E+00,.1886E+00,.1619E+00,.1642E+00,.1681E+00,.1650E+00,
-     A .1615E+00,.1665E+00,.1702E+00,.1675E+00,.1657E+00,.1714E+00,
-     A .1843E+00,.1956E+00,.1908E+00,.1738E+00,.1529E+00,.1384E+00,
-     A .1452E+00,.1572E+00,.1576E+00,.1496E+00,.1447E+00,.1596E+00,
-     A .1770E+00,.1743E+00,.1714E+00,.1911E+00,.2208E+00,.2199E+00,
-     A .1971E+00,.1709E+00,.1628E+00,.1664E+00,.1734E+00,.1819E+00,
-     A .1792E+00,.1743E+00,.1762E+00,.2029E+00,.2240E+00,.2100E+00,
-     A .1932E+00,.1867E+00,.2125E+00,.2562E+00,.2474E+00,.2218E+00,
-     A .2417E+00,.2763E+00,.2908E+00,.2700E+00,.2375E+00,.2121E+00,
-     A .2032E+00,.1950E+00,.1949E+00,.2041E+00,.2101E+00,.2142E+00,
-     A .2293E+00,.2267E+00,.2048E+00,.2119E+00,.2137E+00,.2166E+00,
-     A .2516E+00,.2698E+00,.2634E+00,.2699E+00,.2670E+00,.2462E+00,
-     A .2296E+00,.2404E+00,.2999E+00,.3263E+00,.2816E+00,.2469E+00,
-     A .2544E+00,.2479E+00,.2420E+00,.2707E+00,.2861E+00,.2738E+00,
-     A .2541E+00,.2283E+00,.2272E+00,.2611E+00,.2812E+00,.2961E+00,
-     A .3076E+00,.3116E+00,.3064E+00,.2644E+00,.2318E+00,.2375E+00,
-     A .2627E+00,.2954E+00,.3174E+00,.3064E+00,.2614E+00,.2553E+00,
-     A .3234E+00,.4168E+00,.4697E+00,.4097E+00,.3063E+00,.2711E+00,
-     A .2740E+00,.3024E+00,.3398E+00,.3477E+00,.3245E+00,.2990E+00,
-     A .2941E+00,.2788E+00,.2788E+00,.2788E+00,.2742E+00,.2845E+00,
-     A .2840E+00,.2896E+00,.3080E+00,.3035E+00,.2790E+00,.2710E+00,
-     A .2676E+00,.2694E+00,.2785E+00,.2727E+00,.2798E+00,.3125E+00,
-     A .3523E+00,.3390E+00,.3658E+00,.4814E+00,.7587E+00,.9372E+00,
-     A .1042E+01,.1032E+01,.8773E+00,.6644E+00,.5012E+00,.4159E+00,
-     A .3792E+00,.3311E+00,.3402E+00,.3410E+00,.3413E+00,.3826E+00,
-     A .3832E+00,.3730E+00,.3380E+00,.3232E+00,.3406E+00,.3709E+00,
-     A .3971E+00,.3717E+00,.3475E+00,.3385E+00,.3335E+00,.3288E+00,
-     A .3570E+00,.3813E+00,.4438E+00,.5991E+00,.5330E+00,.3716E+00,
-     A .3159E+00,.3220E+00,.3457E+00,.4062E+00,.4433E+00,.4368E+00,
-     A .3886E+00,.3545E+00,.3842E+00,.4072E+00,.4134E+00,.4070E+00,
-     A .3807E+00,.3800E+00,.3977E+00,.4109E+00,.4049E+00,.4146E+00,
-     A .4427E+00,.4398E+00,.4093E+00,.4033E+00,.4183E+00,.4193E+00,
-     A .4187E+00,.4211E+00,.4326E+00,.4695E+00,.5398E+00,.5902E+00,
-     A .5437E+00,.4858E+00,.4952E+00,.5187E+00,.5073E+00,.5029E+00,
-     A .5147E+00,.5271E+00,.5897E+00,.6094E+00,.5730E+00,.5633E+00,
-     A .5669E+00,.5723E+00,.5957E+00,.6360E+00,.6464E+00,.6178E+00,
-     A .5964E+00,.6616E+00,.7383E+00,.7260E+00,.6429E+00,.6291E+00,
-     A .6683E+00,.6818E+00,.6574E+00,.6479E+00,.6859E+00,.7953E+00,
-     A .8769E+00,.8611E+00,.7538E+00,.6823E+00,.7078E+00,.7135E+00,
-     A .6779E+00,.6572E+00,.6760E+00,.6815E+00,.6712E+00,.6663E+00,
-     A .6960E+00,.7535E+00,.7777E+00,.7774E+00,.7856E+00,.7606E+00,
-     A .7388E+00,.7333E+00,.6500E+00,.6655E+00,.7213E+00,.7198E+00,
-     A .6573E+00,.6142E+00,.6315E+00,.6659E+00,.7177E+00,.7702E+00,
-     A .8016E+00,.8240E+00,.8204E+00,.7694E+00,.7518E+00,.7381E+00,
-     A .7534E+00,.8217E+00,.8665E+00,.8323E+00,.7579E+00,.7254E+00,
-     A .7267E+00,.7209E+00,.7035E+00,.7810E+00,.8567E+00,.8750E+00,
-     A .8148E+00,.8074E+00,.8255E+00,.8252E+00,.8229E+00,.8083E+00,
-     A .7613E+00,.6811E+00,.6619E+00,.6772E+00,.6900E+00,.7333E+00,
-     A .7512E+00,.7401E+00,.7637E+00,.7732E+00,.7770E+00,.8001E+00,
-     A .7910E+00,.7880E+00,.8165E+00,.8233E+00,.8115E+00,.8138E+00,
-     A .8226E+00,.8344E+00,.8623E+00,.8655E+00,.8682E+00,.8687E+00,
-     A .8779E+00,.9340E+00,.9895E+00,.9841E+00,.9885E+00,.9906E+00,
-     A .9905E+00,.9572E+00,.1031E+01,.1023E+01,.1015E+01,.1043E+01,
-     A .9634E+00,.8697E+00,.8767E+00,.9202E+00,.9493E+00,.9523E+00,
-     A .9575E+00,.1035E+01,.1076E+01,.1109E+01,.1121E+01,.1102E+01,
-     A .1080E+01,.1113E+01,.1153E+01,.1195E+01,.1242E+01,.1229E+01,
-     A .1202E+01,.1183E+01,.1176E+01,.1218E+01,.1218E+01,.1213E+01,
-     A .1282E+01,.1253E+01,.1229E+01,.1240E+01,.1253E+01,.1318E+01,
-     A .1342E+01,.1280E+01,.1141E+01,.1126E+01,.1153E+01,.1211E+01,
-     A .1157E+01,.1085E+01,.1043E+01,.1158E+01,.1409E+01,.1544E+01,
-     A .1492E+01,.1372E+01,.1302E+01,.1326E+01,.1351E+01,.1449E+01,
-     A .1533E+01,.1626E+01,.1613E+01,.1696E+01,.1822E+01,.1788E+01,
-     A .1716E+01,.1557E+01,.1341E+01,.1217E+01,.1228E+01,.1306E+01,
-     A .1365E+01,.1371E+01,.1399E+01,.1470E+01,.1620E+01,.1677E+01,
-     A .1637E+01,.1707E+01,.1731E+01,.1651E+01,.1510E+01,.1479E+01,
-     A .1555E+01,.1631E+01,.1646E+01,.1646E+01,.1630E+01,.1645E+01,
-     A .1712E+01,.1687E+01,.1640E+01,.1645E+01,.1653E+01,.1669E+01,
-     A .1743E+01,.1848E+01,.1810E+01,.1822E+01,.1868E+01,.1857E+01,
-     A .1796E+01,.1613E+01,.1532E+01,.1460E+01,.1435E+01,.1473E+01,
-     A .1523E+01,.1603E+01,.1653E+01,.1602E+01,.1599E+01,.1651E+01,
-     A .1686E+01,.1696E+01,.1708E+01,.1720E+01,.1738E+01,.1771E+01,
-     A .1824E+01,.1863E+01,.1873E+01,.1887E+01,.1850E+01,.1880E+01,
-     A .1854E+01,.1856E+01,.1920E+01,.1974E+01,.1976E+01,.1922E+01,
-     A .1774E+01,.1880E+01,.2577E+01,.2967E+01,.2749E+01,.2253E+01,
-     A .1867E+01,.1902E+01,.2020E+01,.1982E+01,.1926E+01,.1898E+01,
-     A .1931E+01,.1893E+01,.1818E+01,.1731E+01,.1785E+01,.1877E+01,
-     A .1822E+01,.2386E+01,.3597E+01,.4543E+01,.4393E+01,.3024E+01,
-     A .2392E+01,.2227E+01,.2245E+01,.2074E+01,.1995E+01,.2130E+01,
-     A .2269E+01,.2268E+01,.2301E+01,.2471E+01,.2582E+01,.2676E+01,
-     A .2602E+01,.2498E+01,.2372E+01,.2254E+01,.2237E+01,.2248E+01,
-     A .2179E+01,.2141E+01,.2204E+01,.2299E+01,.2326E+01,.2250E+01,
-     A .2215E+01,.2248E+01,.2336E+01,.2410E+01,.2459E+01,.2400E+01,
-     A .2397E+01,.2505E+01,.2629E+01,.2651E+01,.2593E+01,.2446E+01,
-     A .2358E+01,.2456E+01,.2521E+01,.2509E+01,.2566E+01,.2741E+01,
-     A .2666E+01,.2380E+01,.2262E+01,.1996E+01,.1945E+01,.2135E+01,
-     A .2303E+01,.2360E+01,.2308E+01,.2297E+01,.2347E+01,.2198E+01,
-     A .2069E+01,.2079E+01,.2092E+01,.1946E+01,.1730E+01,.1751E+01,
-     A .1920E+01,.2190E+01,.2474E+01,.2335E+01,.1879E+01,.1880E+01,
-     A .1957E+01,.1997E+01,.2026E+01,.2234E+01,.2395E+01,.2761E+01,
-     A .2898E+01,.2906E+01,.2818E+01,.2882E+01,.2782E+01,.2561E+01,
-     A .2488E+01,.2500E+01,.2508E+01,.2446E+01,.2424E+01,.2518E+01,
-     A .2540E+01,.2529E+01,.2592E+01,.2635E+01,.2754E+01,.2807E+01,
-     A .2691E+01,.2664E+01,.2556E+01,.2554E+01,.2502E+01,.2659E+01,
-     A .2942E+01,.3032E+01,.3240E+01,.3277E+01,.3238E+01,.3257E+01,
-     A .3233E+01,.3270E+01,.3233E+01,.3416E+01,.3407E+01,.3286E+01,
-     A .3134E+01,.3084E+01,.3197E+01,.3288E+01,.3231E+01,.3128E+01,
-     A .3185E+01,.3166E+01,.3151E+01,.3140E+01,.3155E+01,.3114E+01,
-     A .3058E+01,.3015E+01,.2974E+01,.2994E+01,.2961E+01,.2948E+01,
-     A .2930E+01,.3045E+01,.3425E+01,.3520E+01,.3453E+01,.3544E+01,
-     A .3372E+01,.3378E+01,.3440E+01,.3397E+01,.3443E+01,.3498E+01,
-     A .3413E+01,.3342E+01,.3431E+01,.3630E+01,.3641E+01,.3585E+01,
-     A .3595E+01,.3773E+01,.4015E+01,.4191E+01,.4086E+01,.3403E+01,
-     A .3633E+01,.3721E+01,.3948E+01,.3776E+01,.3709E+01,.3717E+01,
-     A .3758E+01,.3613E+01,.3348E+01,.3208E+01,.3119E+01,.3209E+01,
-     A .3459E+01,.3616E+01,.3562E+01,.3330E+01,.3331E+01,.3572E+01,
-     A .3649E+01,.3787E+01,.3993E+01,.3958E+01,.3828E+01,.3850E+01,
-     A .3688E+01,.3726E+01,.3841E+01,.3925E+01,.3936E+01,.4136E+01,
-     A .4336E+01,.4405E+01,.4231E+01,.3660E+01,.3757E+01,.3749E+01,
-     A .3878E+01,.4035E+01,.3971E+01,.3967E+01,.4044E+01,.4086E+01,
-     A .4259E+01,.4457E+01,.4687E+01,.4400E+01,.4385E+01,.4301E+01,
-     A .4131E+01,.4058E+01,.4049E+01,.4166E+01,.4296E+01,.4453E+01,
-     A .4598E+01,.4802E+01,.4796E+01,.4522E+01,.4398E+01,.4557E+01,
-     A .4513E+01,.4324E+01,.4304E+01,.4226E+01,.4424E+01,.4449E+01,
-     A .4258E+01,.4286E+01,.4351E+01,.4474E+01,.4499E+01,.4326E+01,
-     A .4092E+01,.3703E+01,.3319E+01,.2958E+01,.3020E+01,.2891E+01,
-     A .3051E+01,.3362E+01,.3288E+01,.3341E+01,.3363E+01,.2995E+01,
-     A .2935E+01,.2899E+01,.2730E+01,.3279E+01,.3709E+01,.4033E+01,
-     A .4485E+01,.4735E+01,.4813E+01,.4838E+01,.4901E+01,.5228E+01,
-     A .5828E+01,.5869E+01,.5936E+01,.6014E+01,.5722E+01,.5535E+01,
-     A .5403E+01,.5569E+01,.5347E+01,.5209E+01,.5170E+01,.5432E+01,
-     A .6086E+01,.6212E+01,.6138E+01,.6118E+01,.5714E+01,.5395E+01,
-     A .5466E+01,.5260E+01,.5080E+01,.4777E+01,.4946E+01,.5203E+01,
-     A .5832E+01,.5888E+01,.5656E+01,.5380E+01,.5368E+01,.5557E+01,
-     A .5843E+01,.5783E+01,.5397E+01,.5555E+01,.5896E+01,.6068E+01,
-     A .6044E+01,.5838E+01,.5640E+01,.5273E+01,.5289E+01,.5392E+01,
-     A .5454E+01,.5495E+01,.5544E+01,.5933E+01,.6400E+01,.6526E+01,
-     A .6666E+01,.6699E+01,.6771E+01,.6787E+01,.6806E+01,.6848E+01,
-     A .6958E+01,.6912E+01,.6813E+01,.6508E+01,.6184E+01,.6435E+01,
-     A .6313E+01,.6274E+01,.6379E+01,.6418E+01,.6171E+01,.6124E+01,
-     A .6126E+01,.6192E+01,.6278E+01,.6252E+01,.6079E+01,.5925E+01,
-     A .6297E+01,.6388E+01,.6135E+01,.6141E+01,.6150E+01,.6095E+01,
-     A .6313E+01,.6654E+01,.6940E+01,.6916E+01,.6142E+01,.6216E+01,
-     A .6252E+01,.6331E+01,.6558E+01,.6505E+01,.5841E+01,.5678E+01,
-     A .5564E+01,.5749E+01,.6015E+01,.5743E+01,.5609E+01,.5670E+01,
-     A .5965E+01,.6203E+01,.6154E+01,.6016E+01,.6228E+01,.6926E+01,
-     A .7091E+01,.7309E+01,.7658E+01,.7591E+01,.7121E+01,.6972E+01,
-     A .7072E+01,.7024E+01,.7120E+01,.6959E+01,.6623E+01,.6618E+01,
-     A .7038E+01,.7169E+01,.6869E+01,.6966E+01,.7029E+01,.6899E+01,
-     A .6976E+01,.7318E+01,.7459E+01,.7704E+01,.7459E+01,.7521E+01,
-     A .7214E+01,.7186E+01,.7488E+01,.7976E+01,.8012E+01,.7856E+01,
-     A .7503E+01,.7498E+01,.7422E+01,.7495E+01,.7606E+01,.7716E+01,
-     A .8136E+01,.7572E+01,.7019E+01,.7275E+01,.7633E+01,.7990E+01,
-     A .8493E+01,.8364E+01,.8065E+01,.7902E+01,.7826E+01,.7777E+01,
-     A .7805E+01,.8002E+01,.8249E+01,.8537E+01,.8971E+01,.9138E+01,
-     A .8742E+01,.8551E+01,.8535E+01,.8449E+01,.8050E+01,.7704E+01,
-     A .7714E+01,.7756E+01,.8013E+01,.8682E+01,.8850E+01,.8128E+01,
-     A .8037E+01,.6694E+01,.5917E+01,.6216E+01,.7735E+01,.8646E+01,
-     A .8882E+01,.9033E+01,.9075E+01,.8754E+01,.8756E+01,.9332E+01,
-     A .9735E+01,.9981E+01,.9977E+01,.9596E+01,.8920E+01,.8206E+01,
-     A .7821E+01,.7909E+01,.8462E+01,.8916E+01,.9725E+01,.1012E+02,
-     A .1001E+02,.1009E+02,.9855E+01,.9632E+01,.8873E+01,.8399E+01,
-     A .8536E+01,.9288E+01,.1010E+02,.1029E+02,.1107E+02,.1122E+02,
-     A .1082E+02,.1027E+02,.9827E+01,.9780E+01,.1016E+02,.1092E+02,
-     A .1147E+02,.1112E+02,.1059E+02,.1011E+02,.9945E+01,.1043E+02,
-     A .1061E+02,.1039E+02,.1062E+02,.1069E+02,.1076E+02,.1092E+02,
-     A .1099E+02,.1118E+02,.1153E+02,.1132E+02,.1127E+02,.1083E+02,
-     A .1008E+02,.9602E+01,.1010E+02,.1090E+02,.1132E+02,.1091E+02,
-     A .1017E+02,.9872E+01,.1095E+02,.1144E+02,.1159E+02,.1172E+02,
-     A .1077E+02,.9720E+01,.9707E+01,.9918E+01,.1049E+02,.1115E+02,
-     A .1129E+02,.1169E+02,.1150E+02,.1116E+02,.1092E+02,.1130E+02,
-     A .1196E+02,.1215E+02,.1177E+02,.1155E+02,.1159E+02,.1147E+02,
-     A .1169E+02,.1206E+02,.1247E+02,.1227E+02,.1212E+02,.1248E+02,
-     A .1258E+02,.1304E+02,.1315E+02,.1319E+02,.1343E+02,.1373E+02,
-     A .1403E+02,.1428E+02,.1439E+02,.1409E+02,.1324E+02,.1321E+02,
-     A .1347E+02,.1438E+02,.1407E+02,.1366E+02,.1324E+02,.1311E+02,
-     A .1284E+02,.1297E+02,.1365E+02,.1359E+02,.1322E+02,.1289E+02,
-     A .1392E+02,.1598E+02,.1687E+02,.1672E+02,.1623E+02,.1696E+02,
-     A .1871E+02,.1919E+02,.1738E+02,.1601E+02,.1563E+02,.1637E+02,
-     A .1786E+02,.1865E+02,.1821E+02,.2169E+02,.2534E+02,.2251E+02,
-     A .1843E+02,.1807E+02,.1996E+02,.2141E+02,.2258E+02,.2372E+02,
-     A .2509E+02,.2695E+02,.2675E+02,.2448E+02,.2137E+02,.1902E+02,
-     A .2034E+02,.2364E+02,.2890E+02,.3427E+02,.3444E+02,.3026E+02,
-     A .2252E+02,.1749E+02,.2141E+02,.2832E+02,.3551E+02,.3866E+02,
-     A .3502E+02,.3369E+02,.3365E+02,.3302E+02,.2819E+02,.2140E+02,
-     A .1948E+02,.1938E+02,.2020E+02,.2437E+02,.3386E+02,.3965E+02,
-     A .4051E+02,.3484E+02,.3067E+02,.2919E+02,.2619E+02,.2367E+02,
-     A .2425E+02,.3158E+02,.4100E+02,.4505E+02,.4665E+02,.4032E+02,
-     A .3528E+02,.3616E+02,.4101E+02,.4888E+02,.5173E+02,.4501E+02,
-     A .3860E+02,.3514E+02,.3100E+02,.2687E+02,.1992E+02,.1644E+02,
-     A .1414E+02,.1343E+02,.1962E+02,.2663E+02,.3207E+02,.3640E+02,
-     A .3624E+02,.3639E+02,.3693E+02,.3734E+02,.3387E+02,.2820E+02,
-     A .2469E+02,.2613E+02,.2963E+02,.3011E+02,.2947E+02,.2866E+02,
-     A .3089E+02,.3129E+02,.2784E+02,.2471E+02,.2589E+02,.2957E+02,
-     A .3288E+02,.4055E+02,.4277E+02,.3857E+02,.3189E+02,.2519E+02,
-     A .2204E+02,.2652E+02,.3357E+02,.4303E+02,.5199E+02,.5068E+02,
-     A .4700E+02,.4630E+02,.4846E+02,.4929E+02,.4666E+02,.4359E+02,
-     A .3841E+02,.3443E+02,.3309E+02,.3247E+02,.3318E+02,.3593E+02,
-     A .3996E+02,.4196E+02,.4632E+02,.4349E+02,.3583E+02,.3064E+02,
-     A .3057E+02,.3282E+02,.3540E+02,.4124E+02,.4622E+02,.4793E+02,
-     A .4559E+02,.4120E+02,.3860E+02,.3623E+02,.3337E+02,.2864E+02,
-     A .2403E+02,.2167E+02,.2071E+02,.2235E+02,.2366E+02,.2866E+02,
-     A .3877E+02,.4378E+02,.4233E+02,.4117E+02,.3848E+02,.4004E+02,
-     A .3925E+02,.3706E+02,.3672E+02,.3667E+02,.3162E+02,.2548E+02,
-     A .1994E+02,.1759E+02,.2095E+02,.2954E+02,.3132E+02,.2687E+02,
-     A .2626E+02,.2965E+02,.3378E+02,.3582E+02,.3595E+02,.3789E+02,
-     A .3922E+02,.3757E+02,.3473E+02,.2954E+02,.2628E+02,.2477E+02,
-     A .2651E+02,.3143E+02,.3424E+02,.2933E+02,.2449E+02,.2453E+02,
-     A .2919E+02,.4161E+02,.5075E+02,.5359E+02,.5413E+02,.5500E+02,
-     A .5717E+02,.5920E+02,.5793E+02,.5385E+02,.4900E+02,.4475E+02,
-     A .4305E+02,.4786E+02,.5352E+02,.4556E+02,.3061E+02,.2712E+02,
-     A .3221E+02,.3937E+02,.4239E+02,.4006E+02,.3797E+02,.4199E+02,
-     A .4654E+02,.4460E+02,.3991E+02,.3677E+02,.5015E+02,.6416E+02,
-     A .6217E+02,.5898E+02,.5229E+02,.4485E+02,.3850E+02,.3293E+02,
-     A .3542E+02,.4118E+02,.4784E+02,.5604E+02,.5988E+02,.5937E+02,
-     A .5716E+02,.4821E+02,.3456E+02,.3185E+02,.3530E+02,.4430E+02,
-     A .6032E+02,.6485E+02,.6933E+02,.6571E+02,.5878E+02,.5785E+02,
-     A .5930E+02,.5601E+02,.4768E+02,.4447E+02,.4123E+02,.3685E+02,
-     A .3321E+02,.3888E+02,.3729E+02,.3060E+02,.2186E+02,.1832E+02,
-     A .2074E+02,.2358E+02,.4319E+02,.5046E+02,.4638E+02,.4425E+02,
-     A .4610E+02,.4701E+02,.4012E+02,.3112E+02,.2467E+02,.2242E+02,
-     A .2517E+02,.2963E+02,.3784E+02,.4886E+02,.5275E+02,.5207E+02,
-     A .5346E+02,.5692E+02,.5754E+02,.5074E+02,.4878E+02,.4724E+02,
-     A .4909E+02,.5227E+02,.5066E+02,.4890E+02,.4939E+02,.4794E+02,
-     A .4381E+02,.4175E+02,.4303E+02,.4712E+02,.5351E+02,.5411E+02,
-     A .5109E+02,.4744E+02,.4240E+02,.4175E+02,.4987E+02,.6633E+02,
-     A .7564E+02,.8278E+02,.8027E+02,.7441E+02,.7416E+02,.7661E+02,
-     A .7836E+02,.7665E+02,.7122E+02,.6706E+02,.6250E+02,.5236E+02,
-     A .5202E+02,.6074E+02,.6796E+02,.6798E+02,.6239E+02,.5498E+02,
-     A .5203E+02,.5148E+02,.5096E+02,.4906E+02,.4649E+02,.4467E+02,
-     A .5205E+02,.5901E+02,.6298E+02,.6406E+02,.6760E+02,.7116E+02,
-     A .7471E+02,.6832E+02,.5798E+02,.5256E+02,.5250E+02,.5314E+02,
-     A .5099E+02,.4848E+02,.5203E+02,.5852E+02,.5854E+02,.5176E+02,
-     A .4520E+02,.4613E+02,.5281E+02,.5179E+02,.4557E+02,.4381E+02,
-     A .4893E+02,.5158E+02,.5112E+02,.5172E+02,.5466E+02,.5336E+02,
-     A .4616E+02,.3774E+02,.3770E+02,.4279E+02,.4756E+02,.5019E+02,
-     A .4897E+02,.4336E+02,.3863E+02,.3678E+02,.3358E+02,.3135E+02,
-     A .3247E+02,.3332E+02,.3371E+02,.3257E+02,.3169E+02,.3132E+02,
-     A .3031E+02,.2967E+02,.2939E+02,.3071E+02,.3196E+02,.3278E+02,
-     A .3458E+02,.3601E+02,.3379E+02,.3297E+02,.3632E+02,.3810E+02,
-     A .3584E+02,.3571E+02,.3915E+02,.4219E+02,.4431E+02,.4502E+02,
-     A .4638E+02,.4656E+02,.4496E+02,.4377E+02,.4762E+02,.5507E+02,
-     A .6000E+02,.6321E+02,.6355E+02,.5702E+02,.4982E+02,.5124E+02,
-     A .5819E+02,.6478E+02,.6521E+02,.5445E+02,.4148E+02,.3561E+02,
-     A .3825E+02,.4686E+02,.5251E+02,.4900E+02,.4530E+02,.4265E+02,
-     A .4067E+02,.4205E+02,.4469E+02,.4582E+02,.4776E+02,.4998E+02,
-     A .5138E+02,.5088E+02,.4978E+02,.5339E+02,.5975E+02,.6183E+02,
-     A .5489E+02,.4067E+02,.3146E+02,.2964E+02,.3145E+02,.3496E+02,
-     A .3831E+02,.3842E+02,.3760E+02,.4087E+02,.4579E+02,.4974E+02,
-     A .5079E+02,.4371E+02,.3919E+02,.4605E+02,.5268E+02,.6102E+02,
-     A .7170E+02,.7651E+02,.7724E+02,.7191E+02,.6556E+02,.6169E+02,
-     A .5727E+02,.5152E+02,.4601E+02,.4277E+02,.3830E+02,.3398E+02,
-     A .3204E+02,.3218E+02,.3264E+02,.3166E+02,.3598E+02,.4717E+02,
-     A .5749E+02,.6353E+02,.6208E+02,.5782E+02,.5439E+02,.5206E+02,
-     A .5279E+02,.5679E+02,.5704E+02,.5076E+02,.4108E+02,.3341E+02,
-     A .3428E+02,.3703E+02,.4463E+02,.5686E+02,.6880E+02,.8081E+02,
-     A .8040E+02,.7224E+02,.6028E+02,.4556E+02,.3779E+02,.3559E+02,
-     A .3658E+02,.3864E+02,.4320E+02,.5169E+02,.5805E+02,.5874E+02,
-     A .5672E+02,.5211E+02,.4462E+02,.3906E+02,.3659E+02,.3342E+02,
-     A .3245E+02,.3661E+02,.4129E+02,.4495E+02,.5102E+02,.5767E+02,
-     A .6080E+02,.6015E+02,.5224E+02,.3978E+02,.2969E+02,.2666E+02,
-     A .3006E+02,.3410E+02,.3781E+02,.4075E+02,.4436E+02,.4899E+02,
-     A .5024E+02,.4800E+02,.4097E+02,.3038E+02,.2437E+02,.2355E+02,
-     A .2577E+02,.2826E+02,.2945E+02,.3171E+02,.3470E+02,.3390E+02,
-     A .2915E+02,.2720E+02,.3283E+02,.4343E+02,.5085E+02,.5245E+02,
-     A .5244E+02,.5410E+02,.5868E+02,.6292E+02,.6385E+02,.6234E+02,
-     A .5612E+02,.4702E+02,.4446E+02,.4973E+02,.5886E+02,.6500E+02,
-     A .6527E+02,.6527E+02,.6252E+02,.5225E+02,.3999E+02,.3314E+02,
-     A .2977E+02,.3016E+02,.3640E+02,.4211E+02,.4566E+02,.5217E+02,
-     A .5829E+02,.6006E+02,.5310E+02,.4339E+02,.3903E+02,.3995E+02,
-     A .4225E+02,.4160E+02,.3993E+02,.4054E+02,.4223E+02,.4436E+02,
-     A .4955E+02,.5463E+02,.5567E+02,.5838E+02,.6398E+02,.6850E+02,
-     A .6907E+02,.5959E+02,.4447E+02,.3612E+02,.3557E+02,.3857E+02,
-     A .4195E+02,.4519E+02,.5135E+02,.6169E+02,.6812E+02,.6524E+02,
-     A .5908E+02,.4935E+02,.4094E+02,.3946E+02,.3972E+02,.3691E+02,
-     A .3071E+02,.2488E+02,.2201E+02,.2188E+02,.2264E+02,.2603E+02,
-     A .3064E+02,.3614E+02,.4422E+02,.5103E+02,.5464E+02,.5649E+02,
-     A .5474E+02,.4962E+02,.4161E+02,.3201E+02,.3115E+02,.3796E+02,
-     A .4816E+02,.6073E+02,.6393E+02,.5979E+02,.5937E+02,.5918E+02,
-     A .5841E+02,.5687E+02,.5025E+02,.3607E+02,.2423E+02,.2218E+02,
-     A .2806E+02,.3596E+02,.4117E+02,.4539E+02,.4349E+02,.3709E+02,
-     A .3225E+02,.3697E+02,.4714E+02,.5169E+02,.5171E+02,.4937E+02,
-     A .4821E+02,.4834E+02,.4750E+02,.3983E+02,.2988E+02,.2663E+02,
-     A .2845E+02,.3121E+02,.3210E+02,.3182E+02,.3309E+02,.3960E+02,
-     A .4773E+02,.5014E+02,.4939E+02,.4216E+02,.3243E+02,.2798E+02,
-     A .2870E+02,.3498E+02,.4021E+02,.3894E+02,.3657E+02,.3881E+02,
-     A .4332E+02,.4924E+02,.5398E+02,.5569E+02,.5874E+02,.6107E+02,
-     A .6060E+02,.6162E+02,.6579E+02,.6845E+02,.6860E+02,.6998E+02,
-     A .7344E+02,.7635E+02,.7934E+02,.8448E+02,.8334E+02,.7361E+02,
-     A .6613E+02,.6352E+02,.6172E+02,.6320E+02,.6766E+02,.7159E+02,
-     A .7672E+02,.8503E+02,.8976E+02,.8421E+02,.7356E+02,.6665E+02,
-     A .6723E+02,.7282E+02,.7835E+02,.8036E+02,.7799E+02,.7257E+02,
-     A .6709E+02,.6275E+02,.6335E+02,.6904E+02,.7032E+02,.6429E+02,
-     A .5687E+02,.5525E+02,.5809E+02,.6120E+02,.6676E+02,.7443E+02,
-     A .7295E+02,.6531E+02,.6086E+02,.5693E+02,.6208E+02,.7033E+02,
-     A .7561E+02,.8117E+02,.8217E+02,.7985E+02,.7655E+02,.7022E+02,
-     A .6507E+02,.6494E+02,.6600E+02,.6596E+02,.6510E+02,.6212E+02,
-     A .5864E+02,.5575E+02,.5110E+02,.5150E+02,.5572E+02,.5586E+02,
-     A .5398E+02,.5231E+02,.4972E+02,.4810E+02,.4740E+02,.4757E+02,
-     A .4737E+02,.4643E+02,.4892E+02,.5118E+02,.5260E+02,.5313E+02,
-     A .5132E+02,.4938E+02,.4988E+02,.5573E+02,.5906E+02,.5514E+02,
-     A .5262E+02,.5231E+02,.5150E+02,.4948E+02,.4716E+02,.4511E+02,
-     A .4343E+02,.4113E+02,.4041E+02,.4434E+02,.4908E+02,.5207E+02,
-     A .5404E+02,.5398E+02,.5315E+02,.5303E+02,.5363E+02,.5641E+02,
-     A .5882E+02,.5971E+02,.5984E+02,.5862E+02,.5767E+02,.5774E+02,
-     A .5999E+02,.6488E+02,.6193E+02,.5195E+02,.4505E+02,.4671E+02,
-     A .5766E+02,.6599E+02,.6748E+02,.6656E+02,.6539E+02,.6352E+02,
-     A .6246E+02,.6158E+02,.5753E+02,.5393E+02,.5007E+02,.4454E+02,
-     A .4635E+02,.5340E+02,.5773E+02,.6006E+02,.5696E+02,.4569E+02,
-     A .3787E+02,.3370E+02,.2970E+02,.3556E+02,.4419E+02,.4797E+02,
-     A .5384E+02,.5520E+02,.5048E+02,.4688E+02,.3982E+02,.3500E+02,
-     A .3627E+02,.3782E+02,.3613E+02,.3271E+02,.3065E+02,.3129E+02,
-     A .3444E+02,.4504E+02,.5436E+02,.5659E+02,.6184E+02,.7029E+02,
-     A .7636E+02,.7678E+02,.7212E+02,.6880E+02,.7120E+02,.7327E+02,
-     A .7309E+02,.7228E+02,.7420E+02,.7935E+02,.8143E+02,.7546E+02,
-     A .6405E+02,.5367E+02,.5090E+02,.5738E+02,.6508E+02,.6884E+02,
-     A .7218E+02,.7499E+02,.7413E+02,.6846E+02,.5938E+02,.5072E+02,
-     A .4230E+02,.4184E+02,.5109E+02,.6022E+02,.6793E+02,.7309E+02,
-     A .7383E+02,.6866E+02,.5937E+02,.5580E+02,.5639E+02,.5654E+02,
-     A .5693E+02,.5249E+02,.4594E+02,.4203E+02,.4034E+02,.4001E+02,
-     A .3940E+02,.3650E+02,.3635E+02,.3978E+02,.4084E+02,.4130E+02,
-     A .4133E+02,.4040E+02,.4177E+02,.4708E+02,.5303E+02,.5460E+02,
-     A .5229E+02,.4783E+02,.4019E+02,.3589E+02,.3557E+02,.3635E+02,
-     A .3869E+02,.4314E+02,.4891E+02,.5143E+02,.4938E+02,.4481E+02,
-     A .4062E+02,.3652E+02,.3321E+02,.3362E+02,.3473E+02,.3957E+02,
-     A .5134E+02,.6117E+02,.6401E+02,.6208E+02,.5981E+02,.5771E+02,
-     A .5771E+02,.5856E+02,.5836E+02,.5797E+02,.5477E+02,.5217E+02,
-     A .5206E+02,.5422E+02,.5774E+02,.5868E+02,.5674E+02,.5567E+02,
-     A .5914E+02,.6413E+02,.6217E+02,.5660E+02,.5513E+02,.5677E+02,
-     A .6149E+02,.6724E+02,.7036E+02,.7068E+02,.6854E+02,.6657E+02,
-     A .6270E+02,.5832E+02,.5696E+02,.5796E+02,.6065E+02,.6216E+02,
-     A .5915E+02,.5143E+02,.4967E+02,.5482E+02,.6454E+02,.8056E+02,
-     A .9225E+02,.9754E+02,.9172E+02,.8305E+02,.8766E+02,.9682E+02,
-     A .9822E+02,.9203E+02,.8617E+02,.8607E+02,.8684E+02,.8364E+02,
-     A .8022E+02,.8483E+02,.9440E+02,.1052E+03,.1082E+03,.1017E+03,
-     A .9925E+02,.9792E+02,.9008E+02,.7938E+02,.7072E+02,.6644E+02,
-     A .6972E+02,.7795E+02,.8791E+02,.9812E+02,.1133E+03,.1284E+03,
-     A .1300E+03,.1240E+03,.1225E+03,.1235E+03,.1230E+03,.1277E+03,
-     A .1392E+03,.1472E+03,.1424E+03,.1348E+03,.1374E+03,.1390E+03,
-     A .1409E+03,.1512E+03,.1608E+03,.1566E+03,.1370E+03,.1138E+03,
-     A .9358E+02,.7825E+02,.7040E+02,.7876E+02,.9311E+02,.1084E+03,
-     A .1250E+03,.1332E+03,.1484E+03,.1633E+03,.1712E+03,.1872E+03,
-     A .2046E+03,.1876E+03,.1446E+03,.1237E+03,.1272E+03,.1326E+03,
-     A .1277E+03,.1092E+03,.8116E+02,.6270E+02,.6331E+02,.7469E+02,
-     A .9700E+02,.1110E+03,.1212E+03,.1392E+03,.1655E+03,.1911E+03,
-     A .1890E+03,.1556E+03,.1234E+03,.1154E+03,.1229E+03,.1153E+03,
-     A .9265E+02,.8096E+02,.8601E+02,.1019E+03,.1169E+03,.1159E+03,
-     A .1131E+03,.1293E+03,.1293E+03,.1041E+03,.7759E+02,.6047E+02,
-     A .4956E+02,.4779E+02,.5559E+02,.8173E+02,.1150E+03,.1349E+03,
-     A .1452E+03,.1490E+03,.1444E+03,.1369E+03,.1328E+03,.1232E+03,
-     A .1032E+03,.8856E+02,.7862E+02,.6880E+02,.6403E+02,.7288E+02,
-     A .9040E+02,.1058E+03,.1176E+03,.1213E+03,.1184E+03,.1033E+03,
-     A .8193E+02,.6890E+02,.6368E+02,.6655E+02,.7402E+02,.7074E+02,
-     A .8113E+02,.1019E+03,.1189E+03,.1336E+03,.1371E+03,.1292E+03,
-     A .1053E+03,.8846E+02,.8997E+02,.9772E+02,.1168E+03,.1402E+03,
-     A .1420E+03,.1301E+03,.1196E+03,.1203E+03,.1356E+03,.1446E+03,
-     A .1449E+03,.1498E+03,.1542E+03,.1486E+03,.1323E+03,.1065E+03,
-     A .9578E+02,.1028E+03,.1103E+03,.1087E+03,.9454E+02,.9051E+02,
-     A .9969E+02,.1031E+03,.1004E+03,.7754E+02,.6147E+02,.7087E+02,
-     A .8395E+02,.1002E+03,.1201E+03,.1417E+03,.1686E+03,.1868E+03,
-     A .1871E+03,.1865E+03,.2019E+03,.2253E+03,.2403E+03,.2706E+03,
-     A .3145E+03,.3228E+03,.2980E+03,.2773E+03,.2622E+03,.2516E+03,
-     A .2483E+03,.2678E+03,.3063E+03,.3481E+03,.3783E+03,.3706E+03,
-     A .3283E+03,.2950E+03,.2765E+03,.2616E+03,.2520E+03,.2497E+03,
-     A .2391E+03,.2160E+03,.1945E+03,.1897E+03,.2065E+03,.2210E+03,
-     A .2258E+03,.2259E+03,.2275E+03,.2395E+03,.2541E+03,.2631E+03,
-     A .2649E+03,.2803E+03,.3078E+03,.3381E+03,.3476E+03,.3232E+03,
-     A .3029E+03,.3085E+03,.3150E+03,.2979E+03,.2770E+03,.2820E+03,
-     A .3016E+03,.3109E+03,.3081E+03,.2951E+03,.2720E+03,.2515E+03,
-     A .2559E+03,.2618E+03,.2459E+03,.2224E+03,.2327E+03,.2708E+03,
-     A .2928E+03,.2883E+03,.2502E+03,.2363E+03,.2750E+03,.2968E+03,
-     A .2861E+03,.2673E+03,.2435E+03,.2279E+03,.2509E+03,.3004E+03,
-     A .3190E+03,.2744E+03,.2223E+03,.1915E+03,.2240E+03,.2916E+03,
-     A .3291E+03,.3434E+03,.3412E+03,.3344E+03,.3177E+03,.2845E+03,
-     A .2653E+03,.2519E+03,.2317E+03,.2198E+03,.2203E+03,.2298E+03,
-     A .2457E+03,.2680E+03,.2840E+03,.2892E+03,.2873E+03,.2790E+03,
-     A .2690E+03,.2585E+03,.2509E+03,.2536E+03,.2665E+03,.2843E+03,
-     A .2979E+03,.3004E+03,.2910E+03,.2761E+03,.2677E+03,.2513E+03,
-     A .2303E+03,.2157E+03,.2202E+03,.2363E+03,.2609E+03,.2760E+03,
-     A .2706E+03,.2714E+03,.2873E+03,.2948E+03,.2857E+03,.2568E+03,
-     A .2093E+03,.1929E+03,.2116E+03,.2484E+03,.2619E+03,.2448E+03,
-     A .2358E+03,.2507E+03,.2976E+03,.3629E+03,.3780E+03,.3287E+03,
-     A .2768E+03,.2674E+03,.2853E+03,.3107E+03,.3097E+03,.3251E+03,
-     A .3576E+03,.3589E+03,.3346E+03,.2889E+03,.2596E+03,.2616E+03,
-     A .2723E+03,.2782E+03,.2664E+03,.2610E+03,.2768E+03,.2854E+03,
-     A .2806E+03,.2698E+03,.2612E+03,.2826E+03,.3302E+03,.3452E+03,
-     A .3030E+03,.2491E+03,.2073E+03,.1990E+03,.2165E+03,.2384E+03,
-     A .2715E+03,.2814E+03,.2523E+03,.2160E+03,.1589E+03,.1181E+03,
-     A .1192E+03,.1270E+03,.1274E+03,.1336E+03,.1644E+03,.1948E+03,
-     A .2206E+03,.2122E+03,.1939E+03,.1912E+03,.1953E+03,.2058E+03,
-     A .2182E+03,.2255E+03,.2251E+03,.2158E+03,.1965E+03,.2001E+03,
-     A .2309E+03,.3166E+03,.3702E+03,.3342E+03,.2900E+03,.2762E+03,
-     A .2781E+03,.2815E+03,.2764E+03,.2463E+03,.2128E+03,.1983E+03,
-     A .2036E+03,.2124E+03,.2233E+03,.2127E+03,.1695E+03,.1425E+03,
-     A .1442E+03,.1598E+03,.1784E+03,.1670E+03,.1343E+03,.1359E+03,
-     A .1542E+03,.1648E+03,.1628E+03,.1480E+03,.1269E+03,.1067E+03,
-     A .1013E+03,.1110E+03,.1316E+03,.1659E+03,.1842E+03,.1587E+03,
-     A .1251E+03,.1095E+03,.1184E+03,.1456E+03,.1555E+03,.1326E+03,
-     A .9572E+02,.9431E+02,.1157E+03,.1599E+03,.1989E+03,.2351E+03,
-     A .2655E+03,.2560E+03,.2288E+03,.2058E+03,.1855E+03,.1671E+03,
-     A .1310E+03,.1089E+03,.1272E+03,.1590E+03,.2003E+03,.2596E+03,
-     A .3242E+03,.3423E+03,.3119E+03,.2898E+03,.2883E+03,.2873E+03,
-     A .2619E+03,.2116E+03,.2109E+03,.2270E+03,.2530E+03,.2899E+03,
-     A .3246E+03,.3405E+03,.3251E+03,.2990E+03,.2744E+03,.2658E+03,
-     A .2664E+03,.2609E+03,.2390E+03,.2307E+03,.2431E+03,.2716E+03,
-     A .3036E+03,.3129E+03,.2879E+03,.2613E+03,.2670E+03,.2881E+03,
-     A .3076E+03,.3176E+03,.3098E+03,.2886E+03,.2654E+03,.2474E+03,
-     A .2372E+03,.2357E+03,.2222E+03,.1967E+03,.1841E+03,.1808E+03,
-     A .1745E+03,.1711E+03,.1732E+03,.1751E+03,.1820E+03,.1870E+03,
-     A .1817E+03,.1730E+03,.1711E+03,.1795E+03,.1873E+03,.1891E+03,
-     A .1910E+03,.1910E+03,.1885E+03,.1802E+03,.1589E+03,.1426E+03,
-     A .1408E+03,.1362E+03,.1255E+03,.1181E+03,.1109E+03,.1044E+03,
-     A .1002E+03,.9661E+02,.9089E+02,.8352E+02,.7073E+02,.5916E+02,
-     A .7047E+02,.9171E+02,.9386E+02,.8182E+02,.6926E+02,.6167E+02,
-     A .6164E+02,.6576E+02,.7122E+02,.7687E+02,.8358E+02,.8562E+02,
-     A .8306E+02,.6994E+02,.6656E+02,.7956E+02,.8586E+02,.8225E+02,
-     A .7571E+02,.7207E+02,.7545E+02,.8706E+02,.1006E+03,.1111E+03,
-     A .1175E+03,.1279E+03,.1382E+03,.1488E+03,.1607E+03,.1723E+03,
-     A .1823E+03,.1846E+03,.1831E+03,.1834E+03,.1827E+03,.1825E+03,
-     A .1858E+03,.1800E+03,.2196E+03,.2548E+03,.2773E+03,.2866E+03,
-     A .2819E+03,.2750E+03,.2669E+03,.2587E+03,.2649E+03,.2839E+03,
-     A .2993E+03,.3103E+03,.3213E+03,.3294E+03,.3295E+03,.3240E+03,
-     A .3200E+03,.3177E+03,.3119E+03,.3348E+03,.3685E+03,.3828E+03,
-     A .3645E+03,.3176E+03,.2930E+03,.3074E+03,.3291E+03,.3391E+03,
-     A .3409E+03,.3408E+03,.3539E+03,.3770E+03,.3939E+03,.3951E+03,
-     A .3935E+03,.3930E+03,.3757E+03,.3651E+03,.3745E+03,.3859E+03,
-     A .3897E+03,.3855E+03,.3577E+03,.3072E+03,.2737E+03,.2676E+03,
-     A .3155E+03,.3775E+03,.4021E+03,.3995E+03,.3931E+03,.3863E+03,
-     A .3575E+03,.3336E+03,.3235E+03,.3353E+03,.3630E+03,.3704E+03,
-     A .3504E+03,.2953E+03,.2649E+03,.2943E+03,.3242E+03,.3163E+03,
-     A .2855E+03,.2595E+03,.2453E+03,.2329E+03,.2112E+03,.1897E+03,
-     A .1696E+03,.1453E+03,.1250E+03,.1073E+03,.9557E+02,.8250E+02,
-     A .6286E+02,.5116E+02,.5302E+02,.7098E+02,.9571E+02,.1193E+03,
-     A .1354E+03,.1494E+03,.1682E+03,.1870E+03,.2051E+03,.2231E+03,
-     A .2352E+03,.2467E+03,.2661E+03,.3030E+03,.3617E+03,.3735E+03,
-     A .3717E+03,.3793E+03,.3810E+03,.3781E+03,.3742E+03,.3776E+03,
-     A .4033E+03,.4246E+03,.4108E+03,.4053E+03,.4194E+03,.4161E+03,
-     A .3851E+03,.3612E+03,.3547E+03,.3478E+03,.3350E+03,.3235E+03,
-     A .3550E+03,.4212E+03,.4821E+03,.5118E+03,.5101E+03,.4948E+03,
-     A .4727E+03,.4451E+03,.4159E+03,.4053E+03,.4190E+03,.4222E+03,
-     A .3979E+03,.3727E+03,.3714E+03,.4111E+03,.4126E+03,.3689E+03,
-     A .3294E+03,.3017E+03,.2876E+03,.2594E+03,.2061E+03,.1477E+03,
-     A .1299E+03,.1635E+03,.2204E+03,.2889E+03,.3385E+03,.4040E+03,
-     A .4645E+03,.4864E+03,.4814E+03,.4654E+03,.4558E+03,.4499E+03,
-     A .4416E+03,.4432E+03,.4544E+03,.4467E+03,.4457E+03,.4503E+03,
-     A .4440E+03,.4516E+03,.4631E+03,.4656E+03,.4561E+03,.4541E+03,
-     A .4608E+03,.4585E+03,.4901E+03,.5528E+03,.5924E+03,.6015E+03,
-     A .6000E+03,.5916E+03,.5836E+03,.5858E+03,.5967E+03,.6232E+03,
-     A .6872E+03,.7497E+03,.7735E+03,.6963E+03,.6229E+03,.6305E+03,
-     A .6754E+03,.7332E+03,.7521E+03,.7541E+03,.7556E+03,.7386E+03,
-     A .7010E+03,.6685E+03,.6650E+03,.6547E+03,.6338E+03,.6228E+03,
-     A .6220E+03,.6255E+03,.6258E+03,.6189E+03,.6190E+03,.6247E+03,
-     A .6379E+03,.7039E+03,.7719E+03,.7539E+03,.6959E+03,.6517E+03,
-     A .5990E+03,.5727E+03,.5685E+03,.6011E+03,.6247E+03,.6135E+03,
-     A .5725E+03,.5719E+03,.6088E+03,.6286E+03,.6226E+03,.6144E+03,
-     A .6264E+03,.6328E+03,.6384E+03,.6360E+03,.5826E+03,.5284E+03,
-     A .5132E+03,.5264E+03,.5372E+03,.5230E+03,.4884E+03,.4585E+03,
-     A .4931E+03,.5422E+03,.5559E+03,.4955E+03,.4040E+03,.4824E+03,
-     A .6277E+03,.6846E+03,.6937E+03,.7139E+03,.7336E+03,.7081E+03,
-     A .6690E+03,.6356E+03,.6337E+03,.6593E+03,.7323E+03,.7341E+03,
-     A .6070E+03,.4500E+03,.3654E+03,.3827E+03,.4296E+03,.4666E+03,
-     A .4894E+03,.5111E+03,.5735E+03,.5737E+03,.5257E+03,.5026E+03,
-     A .5457E+03,.6131E+03,.6603E+03,.6436E+03,.5990E+03,.5561E+03,
-     A .5433E+03,.5852E+03,.6995E+03,.7153E+03,.5625E+03,.4262E+03,
-     A .3585E+03,.3265E+03,.3315E+03,.3821E+03,.4704E+03,.5371E+03,
-     A .6074E+03,.6758E+03,.7216E+03,.7510E+03,.6842E+03,.5373E+03,
-     A .4673E+03,.4976E+03,.5826E+03,.6730E+03,.6637E+03,.5782E+03,
-     A .5224E+03,.5502E+03,.6214E+03,.7022E+03,.7251E+03,.6708E+03,
-     A .6142E+03,.5926E+03,.5933E+03,.6279E+03,.6956E+03,.7497E+03,
-     A .7792E+03,.7400E+03,.6747E+03,.5669E+03,.4528E+03,.4062E+03,
-     A .3770E+03,.3170E+03,.2849E+03,.3256E+03,.4630E+03,.5246E+03,
-     A .4898E+03,.4208E+03,.3549E+03,.3966E+03,.4756E+03,.5367E+03,
-     A .5470E+03,.4656E+03,.3822E+03,.3836E+03,.5090E+03,.6174E+03,
-     A .6692E+03,.6678E+03,.6437E+03,.6474E+03,.7495E+03,.8532E+03,
-     A .8393E+03,.7648E+03,.6714E+03,.6171E+03,.6006E+03,.5756E+03,
-     A .5227E+03,.4177E+03,.4022E+03,.4246E+03,.3966E+03,.3327E+03,
-     A .3068E+03,.3067E+03,.3126E+03,.3207E+03,.3557E+03,.4128E+03,
-     A .4281E+03,.4311E+03,.4642E+03,.5170E+03,.5732E+03,.6277E+03,
-     A .6790E+03,.7162E+03,.7304E+03,.6858E+03,.6026E+03,.5851E+03,
-     A .5794E+03,.5406E+03,.4595E+03,.3722E+03,.3411E+03,.3872E+03,
-     A .5542E+03,.6190E+03,.6707E+03,.6961E+03,.6849E+03,.6545E+03,
-     A .5530E+03,.4204E+03,.3275E+03,.2749E+03,.2824E+03,.3119E+03,
-     A .3135E+03,.3000E+03,.2913E+03,.3321E+03,.4368E+03,.5262E+03,
-     A .5727E+03,.5937E+03,.5603E+03,.5021E+03,.4482E+03,.3793E+03,
-     A .3481E+03,.3612E+03,.3766E+03,.4064E+03,.4555E+03,.5534E+03,
-     A .6326E+03,.5669E+03,.5126E+03,.5450E+03,.5766E+03,.5936E+03,
-     A .5935E+03,.5807E+03,.5822E+03,.5846E+03,.5872E+03,.5616E+03,
-     A .5135E+03,.4702E+03,.4330E+03,.4009E+03,.3762E+03,.3504E+03,
-     A .2771E+03,.2039E+03,.1893E+03,.2506E+03,.4046E+03,.5678E+03,
-     A .6379E+03,.6556E+03,.6123E+03,.5842E+03,.5211E+03,.4488E+03,
-     A .4180E+03,.4283E+03,.5383E+03,.7271E+03,.8315E+03,.8111E+03,
-     A .7513E+03,.7047E+03,.6775E+03,.6631E+03,.6043E+03,.5850E+03,
-     A .7033E+03,.8131E+03,.8318E+03,.8240E+03,.7936E+03,.7725E+03,
-     A .7894E+03,.8333E+03,.8060E+03,.6765E+03,.5387E+03,.4080E+03,
-     A .3984E+03,.5187E+03,.6402E+03,.6969E+03,.6996E+03,.6609E+03,
-     A .6021E+03,.5369E+03,.4912E+03,.5516E+03,.6423E+03,.7014E+03,
-     A .7414E+03,.7609E+03,.7675E+03,.7874E+03,.8067E+03,.7091E+03,
-     A .5473E+03,.4406E+03,.4334E+03,.5362E+03,.6434E+03,.7570E+03,
-     A .7709E+03,.7099E+03,.6905E+03,.7672E+03,.9233E+03,.9538E+03,
-     A .8485E+03,.7441E+03,.6730E+03,.6070E+03,.6469E+03,.7221E+03,
-     A .7272E+03,.6678E+03,.5636E+03,.4541E+03,.3773E+03,.3533E+03,
-     A .3457E+03,.3942E+03,.4645E+03,.5769E+03,.6954E+03,.7935E+03,
-     A .8060E+03,.7956E+03,.7577E+03,.6998E+03,.6165E+03,.5748E+03,
-     A .6072E+03,.6508E+03,.6498E+03,.5855E+03,.4962E+03,.4629E+03,
-     A .5252E+03,.6396E+03,.7167E+03,.7756E+03,.8016E+03,.8020E+03,
-     A .7916E+03,.7606E+03,.7167E+03,.6829E+03,.6951E+03,.7394E+03,
-     A .7751E+03,.7315E+03,.6272E+03,.5763E+03,.6327E+03,.7445E+03,
-     A .7845E+03,.7548E+03,.7015E+03,.6616E+03,.6987E+03,.7798E+03,
-     A .8141E+03,.7815E+03,.6927E+03,.6164E+03,.5726E+03,.5773E+03,
-     A .5903E+03,.6337E+03,.7153E+03,.8030E+03,.8682E+03,.9011E+03,
-     A .8877E+03,.7664E+03,.7037E+03,.6370E+03,.6181E+03,.6627E+03,
-     A .6951E+03,.6768E+03,.6521E+03,.6004E+03,.5338E+03,.5089E+03,
-     A .4874E+03,.4366E+03,.3731E+03,.4023E+03,.4606E+03,.5417E+03,
-     A .6954E+03,.7336E+03,.6850E+03,.5909E+03,.4785E+03,.4843E+03,
-     A .5764E+03,.6433E+03,.5839E+03,.4738E+03,.3914E+03,.3439E+03,
-     A .3335E+03,.3537E+03,.4017E+03,.4859E+03,.6303E+03,.7653E+03,
-     A .8363E+03,.8541E+03,.8358E+03,.7996E+03,.8264E+03,.8532E+03,
-     A .8756E+03,.9034E+03,.9492E+03,.9970E+03,.9868E+03,.9312E+03,
-     A .8579E+03,.8234E+03,.8498E+03,.8795E+03,.9259E+03,.9776E+03,
-     A .9689E+03,.8908E+03,.8329E+03,.8445E+03,.8903E+03,.9301E+03,
-     A .8919E+03,.8256E+03,.7547E+03,.7152E+03,.7046E+03,.6996E+03,
-     A .6914E+03,.6571E+03,.6511E+03,.6631E+03,.6625E+03,.6527E+03,
-     A .6515E+03,.7076E+03,.7662E+03,.8387E+03,.8815E+03,.8146E+03,
-     A .7287E+03,.6780E+03,.6783E+03,.7299E+03,.7763E+03,.7984E+03,
-     A .7855E+03,.7676E+03,.7904E+03,.8086E+03,.7830E+03,.7540E+03,
-     A .7596E+03,.7564E+03,.7484E+03,.7479E+03,.7511E+03,.7333E+03,
-     A .6948E+03,.6823E+03,.7379E+03,.7834E+03,.7746E+03,.7714E+03,
-     A .8147E+03,.8874E+03,.9323E+03,.9641E+03,.9493E+03,.9078E+03,
-     A .8766E+03,.8816E+03,.9114E+03,.9307E+03,.9234E+03,.8787E+03,
-     A .7428E+03,.5448E+03,.4210E+03,.3742E+03,.4127E+03,.5326E+03,
-     A .6258E+03,.6819E+03,.6885E+03,.6889E+03,.7094E+03,.7785E+03,
-     A .8748E+03,.8797E+03,.8261E+03,.8080E+03,.8104E+03,.8121E+03,
-     A .8037E+03,.8060E+03,.8234E+03,.8384E+03,.8166E+03,.7640E+03,
-     A .7568E+03,.7771E+03,.7648E+03,.7284E+03,.6115E+03,.5317E+03,
-     A .4587E+03,.4409E+03,.4501E+03,.4896E+03,.5145E+03,.5106E+03,
-     A .5085E+03,.5346E+03,.5978E+03,.6647E+03,.7431E+03,.7684E+03,
-     A .7341E+03,.7050E+03,.7146E+03,.7116E+03,.7082E+03,.7437E+03,
-     A .8141E+03,.8201E+03,.7600E+03,.7197E+03,.7185E+03,.7547E+03,
-     A .8505E+03,.9173E+03,.9928E+03,.1022E+04,.1020E+04,.1027E+04,
-     A .1012E+04,.9744E+03,.9388E+03,.8927E+03,.8767E+03,.9222E+03,
-     A .9943E+03,.1045E+04,.1035E+04,.9307E+03,.8190E+03,.6919E+03,
-     A .6118E+03,.5615E+03,.5636E+03,.5802E+03,.5687E+03,.5601E+03,
-     A .5822E+03,.6111E+03,.6302E+03,.6618E+03,.6777E+03,.6892E+03,
-     A .7299E+03,.7659E+03,.7761E+03,.7660E+03,.7772E+03,.7883E+03,
-     A .8022E+03,.8795E+03,.9949E+03,.1021E+04,.9417E+03,.8277E+03,
-     A .7197E+03,.6464E+03,.5527E+03,.5001E+03,.5484E+03,.6125E+03,
-     A .6740E+03,.7253E+03,.7492E+03,.7518E+03,.7417E+03,.7222E+03,
-     A .7069E+03,.7413E+03,.8504E+03,.1006E+04,.9532E+03,.8549E+03,
-     A .7946E+03,.7727E+03,.8435E+03,.9094E+03,.9116E+03,.8770E+03,
-     A .8682E+03,.9100E+03,.9887E+03,.1022E+04,.9863E+03,.9605E+03,
-     A .9688E+03,.9894E+03,.9988E+03,.9911E+03,.9317E+03,.8242E+03,
-     A .7832E+03,.7657E+03,.7352E+03,.7008E+03,.6493E+03,.6093E+03,
-     A .6268E+03,.6514E+03,.6378E+03,.6100E+03,.5905E+03,.6020E+03,
-     A .6653E+03,.7848E+03,.7866E+03,.7564E+03,.7297E+03,.7569E+03,
-     A .8617E+03,.9601E+03,.9717E+03,.9339E+03,.9360E+03,.9902E+03,
-     A .9955E+03,.8989E+03,.7768E+03,.7148E+03,.7135E+03,.7919E+03,
-     A .8970E+03,.9020E+03,.8474E+03,.7424E+03,.6921E+03,.6927E+03,
-     A .7054E+03,.6768E+03,.6427E+03,.6174E+03,.5922E+03,.5729E+03,
-     A .6001E+03,.6710E+03,.7225E+03,.7871E+03,.8554E+03,.8541E+03,
-     A .8195E+03,.7831E+03,.6778E+03,.6693E+03,.7144E+03,.7347E+03,
-     A .7102E+03,.6685E+03,.6880E+03,.7648E+03,.8396E+03,.8262E+03,
-     A .7613E+03,.7261E+03,.8088E+03,.9148E+03,.9372E+03,.8909E+03,
-     A .8671E+03,.8773E+03,.8708E+03,.8372E+03,.8252E+03,.8612E+03,
-     A .9233E+03,.9651E+03,.9942E+03,.9526E+03,.8797E+03,.8070E+03,
-     A .7601E+03,.7416E+03,.7811E+03,.8155E+03,.8133E+03,.8052E+03,
-     A .8102E+03,.8344E+03,.8647E+03,.8726E+03,.8848E+03,.8821E+03,
-     A .8403E+03,.8852E+03,.1025E+04,.1101E+04,.1120E+04,.1106E+04,
-     A .1069E+04,.1036E+04,.1045E+04,.1086E+04,.1147E+04,.1157E+04,
-     A .1144E+04,.1144E+04,.1099E+04,.1065E+04,.1098E+04,.1109E+04,
-     A .1037E+04,.9687E+03,.9103E+03,.8830E+03,.9174E+03,.9925E+03,
-     A .1099E+04,.1135E+04,.1127E+04,.1132E+04,.1126E+04,.1103E+04,
-     A .1088E+04,.1066E+04,.1004E+04,.9318E+03,.9172E+03,.9605E+03,
-     A .1021E+04,.1080E+04,.1049E+04,.1038E+04,.1078E+04,.1113E+04,
-     A .1092E+04,.1016E+04,.9788E+03,.9677E+03,.1009E+04,.1011E+04,
-     A .9856E+03,.9415E+03,.9279E+03,.9628E+03,.9993E+03,.1021E+04,
-     A .1001E+04,.9411E+03,.9174E+03,.9399E+03,.9995E+03,.1034E+04,
-     A .1013E+04,.9906E+03,.9713E+03,.9159E+03,.8082E+03,.7532E+03,
-     A .7633E+03,.8201E+03,.8779E+03,.9591E+03,.1080E+04,.1157E+04,
-     A .1160E+04,.1142E+04,.1118E+04,.1086E+04,.1101E+04,.1143E+04,
-     A .1184E+04,.1248E+04,.1236E+04,.1166E+04,.1140E+04,.1155E+04,
-     A .1186E+04,.1222E+04,.1219E+04,.1161E+04,.1142E+04,.1134E+04,
-     A .1234E+04,.1313E+04,.1373E+04,.1357E+04,.1319E+04,.1143E+04,
-     A .1032E+04,.9970E+03,.1046E+04,.1092E+04,.1085E+04,.1020E+04,
-     A .8963E+03,.7890E+03,.7833E+03,.8250E+03,.8920E+03,.9770E+03,
-     A .1045E+04,.1077E+04,.1085E+04,.1068E+04,.1051E+04,.1081E+04,
-     A .1086E+04,.1053E+04,.1005E+04,.1005E+04,.9691E+03,.9290E+03,
-     A .8801E+03,.8889E+03,.9533E+03,.1011E+04,.1048E+04,.1068E+04,
-     A .1091E+04,.1106E+04,.1106E+04,.1098E+04,.1060E+04,.1047E+04,
-     A .1037E+04,.1052E+04,.1063E+04,.9932E+03,.8901E+03,.8298E+03,
-     A .8172E+03,.8653E+03,.9427E+03,.1053E+04,.1131E+04,.1173E+04,
-     A .1119E+04,.1034E+04,.1019E+04,.1018E+04,.9991E+03,.8909E+03,
-     A .8653E+03,.8979E+03,.1008E+04,.1069E+04,.1042E+04,.1031E+04,
-     A .1061E+04,.1092E+04,.1056E+04,.1028E+04,.9854E+03,.9114E+03,
-     A .8247E+03,.7559E+03,.7423E+03,.7618E+03,.8294E+03,.9280E+03,
-     A .9957E+03,.1029E+04,.1017E+04,.9955E+03,.9890E+03,.1026E+04,
-     A .9719E+03,.9259E+03,.9338E+03,.9936E+03,.1064E+04,.1105E+04,
-     A .1125E+04,.1116E+04,.1132E+04,.1130E+04,.1109E+04,.1102E+04,
-     A .1090E+04,.1048E+04,.9006E+03,.7469E+03,.7069E+03,.7740E+03,
-     A .9309E+03,.1058E+04,.1102E+04,.1118E+04,.1135E+04,.1131E+04,
-     A .1090E+04,.1052E+04,.1051E+04,.1099E+04,.1167E+04,.1190E+04,
-     A .1168E+04,.1159E+04,.1148E+04,.1062E+04,.9271E+03,.7499E+03,
-     A .6573E+03,.5781E+03,.5270E+03,.4542E+03,.4842E+03,.6016E+03,
-     A .7689E+03,.9158E+03,.9853E+03,.1024E+04,.1094E+04,.1130E+04,
-     A .1116E+04,.1060E+04,.9897E+03,.9055E+03,.8300E+03,.8093E+03,
-     A .7777E+03,.7122E+03,.6774E+03,.6996E+03,.7345E+03,.7602E+03,
-     A .7384E+03,.7072E+03,.6697E+03,.7399E+03,.8167E+03,.8490E+03,
-     A .8735E+03,.9491E+03,.1057E+04,.1119E+04,.1155E+04,.1168E+04,
-     A .1165E+04,.1150E+04,.1052E+04,.9005E+03,.8347E+03,.7346E+03,
-     A .6491E+03,.6813E+03,.8528E+03,.9684E+03,.1008E+04,.9998E+03,
-     A .9364E+03,.9200E+03,.9668E+03,.1034E+04,.1039E+04,.1096E+04,
-     A .1167E+04,.1142E+04,.9953E+03,.9278E+03,.9171E+03,.9548E+03,
-     A .1061E+04,.1168E+04,.1183E+04,.1060E+04,.9662E+03,.9561E+03,
-     A .8532E+03,.7725E+03,.7327E+03,.7798E+03,.8634E+03,.9591E+03,
-     A .1012E+04,.1029E+04,.1049E+04,.1083E+04,.1102E+04,.1138E+04,
-     A .1168E+04,.1141E+04,.1134E+04,.1203E+04,.1312E+04,.1338E+04,
-     A .1267E+04,.1164E+04,.1110E+04,.1098E+04,.1116E+04,.1103E+04,
-     A .1043E+04,.1002E+04,.1045E+04,.1083E+04,.1075E+04,.1003E+04,
-     A .9351E+03,.9303E+03,.9755E+03,.9893E+03,.9586E+03,.9581E+03,
-     A .9925E+03,.1052E+04,.1097E+04,.1154E+04,.1113E+04,.9980E+03,
-     A .8584E+03,.7977E+03,.7189E+03,.7008E+03,.8253E+03,.9513E+03,
-     A .1000E+04,.1028E+04,.1034E+04,.1021E+04,.1034E+04,.1116E+04,
-     A .1195E+04,.1247E+04,.1244E+04,.1197E+04,.1180E+04,.1160E+04,
-     A .1078E+04,.9836E+03,.9300E+03,.8984E+03,.8900E+03,.9501E+03,
-     A .1064E+04,.1162E+04,.1069E+04,.9925E+03,.9774E+03,.9924E+03,
-     A .1022E+04,.1108E+04,.1230E+04,.1287E+04,.1308E+04,.1318E+04,
-     A .1273E+04,.1178E+04,.1098E+04,.1039E+04,.9480E+03,.8249E+03,
-     A .9924E+03,.1173E+04,.1219E+04,.1210E+04,.1150E+04,.1050E+04,
-     A .9768E+03,.9545E+03,.9695E+03,.1004E+04,.9750E+03,.8814E+03,
-     A .7129E+03,.5449E+03,.5008E+03,.5372E+03,.5945E+03,.6527E+03,
-     A .6720E+03,.6364E+03,.6594E+03,.7645E+03,.8510E+03,.8639E+03,
-     A .8217E+03,.8025E+03,.8334E+03,.9330E+03,.1008E+04,.1017E+04,
-     A .1013E+04,.1047E+04,.1114E+04,.1186E+04,.1230E+04,.1183E+04,
-     A .1042E+04,.8819E+03,.8776E+03,.9541E+03,.1071E+04,.1194E+04,
-     A .1207E+04,.1184E+04,.1138E+04,.1095E+04,.1094E+04,.1043E+04,
-     A .9420E+03,.9052E+03,.9003E+03,.8856E+03,.8506E+03,.8381E+03,
-     A .7898E+03,.7798E+03,.8186E+03,.9291E+03,.1038E+04,.1128E+04,
-     A .1194E+04,.1207E+04,.1132E+04,.9761E+03,.8859E+03,.9411E+03,
-     A .1045E+04,.1140E+04,.1176E+04,.1150E+04,.1107E+04,.1119E+04,
-     A .1187E+04,.1258E+04,.1187E+04,.1052E+04,.9768E+03,.9674E+03,
-     A .9769E+03,.9648E+03,.9330E+03,.8765E+03,.7811E+03,.6947E+03,
-     A .6887E+03,.6963E+03,.7940E+03,.9251E+03,.1009E+04,.1053E+04,
-     A .1068E+04,.1065E+04,.1050E+04,.1042E+04,.1033E+04,.1049E+04,
-     A .1015E+04,.9457E+03,.8814E+03,.8770E+03,.8988E+03,.8993E+03,
-     A .8990E+03,.9182E+03,.9992E+03,.1122E+04,.1215E+04,.1196E+04,
-     A .1068E+04,.9415E+03,.8856E+03,.8354E+03,.7622E+03,.7254E+03,
-     A .8053E+03,.9193E+03,.8713E+03,.8091E+03,.8466E+03,.9209E+03,
-     A .1008E+04,.1073E+04,.9992E+03,.9288E+03,.8571E+03,.8089E+03,
-     A .7568E+03,.7555E+03,.7987E+03,.1022E+04,.1190E+04,.1253E+04,
-     A .1238E+04,.1204E+04,.1206E+04,.1188E+04,.1151E+04,.1180E+04,
-     A .1279E+04,.1357E+04,.1327E+04,.1208E+04,.1119E+04,.1078E+04,
-     A .1047E+04,.1043E+04,.1095E+04,.1151E+04,.1177E+04,.1209E+04,
-     A .1176E+04,.1055E+04,.9336E+03,.9402E+03,.1020E+04,.1047E+04,
-     A .1038E+04,.1002E+04,.9280E+03,.8527E+03,.8297E+03,.8027E+03,
-     A .8371E+03,.9577E+03,.1085E+04,.1147E+04,.1258E+04,.1328E+04,
-     A .1302E+04,.1287E+04,.1253E+04,.1181E+04,.1114E+04,.1040E+04,
-     A .9523E+03,.1008E+04,.1042E+04,.1008E+04,.9261E+03,.8276E+03,
-     A .7536E+03,.7527E+03,.7993E+03,.7549E+03,.6793E+03,.7109E+03,
-     A .8622E+03,.1076E+04,.1168E+04,.1190E+04,.1175E+04,.1159E+04,
-     A .1176E+04,.1205E+04,.1145E+04,.1052E+04,.9855E+03,.9669E+03,
-     A .9992E+03,.1137E+04,.1254E+04,.1279E+04,.1245E+04,.1212E+04,
-     A .1178E+04,.1166E+04,.1143E+04,.1111E+04,.1147E+04,.1259E+04,
-     A .1412E+04,.1369E+04,.1238E+04,.1155E+04,.1110E+04,.1079E+04,
-     A .1086E+04,.1156E+04,.1241E+04,.1311E+04,.1309E+04,.1263E+04,
-     A .1227E+04,.1233E+04,.1281E+04,.1303E+04,.1229E+04,.1141E+04,
-     A .1174E+04,.1244E+04,.1291E+04,.1319E+04,.1301E+04,.1269E+04,
-     A .1246E+04,.1228E+04,.1168E+04,.1122E+04,.1076E+04,.9952E+03,
-     A .9487E+03,.9355E+03,.1040E+04,.1182E+04,.1170E+04,.1204E+04,
-     A .1207E+04,.1130E+04,.1056E+04,.1035E+04,.1076E+04,.1129E+04,
-     A .1153E+04,.1165E+04,.1191E+04,.1218E+04,.1281E+04,.1390E+04,
-     A .1440E+04,.1398E+04,.1200E+04,.1050E+04,.7454E+03,.6720E+03,
-     A .6744E+03,.8102E+03,.9951E+03,.1118E+04,.1145E+04,.1041E+04,
-     A .6716E+03,.6455E+03,.6765E+03,.8132E+03,.8618E+03,.8894E+03,
-     A .1047E+04,.1099E+04,.1100E+04,.1089E+04,.1094E+04,.1088E+04,
-     A .1097E+04,.1146E+04,.1221E+04,.1260E+04,.1203E+04,.1108E+04,
-     A .1008E+04,.9660E+03,.9809E+03,.9428E+03,.7967E+03,.5580E+03,
-     A .5084E+03,.5801E+03,.6627E+03,.7615E+03,.8821E+03,.9240E+03,
-     A .8525E+03,.7750E+03,.7106E+03,.6571E+03,.6236E+03,.6295E+03,
-     A .6817E+03,.7762E+03,.8384E+03,.8663E+03,.8596E+03,.9790E+03,
-     A .1068E+04,.1212E+04,.1314E+04,.1333E+04,.1325E+04,.1208E+04,
-     A .1079E+04,.1123E+04,.1152E+04,.1196E+04,.1249E+04,.1323E+04,
-     A .1390E+04,.1406E+04,.1389E+04,.1327E+04,.1324E+04,.1290E+04,
-     A .1316E+04,.1382E+04,.1469E+04,.1494E+04,.1426E+04,.1191E+04,
-     A .1075E+04,.1059E+04,.1044E+04,.1053E+04,.1058E+04,.1010E+04,
-     A .9457E+03,.1022E+04,.1079E+04,.1139E+04,.1161E+04,.1078E+04,
-     A .8932E+03,.7463E+03,.7295E+03,.7597E+03,.8151E+03,.9494E+03,
-     A .1102E+04,.1188E+04,.1167E+04,.1083E+04,.1017E+04,.9977E+03,
-     A .1052E+04,.1159E+04,.1253E+04,.1286E+04,.1281E+04,.1204E+04,
-     A .1054E+04,.8409E+03,.6454E+03,.5571E+03,.5852E+03,.7230E+03,
-     A .8864E+03,.9705E+03,.9936E+03,.1125E+04,.1260E+04,.1277E+04,
-     A .1202E+04,.1136E+04,.1125E+04,.1172E+04,.1294E+04,.1440E+04,
-     A .1521E+04,.1544E+04,.1512E+04,.1481E+04,.1467E+04,.1487E+04,
-     A .1437E+04,.1290E+04,.1006E+04,.8299E+03,.7005E+03,.6814E+03,
-     A .8116E+03,.9694E+03,.1085E+04,.1062E+04,.9785E+03,.1040E+04,
-     A .1114E+04,.1128E+04,.1134E+04,.1145E+04,.1151E+04,.1163E+04,
-     A .1239E+04,.1303E+04,.1346E+04,.1353E+04,.1362E+04,.1319E+04,
-     A .1308E+04,.1272E+04,.1233E+04,.1182E+04,.1157E+04,.1131E+04,
-     A .1060E+04,.9930E+03,.1005E+04,.1086E+04,.1123E+04,.1044E+04,
-     A .8932E+03,.8424E+03,.9081E+03,.9603E+03,.1023E+04,.1075E+04,
-     A .1137E+04,.1139E+04,.1175E+04,.1294E+04,.1425E+04,.1438E+04,
-     A .1425E+04,.1419E+04,.1410E+04,.1385E+04,.1347E+04,.1385E+04,
-     A .1434E+04,.1484E+04,.1444E+04,.1497E+04,.1561E+04,.1592E+04,
-     A .1571E+04,.1529E+04,.1513E+04,.1535E+04,.1568E+04,.1534E+04,
-     A .1499E+04,.1446E+04,.1401E+04,.1324E+04,.1311E+04,.1404E+04,
-     A .1491E+04,.1463E+04,.1390E+04,.1381E+04,.1426E+04,.1442E+04,
-     A .1387E+04,.1289E+04,.1209E+04,.1186E+04,.1237E+04,.1322E+04,
-     A .1445E+04,.1572E+04,.1570E+04,.1517E+04,.1424E+04,.1396E+04,
-     A .1427E+04,.1473E+04,.1525E+04,.1521E+04,.1460E+04,.1316E+04,
-     A .1200E+04,.1196E+04,.1275E+04,.1281E+04,.1165E+04,.1104E+04,
-     A .1153E+04,.1206E+04,.1270E+04,.1287E+04,.1298E+04,.1346E+04,
-     A .1406E+04,.1434E+04,.1398E+04,.1305E+04,.1239E+04,.1226E+04,
-     A .1188E+04,.1091E+04,.1028E+04,.1052E+04,.1118E+04,.1181E+04,
-     A .1272E+04,.1406E+04,.1519E+04,.1587E+04,.1674E+04,.1681E+04,
-     A .1612E+04,.1454E+04,.1345E+04,.1322E+04,.1348E+04,.1404E+04,
-     A .1419E+04,.1429E+04,.1429E+04,.1415E+04,.1421E+04,.1465E+04,
-     A .1535E+04,.1605E+04,.1682E+04,.1703E+04,.1662E+04,.1603E+04,
-     A .1580E+04,.1553E+04,.1555E+04,.1448E+04,.1341E+04,.1230E+04,
-     A .1169E+04,.1034E+04,.9538E+03,.1031E+04,.1105E+04,.1110E+04,
-     A .1130E+04,.1155E+04,.1124E+04,.1058E+04,.1078E+04,.1214E+04,
-     A .1362E+04,.1446E+04,.1504E+04,.1565E+04,.1605E+04,.1670E+04,
-     A .1806E+04,.1873E+04,.1843E+04,.1748E+04,.1689E+04,.1697E+04,
-     A .1720E+04,.1734E+04,.1691E+04,.1532E+04,.1361E+04,.1107E+04,
-     A .8051E+03,.7811E+03,.7817E+03,.8148E+03,.8157E+03,.8107E+03,
-     A .8819E+03,.1046E+04,.1222E+04,.1325E+04,.1406E+04,.1524E+04,
-     A .1641E+04,.1689E+04,.1561E+04,.1282E+04,.1099E+04,.1147E+04,
-     A .1336E+04,.1503E+04,.1555E+04,.1491E+04,.1380E+04,.1347E+04,
-     A .1331E+04,.1287E+04,.1199E+04,.1064E+04,.9209E+03,.7933E+03,
-     A .6282E+03,.6147E+03,.6570E+03,.6910E+03,.7247E+03,.7646E+03,
-     A .8230E+03,.9333E+03,.1105E+04,.1213E+04,.1314E+04,.1435E+04,
-     A .1519E+04,.1564E+04,.1544E+04,.1449E+04,.1347E+04,.1159E+04,
-     A .1080E+04,.1129E+04,.1098E+04,.1017E+04,.8800E+03,.8049E+03,
-     A .8752E+03,.9807E+03,.9965E+03,.8883E+03,.7312E+03,.6077E+03,
-     A .5726E+03,.6666E+03,.8569E+03,.1066E+04,.1237E+04,.1378E+04,
-     A .1398E+04,.1399E+04,.1431E+04,.1511E+04,.1594E+04,.1699E+04,
-     A .1749E+04,.1650E+04,.1476E+04,.1277E+04,.1078E+04,.9043E+03,
-     A .8110E+03,.8613E+03,.1003E+04,.1216E+04,.1297E+04,.1288E+04,
-     A .1296E+04,.1316E+04,.1306E+04,.1236E+04,.1089E+04,.1044E+04,
-     A .1180E+04,.1314E+04,.1360E+04,.1329E+04,.1198E+04,.1045E+04,
-     A .1011E+04,.1113E+04,.1260E+04,.1355E+04,.1345E+04,.1247E+04,
-     A .1169E+04,.1177E+04,.1273E+04,.1394E+04,.1500E+04,.1563E+04,
-     A .1562E+04,.1562E+04,.1550E+04,.1528E+04,.1516E+04,.1535E+04,
-     A .1582E+04,.1609E+04,.1620E+04,.1579E+04,.1550E+04,.1566E+04,
-     A .1638E+04,.1772E+04,.1817E+04,.1796E+04,.1780E+04,.1758E+04,
-     A .1758E+04,.1761E+04,.1809E+04,.1915E+04,.1966E+04,.1917E+04,
-     A .1701E+04,.1463E+04,.1362E+04,.1340E+04,.1348E+04,.1361E+04,
-     A .1358E+04,.1312E+04,.1237E+04,.1211E+04,.1266E+04,.1384E+04,
-     A .1500E+04,.1516E+04,.1458E+04,.1365E+04,.1319E+04,.1266E+04,
-     A .1177E+04,.1124E+04,.1219E+04,.1273E+04,.1274E+04,.1184E+04,
-     A .1059E+04,.9639E+03,.9365E+03,.9434E+03,.1024E+04,.1195E+04,
-     A .1389E+04,.1427E+04,.1396E+04,.1439E+04,.1524E+04,.1611E+04,
-     A .1673E+04,.1700E+04,.1670E+04,.1640E+04,.1626E+04,.1548E+04,
-     A .1426E+04,.1329E+04,.1325E+04,.1428E+04,.1537E+04,.1613E+04,
-     A .1684E+04,.1748E+04,.1760E+04,.1743E+04,.1734E+04,.1692E+04,
-     A .1584E+04,.1400E+04,.1300E+04,.1286E+04,.1239E+04,.1165E+04,
-     A .1004E+04,.9337E+03,.1063E+04,.1255E+04,.1390E+04,.1485E+04,
-     A .1500E+04,.1384E+04,.1159E+04,.9092E+03,.7824E+03,.8276E+03,
-     A .9830E+03,.1179E+04,.1353E+04,.1407E+04,.1409E+04,.1275E+04,
-     A .1055E+04,.9449E+03,.8593E+03,.7391E+03,.7232E+03,.8005E+03,
-     A .8223E+03,.8026E+03,.8433E+03,.8475E+03,.8288E+03,.8856E+03,
-     A .1046E+04,.1030E+04,.9680E+03,.8231E+03,.7172E+03,.6958E+03,
-     A .7088E+03,.6896E+03,.6861E+03,.7303E+03,.8134E+03,.8977E+03,
-     A .9574E+03,.9766E+03,.9505E+03,.8389E+03,.6674E+03,.6716E+03,
-     A .7375E+03,.7487E+03,.7074E+03,.7244E+03,.9065E+03,.1076E+04,
-     A .1263E+04,.1317E+04,.1319E+04,.1369E+04,.1387E+04,.1375E+04,
-     A .1337E+04,.1329E+04,.1320E+04,.1365E+04,.1462E+04,.1529E+04,
-     A .1532E+04,.1458E+04,.1290E+04,.1132E+04,.1099E+04,.1169E+04,
-     A .1325E+04,.1490E+04,.1474E+04,.1440E+04,.1391E+04,.1292E+04,
-     A .1255E+04,.1261E+04,.1146E+04,.1066E+04,.1109E+04,.1197E+04,
-     A .1223E+04,.1166E+04,.1045E+04,.8941E+03,.7599E+03,.7428E+03,
-     A .8013E+03,.8925E+03,.1008E+04,.1168E+04,.1370E+04,.1469E+04,
-     A .1464E+04,.1450E+04,.1389E+04,.1301E+04,.1240E+04,.1257E+04,
-     A .1286E+04,.1279E+04,.1248E+04,.1259E+04,.1243E+04,.1205E+04,
-     A .1140E+04,.1056E+04,.9471E+03,.8610E+03,.8292E+03,.8148E+03,
-     A .8160E+03,.8821E+03,.9795E+03,.1103E+04,.1314E+04,.1410E+04,
-     A .1428E+04,.1422E+04,.1385E+04,.1323E+04,.1172E+04,.1010E+04,
-     A .8595E+03,.9283E+03,.1050E+04,.1121E+04,.1177E+04,.1168E+04,
-     A .1067E+04,.9670E+03,.8663E+03,.9637E+03,.1221E+04,.1289E+04,
-     A .1338E+04,.1257E+04,.1088E+04,.9100E+03,.8546E+03,.9448E+03,
-     A .1042E+04,.1040E+04,.9700E+03,.9269E+03,.9954E+03,.1114E+04,
-     A .1247E+04,.1368E+04,.1469E+04,.1518E+04,.1497E+04,.1457E+04,
-     A .1457E+04,.1503E+04,.1499E+04,.1408E+04,.1302E+04,.1327E+04,
-     A .1491E+04,.1642E+04,.1617E+04,.1570E+04,.1556E+04,.1503E+04,
-     A .1395E+04,.1357E+04,.1433E+04,.1546E+04,.1660E+04,.1621E+04,
-     A .1449E+04,.1315E+04,.1301E+04,.1375E+04,.1410E+04,.1309E+04,
-     A .1161E+04,.1090E+04,.1160E+04,.1312E+04,.1461E+04,.1562E+04,
-     A .1633E+04,.1668E+04,.1657E+04,.1592E+04,.1548E+04,.1594E+04,
-     A .1646E+04,.1714E+04,.1780E+04,.1750E+04,.1666E+04,.1602E+04,
-     A .1605E+04,.1663E+04,.1648E+04,.1584E+04,.1522E+04,.1536E+04,
-     A .1585E+04,.1566E+04,.1507E+04,.1490E+04,.1450E+04,.1358E+04,
-     A .1230E+04,.1144E+04,.1175E+04,.1236E+04,.1244E+04,.1243E+04,
-     A .1323E+04,.1408E+04,.1444E+04,.1434E+04,.1346E+04,.1267E+04,
-     A .1256E+04,.1221E+04,.1102E+04,.9681E+03,.8773E+03,.8266E+03,
-     A .7843E+03,.7218E+03,.6724E+03,.6265E+03,.5740E+03,.5256E+03,
-     A .4636E+03,.4048E+03,.3421E+03,.3047E+03,.3290E+03,.3833E+03,
-     A .4618E+03,.5208E+03,.6259E+03,.6878E+03,.7329E+03,.7867E+03,
-     A .8414E+03,.9267E+03,.1041E+04,.1121E+04,.1165E+04,.1192E+04,
-     A .1212E+04,.1224E+04,.1229E+04,.1216E+04,.1150E+04,.1046E+04,
-     A .9997E+03,.1084E+04,.1307E+04,.1510E+04,.1534E+04,.1537E+04,
-     A .1488E+04,.1418E+04,.1366E+04,.1372E+04,.1443E+04,.1539E+04,
-     A .1626E+04,.1689E+04,.1720E+04,.1665E+04,.1428E+04,.1363E+04,
-     A .1421E+04,.1614E+04,.1690E+04,.1700E+04,.1646E+04,.1476E+04,
-     A .1423E+04,.1437E+04,.1466E+04,.1500E+04,.1545E+04,.1611E+04,
-     A .1675E+04,.1684E+04,.1529E+04,.1228E+04,.1073E+04,.9796E+03,
-     A .9243E+03,.9428E+03,.9888E+03,.1004E+04,.1003E+04,.9634E+03,
-     A .8960E+03,.7893E+03,.6855E+03,.5908E+03,.4950E+03,.4087E+03,
-     A .3496E+03,.3154E+03,.3322E+03,.4038E+03,.4827E+03,.5917E+03,
-     A .6922E+03,.7639E+03,.8546E+03,.9448E+03,.9788E+03,.1006E+04,
-     A .1057E+04,.1164E+04,.1281E+04,.1353E+04,.1382E+04,.1406E+04,
-     A .1520E+04,.1578E+04,.1640E+04,.1723E+04,.1791E+04,.1866E+04,
-     A .1924E+04,.1942E+04,.1894E+04,.1824E+04,.1784E+04,.1770E+04,
-     A .1747E+04,.1706E+04,.1702E+04,.1717E+04,.1780E+04,.1814E+04,
-     A .1725E+04,.1648E+04,.1708E+04,.1820E+04,.1912E+04,.1978E+04,
-     A .1925E+04,.1852E+04,.1806E+04,.1829E+04,.1893E+04,.1923E+04,
-     A .1948E+04,.1982E+04,.1991E+04,.1980E+04,.1941E+04,.1896E+04,
-     A .1887E+04,.1891E+04,.1887E+04,.1826E+04,.1747E+04,.1715E+04,
-     A .1712E+04,.1811E+04,.1972E+04,.2095E+04,.2160E+04,.2114E+04/      
       REAL lambda
       INTEGER ierr
       INTEGER i, j, n
@@ -12122,12 +11167,12 @@ c         WRITE(kout,*) 'DATAE1/SUN/susim_hi.flx'
 
 *_______________________________________________________________________
 
-******* SUSIM irradiance 
+******* SUSIM irradiance
 *_______________________________________________________________________
 * VanHoosier, M. E., J.-D. F. Bartoe, G. E. Brueckner, and
 * D. K. Prinz, Absolute solar spectral irradiance 120 nm -
 * 400 nm (Results from the Solar Ultraviolet Spectral Irradiance
-* Monitor - SUSIM- Experiment on board Spacelab 2), 
+* Monitor - SUSIM- Experiment on board Spacelab 2),
 * Astro. Lett. and Communications, 1988, vol. 27, pp. 163-168.
 *     SUSIM SL2 high resolution (0.15nm) Solar Irridance data.
 *     Irradiance values are given in milliwatts/m^2/nanomenters
@@ -12138,12 +11183,21 @@ c         WRITE(kout,*) 'DATAE1/SUN/susim_hi.flx'
 * (Van Hoosier, personal communication, 1994).
 *_______________________________________________________________________
 
+** high resolution
 
-
+      fil = 'DATAE1/SUN/susim_hi.flx'
+      OPEN(UNIT=kin,FILE=fil,STATUS='old')
+      DO 11, i = 1, 7
+         READ(kin,*)
+   11 CONTINUE
+      DO 12, i = 1, 559
+         READ(kin,*)lambda,(irrad_hi(10*(i-1)+j), j=1, 10)
+   12 CONTINUE
+      CLOSE (kin)
 
 * compute wavelengths, convert from mW to W
 
-      n = nsusim
+      n = 559*10
       DO 13, i = 1, n
          lambda_hi(i)=120.5 + FLOAT(i-1)*.05
          irrad_hi(i) = irrad_hi(i)  /  1000.
@@ -12162,10 +11216,10 @@ c         WRITE(kout,*) 'DATAE1/SUN/susim_hi.flx'
          STOP
       ENDIF
 
-*_______________________________________________________________________
-
       RETURN
       END
+
+
       SUBROUTINE read2(nw,wl,f)
 
 *-----------------------------------------------------------------------------*
@@ -12218,7 +11272,7 @@ c         WRITE(kout,*) 'DATAE1/SUN/susim_hi.flx'
 
 * local:
 
-      REAL x1(1000), y1(1000) 
+      REAL x1(1000), y1(1000)
       REAL x2(1000), y2(1000)
       REAL x3(1000), y3(1000)
       INTEGER i, n
@@ -12240,14 +11294,14 @@ c         WRITE(kout,*) 'DATAE1/SUN/susim_hi.flx'
 
 C average value needs to be calculated only if inter2 is
 C used to interpolate onto wavelength grid (see below)
-C        y1(i) =  y1(i) / (x2(i) - x1(i)) 
+C        y1(i) =  y1(i) / (x2(i) - x1(i))
 
    12 CONTINUE
       CLOSE (kin)
 
       x1(n+1) = x2(n)
 
-C inter2: INPUT : average value in each bin 
+C inter2: INPUT : average value in each bin
 C         OUTPUT: average value in each bin
 C inter3: INPUT : total area in each bin
 C         OUTPUT: total area in each bin
@@ -12257,17 +11311,17 @@ C      CALL inter2(nw,wl,yg,n,x3,y1,ierr)
 
       DO 10,  iw = 1, nw-1
 * from quanta s-1 cm-2 bin-1 to  watts m-2 nm-1
-* 1.e4 * ([hc =] 6.62E-34 * 2.998E8)/(wc*1e-9) 
-         
+* 1.e4 * ([hc =] 6.62E-34 * 2.998E8)/(wc*1e-9)
+
 C the scaling by bin width needs to be done only if
 C inter3 is used for interpolation
 
          yg(iw) = yg(iw) / (wl(iw+1)-wl(iw))
-         f(iw) = yg(iw) * 1.e4 * (6.62E-34 * 2.998E8) / 
+         f(iw) = yg(iw) * 1.e4 * (6.62E-34 * 2.998E8) /
      $        ( 0.5 * (wl(iw+1)+wl(iw)) * 1.e-9)
 
    10 CONTINUE
-      
+
 *_______________________________________________________________________
 
       RETURN
@@ -12298,7 +11352,7 @@ C inter3 is used for interpolation
       IF (w .LT. 200.) sig = 1.E3/200.
       IF (w .GT. 2000.) sig = 1.E3/2000.
 
-      dum = 8342.13 + 2406030./(130. - sig*sig) + 
+      dum = 8342.13 + 2406030./(130. - sig*sig) +
      $     15997./(38.9 - sig*sig)
       refrac = 1. + 1.E-8 * dum
 
@@ -12306,1452 +11360,38 @@ C inter3 is used for interpolation
       RETURN
       END
 
+*_______________________________________________________________________
       Subroutine read_atlas(x1,y1,kdata,n) ! data atlas extra-terrestrial flux data
-      parameter (natlas=5160)
-      real x1(kdata),y1(kdata),x1_atlas(natlas),y1_atlas(natlas)
-      
-       data x1_atlas/150.01,150.06,150.11,150.16,150.21,
-     A 150.26,150.31,150.36,150.41,150.46,150.51,150.56,150.61,150.66,
-     A 150.71,150.76,150.81,150.86,150.91,150.96,151.01,151.06,151.11,
-     A 151.16,151.21,151.26,151.31,151.36,151.41,151.46,151.51,151.56,
-     A 151.61,151.66,151.71,151.76,151.81,151.86,151.91,151.96,152.01,
-     A 152.06,152.11,152.16,152.21,152.26,152.31,152.36,152.41,152.46,
-     A 152.51,152.56,152.61,152.66,152.71,152.76,152.81,152.86,152.91,
-     A 152.96,153.01,153.06,153.11,153.16,153.21,153.26,153.31,153.36,
-     A 153.41,153.46,153.51,153.56,153.61,153.66,153.71,153.76,153.81,
-     A 153.86,153.91,153.96,154.01,154.06,154.11,154.16,154.21,154.26,
-     A 154.31,154.36,154.41,154.46,154.51,154.56,154.61,154.66,154.71,
-     A 154.76,154.81,154.86,154.91,154.96,155.01,155.06,155.11,155.16,
-     A 155.21,155.26,155.31,155.36,155.41,155.46,155.51,155.56,155.61,
-     A 155.66,155.71,155.76,155.81,155.86,155.91,155.96,156.01,156.06,
-     A 156.11,156.16,156.21,156.26,156.31,156.36,156.41,156.46,156.51,
-     A 156.56,156.61,156.66,156.71,156.76,156.81,156.86,156.91,156.96,
-     A 157.01,157.06,157.11,157.16,157.21,157.26,157.31,157.36,157.41,
-     A 157.46,157.51,157.56,157.61,157.66,157.71,157.76,157.81,157.86,
-     A 157.91,157.96,158.01,158.06,158.11,158.16,158.21,158.26,158.31,
-     A 158.36,158.41,158.46,158.51,158.56,158.61,158.66,158.71,158.76,
-     A 158.81,158.86,158.91,158.96,159.01,159.06,159.11,159.16,159.21,
-     A 159.26,159.31,159.36,159.41,159.46,159.51,159.56,159.61,159.66,
-     A 159.71,159.76,159.81,159.86,159.91,159.96,160.01,160.06,160.11,
-     A 160.16,160.21,160.26,160.31,160.36,160.41,160.46,160.51,160.56,
-     A 160.61,160.66,160.71,160.76,160.81,160.86,160.91,160.96,161.01,
-     A 161.06,161.11,161.16,161.21,161.26,161.31,161.36,161.41,161.46,
-     A 161.51,161.56,161.61,161.66,161.71,161.76,161.81,161.86,161.91,
-     A 161.96,162.01,162.06,162.11,162.16,162.21,162.26,162.31,162.36,
-     A 162.41,162.46,162.51,162.56,162.61,162.66,162.71,162.76,162.81,
-     A 162.86,162.91,162.96,163.01,163.06,163.11,163.16,163.21,163.26,
-     A 163.31,163.36,163.41,163.46,163.51,163.56,163.61,163.66,163.71,
-     A 163.76,163.81,163.86,163.91,163.96,164.01,164.06,164.11,164.16,
-     A 164.21,164.26,164.31,164.36,164.41,164.46,164.51,164.56,164.61,
-     A 164.66,164.71,164.76,164.81,164.86,164.91,164.96,165.01,165.06,
-     A 165.11,165.16,165.21,165.26,165.31,165.36,165.41,165.46,165.51,
-     A 165.56,165.61,165.66,165.71,165.76,165.81,165.86,165.91,165.96,
-     A 166.01,166.06,166.11,166.16,166.21,166.26,166.31,166.36,166.41,
-     A 166.46,166.51,166.56,166.61,166.66,166.71,166.76,166.81,166.86,
-     A 166.91,166.96,167.01,167.06,167.11,167.16,167.21,167.26,167.31,
-     A 167.36,167.41,167.46,167.51,167.56,167.61,167.66,167.71,167.76,
-     A 167.81,167.86,167.91,167.96,168.01,168.06,168.11,168.16,168.21,
-     A 168.26,168.31,168.36,168.41,168.46,168.51,168.56,168.61,168.66,
-     A 168.71,168.76,168.81,168.86,168.91,168.96,169.01,169.06,169.11,
-     A 169.16,169.21,169.26,169.31,169.36,169.41,169.46,169.51,169.56,
-     A 169.61,169.66,169.71,169.76,169.81,169.86,169.91,169.96,170.01,
-     A 170.06,170.11,170.16,170.21,170.26,170.31,170.36,170.41,170.46,
-     A 170.51,170.56,170.61,170.66,170.71,170.76,170.81,170.86,170.91,
-     A 170.96,171.01,171.06,171.11,171.16,171.21,171.26,171.31,171.36,
-     A 171.41,171.46,171.51,171.56,171.61,171.66,171.71,171.76,171.81,
-     A 171.86,171.91,171.96,172.01,172.06,172.11,172.16,172.21,172.26,
-     A 172.31,172.36,172.41,172.46,172.51,172.56,172.61,172.66,172.71,
-     A 172.76,172.81,172.86,172.91,172.96,173.01,173.06,173.11,173.16,
-     A 173.21,173.26,173.31,173.36,173.41,173.46,173.51,173.56,173.61,
-     A 173.66,173.71,173.76,173.81,173.86,173.91,173.96,174.01,174.06,
-     A 174.11,174.16,174.21,174.26,174.31,174.36,174.41,174.46,174.51,
-     A 174.56,174.61,174.66,174.71,174.76,174.81,174.86,174.91,174.96,
-     A 175.01,175.06,175.11,175.16,175.21,175.26,175.31,175.36,175.41,
-     A 175.46,175.51,175.56,175.61,175.66,175.71,175.76,175.81,175.86,
-     A 175.91,175.96,176.01,176.06,176.11,176.16,176.21,176.26,176.31,
-     A 176.36,176.41,176.46,176.51,176.56,176.61,176.66,176.71,176.76,
-     A 176.81,176.86,176.91,176.96,177.01,177.06,177.11,177.16,177.21,
-     A 177.26,177.31,177.36,177.41,177.46,177.51,177.56,177.61,177.66,
-     A 177.71,177.76,177.81,177.86,177.91,177.96,178.01,178.06,178.11,
-     A 178.16,178.21,178.26,178.31,178.36,178.41,178.46,178.51,178.56,
-     A 178.61,178.66,178.71,178.76,178.81,178.86,178.91,178.96,179.01,
-     A 179.06,179.11,179.16,179.21,179.26,179.31,179.36,179.41,179.46,
-     A 179.51,179.56,179.61,179.66,179.71,179.76,179.81,179.86,179.91,
-     A 179.96,180.01,180.06,180.11,180.16,180.21,180.26,180.31,180.36,
-     A 180.41,180.46,180.51,180.56,180.61,180.66,180.71,180.76,180.81,
-     A 180.86,180.91,180.96,181.01,181.06,181.11,181.16,181.21,181.26,
-     A 181.31,181.36,181.41,181.46,181.51,181.56,181.61,181.66,181.71,
-     A 181.76,181.81,181.86,181.91,181.96,182.01,182.06,182.11,182.16,
-     A 182.21,182.26,182.31,182.36,182.41,182.46,182.51,182.56,182.61,
-     A 182.66,182.71,182.76,182.81,182.86,182.91,182.96,183.01,183.06,
-     A 183.11,183.16,183.21,183.26,183.31,183.36,183.41,183.46,183.51,
-     A 183.56,183.61,183.66,183.71,183.76,183.81,183.86,183.91,183.96,
-     A 184.01,184.06,184.11,184.16,184.21,184.26,184.31,184.36,184.41,
-     A 184.46,184.51,184.56,184.61,184.66,184.71,184.76,184.81,184.86,
-     A 184.91,184.96,185.01,185.06,185.11,185.16,185.21,185.26,185.31,
-     A 185.36,185.41,185.46,185.51,185.56,185.61,185.66,185.71,185.76,
-     A 185.81,185.86,185.91,185.96,186.01,186.06,186.11,186.16,186.21,
-     A 186.26,186.31,186.36,186.41,186.46,186.51,186.56,186.61,186.66,
-     A 186.71,186.76,186.81,186.86,186.91,186.96,187.01,187.06,187.11,
-     A 187.16,187.21,187.26,187.31,187.36,187.41,187.46,187.51,187.56,
-     A 187.61,187.66,187.71,187.76,187.81,187.86,187.91,187.96,188.01,
-     A 188.06,188.11,188.16,188.21,188.26,188.31,188.36,188.41,188.46,
-     A 188.51,188.56,188.61,188.66,188.71,188.76,188.81,188.86,188.91,
-     A 188.96,189.01,189.06,189.11,189.16,189.21,189.26,189.31,189.36,
-     A 189.41,189.46,189.51,189.56,189.61,189.66,189.71,189.76,189.81,
-     A 189.86,189.91,189.96,190.01,190.06,190.11,190.16,190.21,190.26,
-     A 190.31,190.36,190.41,190.46,190.51,190.56,190.61,190.66,190.71,
-     A 190.76,190.81,190.86,190.91,190.96,191.01,191.06,191.11,191.16,
-     A 191.21,191.26,191.31,191.36,191.41,191.46,191.51,191.56,191.61,
-     A 191.66,191.71,191.76,191.81,191.86,191.91,191.96,192.01,192.06,
-     A 192.11,192.16,192.21,192.26,192.31,192.36,192.41,192.46,192.51,
-     A 192.56,192.61,192.66,192.71,192.76,192.81,192.86,192.91,192.96,
-     A 193.01,193.06,193.11,193.16,193.21,193.26,193.31,193.36,193.41,
-     A 193.46,193.51,193.56,193.61,193.66,193.71,193.76,193.81,193.86,
-     A 193.91,193.96,194.01,194.06,194.11,194.16,194.21,194.26,194.31,
-     A 194.36,194.41,194.46,194.51,194.56,194.61,194.66,194.71,194.76,
-     A 194.81,194.86,194.91,194.96,195.01,195.06,195.11,195.16,195.21,
-     A 195.26,195.31,195.36,195.41,195.46,195.51,195.56,195.61,195.66,
-     A 195.71,195.76,195.81,195.86,195.91,195.96,196.01,196.06,196.11,
-     A 196.16,196.21,196.26,196.31,196.36,196.41,196.46,196.51,196.56,
-     A 196.61,196.66,196.71,196.76,196.81,196.86,196.91,196.96,197.01,
-     A 197.06,197.11,197.16,197.21,197.26,197.31,197.36,197.41,197.46,
-     A 197.51,197.56,197.61,197.66,197.71,197.76,197.81,197.86,197.91,
-     A 197.96,198.01,198.06,198.11,198.16,198.21,198.26,198.31,198.36,
-     A 198.41,198.46,198.51,198.56,198.61,198.66,198.71,198.76,198.81,
-     A 198.86,198.91,198.96,199.01,199.06,199.11,199.16,199.21,199.26,
-     A 199.31,199.36,199.41,199.46,199.51,199.56,199.61,199.66,199.71,
-     A 199.76,199.81,199.86,199.91,199.96,200.01,200.06,200.11,200.16,
-     A 200.21,200.26,200.31,200.36,200.41,200.46,200.51,200.56,200.61,
-     A 200.66,200.71,200.76,200.81,200.86,200.91,200.96,201.01,201.06,
-     A 201.11,201.16,201.21,201.26,201.31,201.36,201.41,201.46,201.51,
-     A 201.56,201.61,201.66,201.71,201.76,201.81,201.86,201.91,201.96,
-     A 202.01,202.06,202.11,202.16,202.21,202.26,202.31,202.36,202.41,
-     A 202.46,202.51,202.56,202.61,202.66,202.71,202.76,202.81,202.86,
-     A 202.91,202.96,203.01,203.06,203.11,203.16,203.21,203.26,203.31,
-     A 203.36,203.41,203.46,203.51,203.56,203.61,203.66,203.71,203.76,
-     A 203.81,203.86,203.91,203.96,204.01,204.06,204.11,204.16,204.21,
-     A 204.26,204.31,204.36,204.41,204.46,204.51,204.56,204.61,204.66,
-     A 204.71,204.76,204.81,204.86,204.91,204.96,205.01,205.06,205.11,
-     A 205.16,205.21,205.26,205.31,205.36,205.41,205.46,205.51,205.56,
-     A 205.61,205.66,205.71,205.76,205.81,205.86,205.91,205.96,206.01,
-     A 206.06,206.11,206.16,206.21,206.26,206.31,206.36,206.41,206.46,
-     A 206.51,206.56,206.61,206.66,206.71,206.76,206.81,206.86,206.91,
-     A 206.96,207.01,207.06,207.11,207.16,207.21,207.26,207.31,207.36,
-     A 207.41,207.46,207.51,207.56,207.61,207.66,207.71,207.76,207.81,
-     A 207.86,207.91,207.96,208.01,208.06,208.11,208.16,208.21,208.26,
-     A 208.31,208.36,208.41,208.46,208.51,208.56,208.61,208.66,208.71,
-     A 208.76,208.81,208.86,208.91,208.96,209.01,209.06,209.11,209.16,
-     A 209.21,209.26,209.31,209.36,209.41,209.46,209.51,209.56,209.61,
-     A 209.66,209.71,209.76,209.81,209.86,209.91,209.96,210.01,210.06,
-     A 210.11,210.16,210.21,210.26,210.31,210.36,210.41,210.46,210.51,
-     A 210.56,210.61,210.66,210.71,210.76,210.81,210.86,210.91,210.96,
-     A 211.01,211.06,211.11,211.16,211.21,211.26,211.31,211.36,211.41,
-     A 211.46,211.51,211.56,211.61,211.66,211.71,211.76,211.81,211.86,
-     A 211.91,211.96,212.01,212.06,212.11,212.16,212.21,212.26,212.31,
-     A 212.36,212.41,212.46,212.51,212.56,212.61,212.66,212.71,212.76,
-     A 212.81,212.86,212.91,212.96,213.01,213.06,213.11,213.16,213.21,
-     A 213.26,213.31,213.36,213.41,213.46,213.51,213.56,213.61,213.66,
-     A 213.71,213.76,213.81,213.86,213.91,213.96,214.01,214.06,214.11,
-     A 214.16,214.21,214.26,214.31,214.36,214.41,214.46,214.51,214.56,
-     A 214.61,214.66,214.71,214.76,214.81,214.86,214.91,214.96,215.01,
-     A 215.06,215.11,215.16,215.21,215.26,215.31,215.36,215.41,215.46,
-     A 215.51,215.56,215.61,215.66,215.71,215.76,215.81,215.86,215.91,
-     A 215.96,216.01,216.06,216.11,216.16,216.21,216.26,216.31,216.36,
-     A 216.41,216.46,216.51,216.56,216.61,216.66,216.71,216.76,216.81,
-     A 216.86,216.91,216.96,217.01,217.06,217.11,217.16,217.21,217.26,
-     A 217.31,217.36,217.41,217.46,217.51,217.56,217.61,217.66,217.71,
-     A 217.76,217.81,217.86,217.91,217.96,218.01,218.06,218.11,218.16,
-     A 218.21,218.26,218.31,218.36,218.41,218.46,218.51,218.56,218.61,
-     A 218.66,218.71,218.76,218.81,218.86,218.91,218.96,219.01,219.06,
-     A 219.11,219.16,219.21,219.26,219.31,219.36,219.41,219.46,219.51,
-     A 219.56,219.61,219.66,219.71,219.76,219.81,219.86,219.91,219.96,
-     A 220.01,220.06,220.11,220.16,220.21,220.26,220.31,220.36,220.41,
-     A 220.46,220.51,220.56,220.61,220.66,220.71,220.76,220.81,220.86,
-     A 220.91,220.96,221.01,221.06,221.11,221.16,221.21,221.26,221.31,
-     A 221.36,221.41,221.46,221.51,221.56,221.61,221.66,221.71,221.76,
-     A 221.81,221.86,221.91,221.96,222.01,222.06,222.11,222.16,222.21,
-     A 222.26,222.31,222.36,222.41,222.46,222.51,222.56,222.61,222.66,
-     A 222.71,222.76,222.81,222.86,222.91,222.96,223.01,223.06,223.11,
-     A 223.16,223.21,223.26,223.31,223.36,223.41,223.46,223.51,223.56,
-     A 223.61,223.66,223.71,223.76,223.81,223.86,223.91,223.96,224.01,
-     A 224.06,224.11,224.16,224.21,224.26,224.31,224.36,224.41,224.46,
-     A 224.51,224.56,224.61,224.66,224.71,224.76,224.81,224.86,224.91,
-     A 224.96,225.01,225.06,225.11,225.16,225.21,225.26,225.31,225.36,
-     A 225.41,225.46,225.51,225.56,225.61,225.66,225.71,225.76,225.81,
-     A 225.86,225.91,225.96,226.01,226.06,226.11,226.16,226.21,226.26,
-     A 226.31,226.36,226.41,226.46,226.51,226.56,226.61,226.66,226.71,
-     A 226.76,226.81,226.86,226.91,226.96,227.01,227.06,227.11,227.16,
-     A 227.21,227.26,227.31,227.36,227.41,227.46,227.51,227.56,227.61,
-     A 227.66,227.71,227.76,227.81,227.86,227.91,227.96,228.01,228.06,
-     A 228.11,228.16,228.21,228.26,228.31,228.36,228.41,228.46,228.51,
-     A 228.56,228.61,228.66,228.71,228.76,228.81,228.86,228.91,228.96,
-     A 229.01,229.06,229.11,229.16,229.21,229.26,229.31,229.36,229.41,
-     A 229.46,229.51,229.56,229.61,229.66,229.71,229.76,229.81,229.86,
-     A 229.91,229.96,230.01,230.06,230.11,230.16,230.21,230.26,230.31,
-     A 230.36,230.41,230.46,230.51,230.56,230.61,230.66,230.71,230.76,
-     A 230.81,230.86,230.91,230.96,231.01,231.06,231.11,231.16,231.21,
-     A 231.26,231.31,231.36,231.41,231.46,231.51,231.56,231.61,231.66,
-     A 231.71,231.76,231.81,231.86,231.91,231.96,232.01,232.06,232.11,
-     A 232.16,232.21,232.26,232.31,232.36,232.41,232.46,232.51,232.56,
-     A 232.61,232.66,232.71,232.76,232.81,232.86,232.91,232.96,233.01,
-     A 233.06,233.11,233.16,233.21,233.26,233.31,233.36,233.41,233.46,
-     A 233.51,233.56,233.61,233.66,233.71,233.76,233.81,233.86,233.91,
-     A 233.96,234.01,234.06,234.11,234.16,234.21,234.26,234.31,234.36,
-     A 234.41,234.46,234.51,234.56,234.61,234.66,234.71,234.76,234.81,
-     A 234.86,234.91,234.96,235.01,235.06,235.11,235.16,235.21,235.26,
-     A 235.31,235.36,235.41,235.46,235.51,235.56,235.61,235.66,235.71,
-     A 235.76,235.81,235.86,235.91,235.96,236.01,236.06,236.11,236.16,
-     A 236.21,236.26,236.31,236.36,236.41,236.46,236.51,236.56,236.61,
-     A 236.66,236.71,236.76,236.81,236.86,236.91,236.96,237.01,237.06,
-     A 237.11,237.16,237.21,237.26,237.31,237.36,237.41,237.46,237.51,
-     A 237.56,237.61,237.66,237.71,237.76,237.81,237.86,237.91,237.96,
-     A 238.01,238.06,238.11,238.16,238.21,238.26,238.31,238.36,238.41,
-     A 238.46,238.51,238.56,238.61,238.66,238.71,238.76,238.81,238.86,
-     A 238.91,238.96,239.01,239.06,239.11,239.16,239.21,239.26,239.31,
-     A 239.36,239.41,239.46,239.51,239.56,239.61,239.66,239.71,239.76,
-     A 239.81,239.86,239.91,239.96,240.01,240.06,240.11,240.16,240.21,
-     A 240.26,240.31,240.36,240.41,240.46,240.51,240.56,240.61,240.66,
-     A 240.71,240.76,240.81,240.86,240.91,240.96,241.01,241.06,241.11,
-     A 241.16,241.21,241.26,241.31,241.36,241.41,241.46,241.51,241.56,
-     A 241.61,241.66,241.71,241.76,241.81,241.86,241.91,241.96,242.01,
-     A 242.06,242.11,242.16,242.21,242.26,242.31,242.36,242.41,242.46,
-     A 242.51,242.56,242.61,242.66,242.71,242.76,242.81,242.86,242.91,
-     A 242.96,243.01,243.06,243.11,243.16,243.21,243.26,243.31,243.36,
-     A 243.41,243.46,243.51,243.56,243.61,243.66,243.71,243.76,243.81,
-     A 243.86,243.91,243.96,244.01,244.06,244.11,244.16,244.21,244.26,
-     A 244.31,244.36,244.41,244.46,244.51,244.56,244.61,244.66,244.71,
-     A 244.76,244.81,244.86,244.91,244.96,245.01,245.06,245.11,245.16,
-     A 245.21,245.26,245.31,245.36,245.41,245.46,245.51,245.56,245.61,
-     A 245.66,245.71,245.76,245.81,245.86,245.91,245.96,246.01,246.06,
-     A 246.11,246.16,246.21,246.26,246.31,246.36,246.41,246.46,246.51,
-     A 246.56,246.61,246.66,246.71,246.76,246.81,246.86,246.91,246.96,
-     A 247.01,247.06,247.11,247.16,247.21,247.26,247.31,247.36,247.41,
-     A 247.46,247.51,247.56,247.61,247.66,247.71,247.76,247.81,247.86,
-     A 247.91,247.96,248.01,248.06,248.11,248.16,248.21,248.26,248.31,
-     A 248.36,248.41,248.46,248.51,248.56,248.61,248.66,248.71,248.76,
-     A 248.81,248.86,248.91,248.96,249.01,249.06,249.11,249.16,249.21,
-     A 249.26,249.31,249.36,249.41,249.46,249.51,249.56,249.61,249.66,
-     A 249.71,249.76,249.81,249.86,249.91,249.96,250.01,250.06,250.11,
-     A 250.16,250.21,250.26,250.31,250.36,250.41,250.46,250.51,250.56,
-     A 250.61,250.66,250.71,250.76,250.81,250.86,250.91,250.96,251.01,
-     A 251.06,251.11,251.16,251.21,251.26,251.31,251.36,251.41,251.46,
-     A 251.51,251.56,251.61,251.66,251.71,251.76,251.81,251.86,251.91,
-     A 251.96,252.01,252.06,252.11,252.16,252.21,252.26,252.31,252.36,
-     A 252.41,252.46,252.51,252.56,252.61,252.66,252.71,252.76,252.81,
-     A 252.86,252.91,252.96,253.01,253.06,253.11,253.16,253.21,253.26,
-     A 253.31,253.36,253.41,253.46,253.51,253.56,253.61,253.66,253.71,
-     A 253.76,253.81,253.86,253.91,253.96,254.01,254.06,254.11,254.16,
-     A 254.21,254.26,254.31,254.36,254.41,254.46,254.51,254.56,254.61,
-     A 254.66,254.71,254.76,254.81,254.86,254.91,254.96,255.01,255.06,
-     A 255.11,255.16,255.21,255.26,255.31,255.36,255.41,255.46,255.51,
-     A 255.56,255.61,255.66,255.71,255.76,255.81,255.86,255.91,255.96,
-     A 256.01,256.06,256.11,256.16,256.21,256.26,256.31,256.36,256.41,
-     A 256.46,256.51,256.56,256.61,256.66,256.71,256.76,256.81,256.86,
-     A 256.91,256.96,257.01,257.06,257.11,257.16,257.21,257.26,257.31,
-     A 257.36,257.41,257.46,257.51,257.56,257.61,257.66,257.71,257.76,
-     A 257.81,257.86,257.91,257.96,258.01,258.06,258.11,258.16,258.21,
-     A 258.26,258.31,258.36,258.41,258.46,258.51,258.56,258.61,258.66,
-     A 258.71,258.76,258.81,258.86,258.91,258.96,259.01,259.06,259.11,
-     A 259.16,259.21,259.26,259.31,259.36,259.41,259.46,259.51,259.56,
-     A 259.61,259.66,259.71,259.76,259.81,259.86,259.91,259.96,260.01,
-     A 260.06,260.11,260.16,260.21,260.26,260.31,260.36,260.41,260.46,
-     A 260.51,260.56,260.61,260.66,260.71,260.76,260.81,260.86,260.91,
-     A 260.96,261.01,261.06,261.11,261.16,261.21,261.26,261.31,261.36,
-     A 261.41,261.46,261.51,261.56,261.61,261.66,261.71,261.76,261.81,
-     A 261.86,261.91,261.96,262.01,262.06,262.11,262.16,262.21,262.26,
-     A 262.31,262.36,262.41,262.46,262.51,262.56,262.61,262.66,262.71,
-     A 262.76,262.81,262.86,262.91,262.96,263.01,263.06,263.11,263.16,
-     A 263.21,263.26,263.31,263.36,263.41,263.46,263.51,263.56,263.61,
-     A 263.66,263.71,263.76,263.81,263.86,263.91,263.96,264.01,264.06,
-     A 264.11,264.16,264.21,264.26,264.31,264.36,264.41,264.46,264.51,
-     A 264.56,264.61,264.66,264.71,264.76,264.81,264.86,264.91,264.96,
-     A 265.01,265.06,265.11,265.16,265.21,265.26,265.31,265.36,265.41,
-     A 265.46,265.51,265.56,265.61,265.66,265.71,265.76,265.81,265.86,
-     A 265.91,265.96,266.01,266.06,266.11,266.16,266.21,266.26,266.31,
-     A 266.36,266.41,266.46,266.51,266.56,266.61,266.66,266.71,266.76,
-     A 266.81,266.86,266.91,266.96,267.01,267.06,267.11,267.16,267.21,
-     A 267.26,267.31,267.36,267.41,267.46,267.51,267.56,267.61,267.66,
-     A 267.71,267.76,267.81,267.86,267.91,267.96,268.01,268.06,268.11,
-     A 268.16,268.21,268.26,268.31,268.36,268.41,268.46,268.51,268.56,
-     A 268.61,268.66,268.71,268.76,268.81,268.86,268.91,268.96,269.01,
-     A 269.06,269.11,269.16,269.21,269.26,269.31,269.36,269.41,269.46,
-     A 269.51,269.56,269.61,269.66,269.71,269.76,269.81,269.86,269.91,
-     A 269.96,270.01,270.06,270.11,270.16,270.21,270.26,270.31,270.36,
-     A 270.41,270.46,270.51,270.56,270.61,270.66,270.71,270.76,270.81,
-     A 270.86,270.91,270.96,271.01,271.06,271.11,271.16,271.21,271.26,
-     A 271.31,271.36,271.41,271.46,271.51,271.56,271.61,271.66,271.71,
-     A 271.76,271.81,271.86,271.91,271.96,272.01,272.06,272.11,272.16,
-     A 272.21,272.26,272.31,272.36,272.41,272.46,272.51,272.56,272.61,
-     A 272.66,272.71,272.76,272.81,272.86,272.91,272.96,273.01,273.06,
-     A 273.11,273.16,273.21,273.26,273.31,273.36,273.41,273.46,273.51,
-     A 273.56,273.61,273.66,273.71,273.76,273.81,273.86,273.91,273.96,
-     A 274.01,274.06,274.11,274.16,274.21,274.26,274.31,274.36,274.41,
-     A 274.46,274.51,274.56,274.61,274.66,274.71,274.76,274.81,274.86,
-     A 274.91,274.96,275.01,275.06,275.11,275.16,275.21,275.26,275.31,
-     A 275.36,275.41,275.46,275.51,275.56,275.61,275.66,275.71,275.76,
-     A 275.81,275.86,275.91,275.96,276.01,276.06,276.11,276.16,276.21,
-     A 276.26,276.31,276.36,276.41,276.46,276.51,276.56,276.61,276.66,
-     A 276.71,276.76,276.81,276.86,276.91,276.96,277.01,277.06,277.11,
-     A 277.16,277.21,277.26,277.31,277.36,277.41,277.46,277.51,277.56,
-     A 277.61,277.66,277.71,277.76,277.81,277.86,277.91,277.96,278.01,
-     A 278.06,278.11,278.16,278.21,278.26,278.31,278.36,278.41,278.46,
-     A 278.51,278.56,278.61,278.66,278.71,278.76,278.81,278.86,278.91,
-     A 278.96,279.01,279.06,279.11,279.16,279.21,279.26,279.31,279.36,
-     A 279.41,279.46,279.51,279.56,279.61,279.66,279.71,279.76,279.81,
-     A 279.86,279.91,279.96,280.01,280.06,280.11,280.16,280.21,280.26,
-     A 280.31,280.36,280.41,280.46,280.51,280.56,280.61,280.66,280.71,
-     A 280.76,280.81,280.86,280.91,280.96,281.01,281.06,281.11,281.16,
-     A 281.21,281.26,281.31,281.36,281.41,281.46,281.51,281.56,281.61,
-     A 281.66,281.71,281.76,281.81,281.86,281.91,281.96,282.01,282.06,
-     A 282.11,282.16,282.21,282.26,282.31,282.36,282.41,282.46,282.51,
-     A 282.56,282.61,282.66,282.71,282.76,282.81,282.86,282.91,282.96,
-     A 283.01,283.06,283.11,283.16,283.21,283.26,283.31,283.36,283.41,
-     A 283.46,283.51,283.56,283.61,283.66,283.71,283.76,283.81,283.86,
-     A 283.91,283.96,284.01,284.06,284.11,284.16,284.21,284.26,284.31,
-     A 284.36,284.41,284.46,284.51,284.56,284.61,284.66,284.71,284.76,
-     A 284.81,284.86,284.91,284.96,285.01,285.06,285.11,285.16,285.21,
-     A 285.26,285.31,285.36,285.41,285.46,285.51,285.56,285.61,285.66,
-     A 285.71,285.76,285.81,285.86,285.91,285.96,286.01,286.06,286.11,
-     A 286.16,286.21,286.26,286.31,286.36,286.41,286.46,286.51,286.56,
-     A 286.61,286.66,286.71,286.76,286.81,286.86,286.91,286.96,287.01,
-     A 287.06,287.11,287.16,287.21,287.26,287.31,287.36,287.41,287.46,
-     A 287.51,287.56,287.61,287.66,287.71,287.76,287.81,287.86,287.91,
-     A 287.96,288.01,288.06,288.11,288.16,288.21,288.26,288.31,288.36,
-     A 288.41,288.46,288.51,288.56,288.61,288.66,288.71,288.76,288.81,
-     A 288.86,288.91,288.96,289.01,289.06,289.11,289.16,289.21,289.26,
-     A 289.31,289.36,289.41,289.46,289.51,289.56,289.61,289.66,289.71,
-     A 289.76,289.81,289.86,289.91,289.96,290.01,290.06,290.11,290.16,
-     A 290.21,290.26,290.31,290.36,290.41,290.46,290.51,290.56,290.61,
-     A 290.66,290.71,290.76,290.81,290.86,290.91,290.96,291.01,291.06,
-     A 291.11,291.16,291.21,291.26,291.31,291.36,291.41,291.46,291.51,
-     A 291.56,291.61,291.66,291.71,291.76,291.81,291.86,291.91,291.96,
-     A 292.01,292.06,292.11,292.16,292.21,292.26,292.31,292.36,292.41,
-     A 292.46,292.51,292.56,292.61,292.66,292.71,292.76,292.81,292.86,
-     A 292.91,292.96,293.01,293.06,293.11,293.16,293.21,293.26,293.31,
-     A 293.36,293.41,293.46,293.51,293.56,293.61,293.66,293.71,293.76,
-     A 293.81,293.86,293.91,293.96,294.01,294.06,294.11,294.16,294.21,
-     A 294.26,294.31,294.36,294.41,294.46,294.51,294.56,294.61,294.66,
-     A 294.71,294.76,294.81,294.86,294.91,294.96,295.01,295.06,295.11,
-     A 295.16,295.21,295.26,295.31,295.36,295.41,295.46,295.51,295.56,
-     A 295.61,295.66,295.71,295.76,295.81,295.86,295.91,295.96,296.01,
-     A 296.06,296.11,296.16,296.21,296.26,296.31,296.36,296.41,296.46,
-     A 296.51,296.56,296.61,296.66,296.71,296.76,296.81,296.86,296.91,
-     A 296.96,297.01,297.06,297.11,297.16,297.21,297.26,297.31,297.36,
-     A 297.41,297.46,297.51,297.56,297.61,297.66,297.71,297.76,297.81,
-     A 297.86,297.91,297.96,298.01,298.06,298.11,298.16,298.21,298.26,
-     A 298.31,298.36,298.41,298.46,298.51,298.56,298.61,298.66,298.71,
-     A 298.76,298.81,298.86,298.91,298.96,299.01,299.06,299.11,299.16,
-     A 299.21,299.26,299.31,299.36,299.41,299.46,299.51,299.56,299.61,
-     A 299.66,299.71,299.76,299.81,299.86,299.91,299.96,300.01,300.06,
-     A 300.11,300.16,300.21,300.26,300.31,300.36,300.41,300.46,300.51,
-     A 300.56,300.61,300.66,300.71,300.76,300.81,300.86,300.91,300.96,
-     A 301.01,301.06,301.11,301.16,301.21,301.26,301.31,301.36,301.41,
-     A 301.46,301.51,301.56,301.61,301.66,301.71,301.76,301.81,301.86,
-     A 301.91,301.96,302.01,302.06,302.11,302.16,302.21,302.26,302.31,
-     A 302.36,302.41,302.46,302.51,302.56,302.61,302.66,302.71,302.76,
-     A 302.81,302.86,302.91,302.96,303.01,303.06,303.11,303.16,303.21,
-     A 303.26,303.31,303.36,303.41,303.46,303.51,303.56,303.61,303.66,
-     A 303.71,303.76,303.81,303.86,303.91,303.96,304.01,304.06,304.11,
-     A 304.16,304.21,304.26,304.31,304.36,304.41,304.46,304.51,304.56,
-     A 304.61,304.66,304.71,304.76,304.81,304.86,304.91,304.96,305.01,
-     A 305.06,305.11,305.16,305.21,305.26,305.31,305.36,305.41,305.46,
-     A 305.51,305.56,305.61,305.66,305.71,305.76,305.81,305.86,305.91,
-     A 305.96,306.01,306.06,306.11,306.16,306.21,306.26,306.31,306.36,
-     A 306.41,306.46,306.51,306.56,306.61,306.66,306.71,306.76,306.81,
-     A 306.86,306.91,306.96,307.01,307.06,307.11,307.16,307.21,307.26,
-     A 307.31,307.36,307.41,307.46,307.51,307.56,307.61,307.66,307.71,
-     A 307.76,307.81,307.86,307.91,307.96,308.01,308.06,308.11,308.16,
-     A 308.21,308.26,308.31,308.36,308.41,308.46,308.51,308.56,308.61,
-     A 308.66,308.71,308.76,308.81,308.86,308.91,308.96,309.01,309.06,
-     A 309.11,309.16,309.21,309.26,309.31,309.36,309.41,309.46,309.51,
-     A 309.56,309.61,309.66,309.71,309.76,309.81,309.86,309.91,309.96,
-     A 310.01,310.06,310.11,310.16,310.21,310.26,310.31,310.36,310.41,
-     A 310.46,310.51,310.56,310.61,310.66,310.71,310.76,310.81,310.86,
-     A 310.91,310.96,311.01,311.06,311.11,311.16,311.21,311.26,311.31,
-     A 311.36,311.41,311.46,311.51,311.56,311.61,311.66,311.71,311.76,
-     A 311.81,311.86,311.91,311.96,312.01,312.06,312.11,312.16,312.21,
-     A 312.26,312.31,312.36,312.41,312.46,312.51,312.56,312.61,312.66,
-     A 312.71,312.76,312.81,312.86,312.91,312.96,313.01,313.06,313.11,
-     A 313.16,313.21,313.26,313.31,313.36,313.41,313.46,313.51,313.56,
-     A 313.61,313.66,313.71,313.76,313.81,313.86,313.91,313.96,314.01,
-     A 314.06,314.11,314.16,314.21,314.26,314.31,314.36,314.41,314.46,
-     A 314.51,314.56,314.61,314.66,314.71,314.76,314.81,314.86,314.91,
-     A 314.96,315.01,315.06,315.11,315.16,315.21,315.26,315.31,315.36,
-     A 315.41,315.46,315.51,315.56,315.61,315.66,315.71,315.76,315.81,
-     A 315.86,315.91,315.96,316.01,316.06,316.11,316.16,316.21,316.26,
-     A 316.31,316.36,316.41,316.46,316.51,316.56,316.61,316.66,316.71,
-     A 316.76,316.81,316.86,316.91,316.96,317.01,317.06,317.11,317.16,
-     A 317.21,317.26,317.31,317.36,317.41,317.46,317.51,317.56,317.61,
-     A 317.66,317.71,317.76,317.81,317.86,317.91,317.96,318.01,318.06,
-     A 318.11,318.16,318.21,318.26,318.31,318.36,318.41,318.46,318.51,
-     A 318.56,318.61,318.66,318.71,318.76,318.81,318.86,318.91,318.96,
-     A 319.01,319.06,319.11,319.16,319.21,319.26,319.31,319.36,319.41,
-     A 319.46,319.51,319.56,319.61,319.66,319.71,319.76,319.81,319.86,
-     A 319.91,319.96,320.01,320.06,320.11,320.16,320.21,320.26,320.31,
-     A 320.36,320.41,320.46,320.51,320.56,320.61,320.66,320.71,320.76,
-     A 320.81,320.86,320.91,320.96,321.01,321.06,321.11,321.16,321.21,
-     A 321.26,321.31,321.36,321.41,321.46,321.51,321.56,321.61,321.66,
-     A 321.71,321.76,321.81,321.86,321.91,321.96,322.01,322.06,322.11,
-     A 322.16,322.21,322.26,322.31,322.36,322.41,322.46,322.51,322.56,
-     A 322.61,322.66,322.71,322.76,322.81,322.86,322.91,322.96,323.01,
-     A 323.06,323.11,323.16,323.21,323.26,323.31,323.36,323.41,323.46,
-     A 323.51,323.56,323.61,323.66,323.71,323.76,323.81,323.86,323.91,
-     A 323.96,324.01,324.06,324.11,324.16,324.21,324.26,324.31,324.36,
-     A 324.41,324.46,324.51,324.56,324.61,324.66,324.71,324.76,324.81,
-     A 324.86,324.91,324.96,325.01,325.06,325.11,325.16,325.21,325.26,
-     A 325.31,325.36,325.41,325.46,325.51,325.56,325.61,325.66,325.71,
-     A 325.76,325.81,325.86,325.91,325.96,326.01,326.06,326.11,326.16,
-     A 326.21,326.26,326.31,326.36,326.41,326.46,326.51,326.56,326.61,
-     A 326.66,326.71,326.76,326.81,326.86,326.91,326.96,327.01,327.06,
-     A 327.11,327.16,327.21,327.26,327.31,327.36,327.41,327.46,327.51,
-     A 327.56,327.61,327.66,327.71,327.76,327.81,327.86,327.91,327.96,
-     A 328.01,328.06,328.11,328.16,328.21,328.26,328.31,328.36,328.41,
-     A 328.46,328.51,328.56,328.61,328.66,328.71,328.76,328.81,328.86,
-     A 328.91,328.96,329.01,329.06,329.11,329.16,329.21,329.26,329.31,
-     A 329.36,329.41,329.46,329.51,329.56,329.61,329.66,329.71,329.76,
-     A 329.81,329.86,329.91,329.96,330.01,330.06,330.11,330.16,330.21,
-     A 330.26,330.31,330.36,330.41,330.46,330.51,330.56,330.61,330.66,
-     A 330.71,330.76,330.81,330.86,330.91,330.96,331.01,331.06,331.11,
-     A 331.16,331.21,331.26,331.31,331.36,331.41,331.46,331.51,331.56,
-     A 331.61,331.66,331.71,331.76,331.81,331.86,331.91,331.96,332.01,
-     A 332.06,332.11,332.16,332.21,332.26,332.31,332.36,332.41,332.46,
-     A 332.51,332.56,332.61,332.66,332.71,332.76,332.81,332.86,332.91,
-     A 332.96,333.01,333.06,333.11,333.16,333.21,333.26,333.31,333.36,
-     A 333.41,333.46,333.51,333.56,333.61,333.66,333.71,333.76,333.81,
-     A 333.86,333.91,333.96,334.01,334.06,334.11,334.16,334.21,334.26,
-     A 334.31,334.36,334.41,334.46,334.51,334.56,334.61,334.66,334.71,
-     A 334.76,334.81,334.86,334.91,334.96,335.01,335.06,335.11,335.16,
-     A 335.21,335.26,335.31,335.36,335.41,335.46,335.51,335.56,335.61,
-     A 335.66,335.71,335.76,335.81,335.86,335.91,335.96,336.01,336.06,
-     A 336.11,336.16,336.21,336.26,336.31,336.36,336.41,336.46,336.51,
-     A 336.56,336.61,336.66,336.71,336.76,336.81,336.86,336.91,336.96,
-     A 337.01,337.06,337.11,337.16,337.21,337.26,337.31,337.36,337.41,
-     A 337.46,337.51,337.56,337.61,337.66,337.71,337.76,337.81,337.86,
-     A 337.91,337.96,338.01,338.06,338.11,338.16,338.21,338.26,338.31,
-     A 338.36,338.41,338.46,338.51,338.56,338.61,338.66,338.71,338.76,
-     A 338.81,338.86,338.91,338.96,339.01,339.06,339.11,339.16,339.21,
-     A 339.26,339.31,339.36,339.41,339.46,339.51,339.56,339.61,339.66,
-     A 339.71,339.76,339.81,339.86,339.91,339.96,340.01,340.06,340.11,
-     A 340.16,340.21,340.26,340.31,340.36,340.41,340.46,340.51,340.56,
-     A 340.61,340.66,340.71,340.76,340.81,340.86,340.91,340.96,341.01,
-     A 341.06,341.11,341.16,341.21,341.26,341.31,341.36,341.41,341.46,
-     A 341.51,341.56,341.61,341.66,341.71,341.76,341.81,341.86,341.91,
-     A 341.96,342.01,342.06,342.11,342.16,342.21,342.26,342.31,342.36,
-     A 342.41,342.46,342.51,342.56,342.61,342.66,342.71,342.76,342.81,
-     A 342.86,342.91,342.96,343.01,343.06,343.11,343.16,343.21,343.26,
-     A 343.31,343.36,343.41,343.46,343.51,343.56,343.61,343.66,343.71,
-     A 343.76,343.81,343.86,343.91,343.96,344.01,344.06,344.11,344.16,
-     A 344.21,344.26,344.31,344.36,344.41,344.46,344.51,344.56,344.61,
-     A 344.66,344.71,344.76,344.81,344.86,344.91,344.96,345.01,345.06,
-     A 345.11,345.16,345.21,345.26,345.31,345.36,345.41,345.46,345.51,
-     A 345.56,345.61,345.66,345.71,345.76,345.81,345.86,345.91,345.96,
-     A 346.01,346.06,346.11,346.16,346.21,346.26,346.31,346.36,346.41,
-     A 346.46,346.51,346.56,346.61,346.66,346.71,346.76,346.81,346.86,
-     A 346.91,346.96,347.01,347.06,347.11,347.16,347.21,347.26,347.31,
-     A 347.36,347.41,347.46,347.51,347.56,347.61,347.66,347.71,347.76,
-     A 347.81,347.86,347.91,347.96,348.01,348.06,348.11,348.16,348.21,
-     A 348.26,348.31,348.36,348.41,348.46,348.51,348.56,348.61,348.66,
-     A 348.71,348.76,348.81,348.86,348.91,348.96,349.01,349.06,349.11,
-     A 349.16,349.21,349.26,349.31,349.36,349.41,349.46,349.51,349.56,
-     A 349.61,349.66,349.71,349.76,349.81,349.86,349.91,349.96,350.01,
-     A 350.06,350.11,350.16,350.21,350.26,350.31,350.36,350.41,350.46,
-     A 350.51,350.56,350.61,350.66,350.71,350.76,350.81,350.86,350.91,
-     A 350.96,351.01,351.06,351.11,351.16,351.21,351.26,351.31,351.36,
-     A 351.41,351.46,351.51,351.56,351.61,351.66,351.71,351.76,351.81,
-     A 351.86,351.91,351.96,352.01,352.06,352.11,352.16,352.21,352.26,
-     A 352.31,352.36,352.41,352.46,352.51,352.56,352.61,352.66,352.71,
-     A 352.76,352.81,352.86,352.91,352.96,353.01,353.06,353.11,353.16,
-     A 353.21,353.26,353.31,353.36,353.41,353.46,353.51,353.56,353.61,
-     A 353.66,353.71,353.76,353.81,353.86,353.91,353.96,354.01,354.06,
-     A 354.11,354.16,354.21,354.26,354.31,354.36,354.41,354.46,354.51,
-     A 354.56,354.61,354.66,354.71,354.76,354.81,354.86,354.91,354.96,
-     A 355.01,355.06,355.11,355.16,355.21,355.26,355.31,355.36,355.41,
-     A 355.46,355.51,355.56,355.61,355.66,355.71,355.76,355.81,355.86,
-     A 355.91,355.96,356.01,356.06,356.11,356.16,356.21,356.26,356.31,
-     A 356.36,356.41,356.46,356.51,356.56,356.61,356.66,356.71,356.76,
-     A 356.81,356.86,356.91,356.96,357.01,357.06,357.11,357.16,357.21,
-     A 357.26,357.31,357.36,357.41,357.46,357.51,357.56,357.61,357.66,
-     A 357.71,357.76,357.81,357.86,357.91,357.96,358.01,358.06,358.11,
-     A 358.16,358.21,358.26,358.31,358.36,358.41,358.46,358.51,358.56,
-     A 358.61,358.66,358.71,358.76,358.81,358.86,358.91,358.96,359.01,
-     A 359.06,359.11,359.16,359.21,359.26,359.31,359.36,359.41,359.46,
-     A 359.51,359.56,359.61,359.66,359.71,359.76,359.81,359.86,359.91,
-     A 359.96,360.01,360.06,360.11,360.16,360.21,360.26,360.31,360.36,
-     A 360.41,360.46,360.51,360.56,360.61,360.66,360.71,360.76,360.81,
-     A 360.86,360.91,360.96,361.01,361.06,361.11,361.16,361.21,361.26,
-     A 361.31,361.36,361.41,361.46,361.51,361.56,361.61,361.66,361.71,
-     A 361.76,361.81,361.86,361.91,361.96,362.01,362.06,362.11,362.16,
-     A 362.21,362.26,362.31,362.36,362.41,362.46,362.51,362.56,362.61,
-     A 362.66,362.71,362.76,362.81,362.86,362.91,362.96,363.01,363.06,
-     A 363.11,363.16,363.21,363.26,363.31,363.36,363.41,363.46,363.51,
-     A 363.56,363.61,363.66,363.71,363.76,363.81,363.86,363.91,363.96,
-     A 364.01,364.06,364.11,364.16,364.21,364.26,364.31,364.36,364.41,
-     A 364.46,364.51,364.56,364.61,364.66,364.71,364.76,364.81,364.86,
-     A 364.91,364.96,365.01,365.06,365.11,365.16,365.21,365.26,365.31,
-     A 365.36,365.41,365.46,365.51,365.56,365.61,365.66,365.71,365.76,
-     A 365.81,365.86,365.91,365.96,366.01,366.06,366.11,366.16,366.21,
-     A 366.26,366.31,366.36,366.41,366.46,366.51,366.56,366.61,366.66,
-     A 366.71,366.76,366.81,366.86,366.91,366.96,367.01,367.06,367.11,
-     A 367.16,367.21,367.26,367.31,367.36,367.41,367.46,367.51,367.56,
-     A 367.61,367.66,367.71,367.76,367.81,367.86,367.91,367.96,368.01,
-     A 368.06,368.11,368.16,368.21,368.26,368.31,368.36,368.41,368.46,
-     A 368.51,368.56,368.61,368.66,368.71,368.76,368.81,368.86,368.91,
-     A 368.96,369.01,369.06,369.11,369.16,369.21,369.26,369.31,369.36,
-     A 369.41,369.46,369.51,369.56,369.61,369.66,369.71,369.76,369.81,
-     A 369.86,369.91,369.96,370.01,370.06,370.11,370.16,370.21,370.26,
-     A 370.31,370.36,370.41,370.46,370.51,370.56,370.61,370.66,370.71,
-     A 370.76,370.81,370.86,370.91,370.96,371.01,371.06,371.11,371.16,
-     A 371.21,371.26,371.31,371.36,371.41,371.46,371.51,371.56,371.61,
-     A 371.66,371.71,371.76,371.81,371.86,371.91,371.96,372.01,372.06,
-     A 372.11,372.16,372.21,372.26,372.31,372.36,372.41,372.46,372.51,
-     A 372.56,372.61,372.66,372.71,372.76,372.81,372.86,372.91,372.96,
-     A 373.01,373.06,373.11,373.16,373.21,373.26,373.31,373.36,373.41,
-     A 373.46,373.51,373.56,373.61,373.66,373.71,373.76,373.81,373.86,
-     A 373.91,373.96,374.01,374.06,374.11,374.16,374.21,374.26,374.31,
-     A 374.36,374.41,374.46,374.51,374.56,374.61,374.66,374.71,374.76,
-     A 374.81,374.86,374.91,374.96,375.01,375.06,375.11,375.16,375.21,
-     A 375.26,375.31,375.36,375.41,375.46,375.51,375.56,375.61,375.66,
-     A 375.71,375.76,375.81,375.86,375.91,375.96,376.01,376.06,376.11,
-     A 376.16,376.21,376.26,376.31,376.36,376.41,376.46,376.51,376.56,
-     A 376.61,376.66,376.71,376.76,376.81,376.86,376.91,376.96,377.01,
-     A 377.06,377.11,377.16,377.21,377.26,377.31,377.36,377.41,377.46,
-     A 377.51,377.56,377.61,377.66,377.71,377.76,377.81,377.86,377.91,
-     A 377.96,378.01,378.06,378.11,378.16,378.21,378.26,378.31,378.36,
-     A 378.41,378.46,378.51,378.56,378.61,378.66,378.71,378.76,378.81,
-     A 378.86,378.91,378.96,379.01,379.06,379.11,379.16,379.21,379.26,
-     A 379.31,379.36,379.41,379.46,379.51,379.56,379.61,379.66,379.71,
-     A 379.76,379.81,379.86,379.91,379.96,380.01,380.06,380.11,380.16,
-     A 380.21,380.26,380.31,380.36,380.41,380.46,380.51,380.56,380.61,
-     A 380.66,380.71,380.76,380.81,380.86,380.91,380.96,381.01,381.06,
-     A 381.11,381.16,381.21,381.26,381.31,381.36,381.41,381.46,381.51,
-     A 381.56,381.61,381.66,381.71,381.76,381.81,381.86,381.91,381.96,
-     A 382.01,382.06,382.11,382.16,382.21,382.26,382.31,382.36,382.41,
-     A 382.46,382.51,382.56,382.61,382.66,382.71,382.76,382.81,382.86,
-     A 382.91,382.96,383.01,383.06,383.11,383.16,383.21,383.26,383.31,
-     A 383.36,383.41,383.46,383.51,383.56,383.61,383.66,383.71,383.76,
-     A 383.81,383.86,383.91,383.96,384.01,384.06,384.11,384.16,384.21,
-     A 384.26,384.31,384.36,384.41,384.46,384.51,384.56,384.61,384.66,
-     A 384.71,384.76,384.81,384.86,384.91,384.96,385.01,385.06,385.11,
-     A 385.16,385.21,385.26,385.31,385.36,385.41,385.46,385.51,385.56,
-     A 385.61,385.66,385.71,385.76,385.81,385.86,385.91,385.96,386.01,
-     A 386.06,386.11,386.16,386.21,386.26,386.31,386.36,386.41,386.46,
-     A 386.51,386.56,386.61,386.66,386.71,386.76,386.81,386.86,386.91,
-     A 386.96,387.01,387.06,387.11,387.16,387.21,387.26,387.31,387.36,
-     A 387.41,387.46,387.51,387.56,387.61,387.66,387.71,387.76,387.81,
-     A 387.86,387.91,387.96,388.01,388.06,388.11,388.16,388.21,388.26,
-     A 388.31,388.36,388.41,388.46,388.51,388.56,388.61,388.66,388.71,
-     A 388.76,388.81,388.86,388.91,388.96,389.01,389.06,389.11,389.16,
-     A 389.21,389.26,389.31,389.36,389.41,389.46,389.51,389.56,389.61,
-     A 389.66,389.71,389.76,389.81,389.86,389.91,389.96,390.01,390.06,
-     A 390.11,390.16,390.21,390.26,390.31,390.36,390.41,390.46,390.51,
-     A 390.56,390.61,390.66,390.71,390.76,390.81,390.86,390.91,390.96,
-     A 391.01,391.06,391.11,391.16,391.21,391.26,391.31,391.36,391.41,
-     A 391.46,391.51,391.56,391.61,391.66,391.71,391.76,391.81,391.86,
-     A 391.91,391.96,392.01,392.06,392.11,392.16,392.21,392.26,392.31,
-     A 392.36,392.41,392.46,392.51,392.56,392.61,392.66,392.71,392.76,
-     A 392.81,392.86,392.91,392.96,393.01,393.06,393.11,393.16,393.21,
-     A 393.26,393.31,393.36,393.41,393.46,393.51,393.56,393.61,393.66,
-     A 393.71,393.76,393.81,393.86,393.91,393.96,394.01,394.06,394.11,
-     A 394.16,394.21,394.26,394.31,394.36,394.41,394.46,394.51,394.56,
-     A 394.61,394.66,394.71,394.76,394.81,394.86,394.91,394.96,395.01,
-     A 395.06,395.11,395.16,395.21,395.26,395.31,395.36,395.41,395.46,
-     A 395.51,395.56,395.61,395.66,395.71,395.76,395.81,395.86,395.91,
-     A 395.96,396.01,396.06,396.11,396.16,396.21,396.26,396.31,396.36,
-     A 396.41,396.46,396.51,396.56,396.61,396.66,396.71,396.76,396.81,
-     A 396.86,396.91,396.96,397.01,397.06,397.11,397.16,397.21,397.26,
-     A 397.31,397.36,397.41,397.46,397.51,397.56,397.61,397.66,397.71,
-     A 397.76,397.81,397.86,397.91,397.96,398.01,398.06,398.11,398.16,
-     A 398.21,398.26,398.31,398.36,398.41,398.46,398.51,398.56,398.61,
-     A 398.66,398.71,398.76,398.81,398.86,398.91,398.96,399.01,399.06,
-     A 399.11,399.16,399.21,399.26,399.31,399.36,399.41,399.46,399.51,
-     A 399.56,399.61,399.66,399.71,399.76,399.81,399.86,399.91,399.96,
-     A 400.01,400.06,400.11,400.16,400.21,400.26,400.31,400.36,400.41,
-     A 400.46,400.51,400.56,400.61,400.66,400.71,400.76,400.81,400.86,
-     A 400.91,400.96,401.01,401.06,401.11,401.16,401.21,401.26,401.31,
-     A 401.36,401.41,401.46,401.51,401.56,401.61,401.66,401.71,401.76,
-     A 401.81,401.86,401.91,401.96,402.01,402.06,402.11,402.16,402.21,
-     A 402.26,402.31,402.36,402.41,402.46,402.51,402.56,402.61,402.66,
-     A 402.71,402.76,402.81,402.86,402.91,402.96,403.01,403.06,403.11,
-     A 403.16,403.21,403.26,403.31,403.36,403.41,403.46,403.51,403.56,
-     A 403.61,403.66,403.71,403.76,403.81,403.86,403.91,403.96,404.01,
-     A 404.06,404.11,404.16,404.21,404.26,404.31,404.36,404.41,404.46,
-     A 404.51,404.56,404.61,404.66,404.71,404.76,404.81,404.86,404.91,
-     A 404.96,405.01,405.06,405.11,405.16,405.21,405.26,405.31,405.36,
-     A 405.41,405.46,405.51,405.56,405.61,405.66,405.71,405.76,405.81,
-     A 405.86,405.91,405.96,406.01,406.06,406.11,406.16,406.21,406.26,
-     A 406.31,406.36,406.41,406.46,406.51,406.56,406.61,406.66,406.71,
-     A 406.76,406.81,406.86,406.91,406.96,407.01,407.06,407.11,407.16,
-     A 407.21,407.26,407.31,407.36,407.41,407.46,407.51,407.56,407.61,
-     A 407.66,407.71,407.76,407.81,407.86,407.91,407.96/
-     
-       data y1_atlas/.1016E+00,.9724E-01,.9506E-01,.9816E-01,
-     A .9452E-01,.9815E-01,.1016E+00,.9245E-01,.9415E-01,.9548E-01,
-     A .9849E-01,.9356E-01,.9330E-01,.9741E-01,.9714E-01,.9723E-01,
-     A .9314E-01,.9572E-01,.9805E-01,.1020E+00,.1158E+00,.1210E+00,
-     A .1245E+00,.1112E+00,.1020E+00,.1028E+00,.9836E-01,.9947E-01,
-     A .9813E-01,.1006E+00,.9890E-01,.9947E-01,.1057E+00,.1001E+00,
-     A .1006E+00,.1061E+00,.1010E+00,.1045E+00,.1008E+00,.1052E+00,
-     A .1058E+00,.1051E+00,.1081E+00,.1086E+00,.1104E+00,.1124E+00,
-     A .1157E+00,.1159E+00,.1134E+00,.1155E+00,.1199E+00,.1204E+00,
-     A .1564E+00,.2108E+00,.1850E+00,.1407E+00,.1172E+00,.1126E+00,
-     A .1212E+00,.1169E+00,.1158E+00,.1189E+00,.1255E+00,.1204E+00,
-     A .1180E+00,.1426E+00,.2028E+00,.2214E+00,.1804E+00,.1506E+00,
-     A .1265E+00,.1214E+00,.1261E+00,.1323E+00,.1469E+00,.1495E+00,
-     A .1310E+00,.1167E+00,.1141E+00,.1217E+00,.1463E+00,.1560E+00,
-     A .1615E+00,.1585E+00,.1409E+00,.1288E+00,.1202E+00,.1200E+00,
-     A .1315E+00,.1383E+00,.1496E+00,.1445E+00,.1243E+00,.1320E+00,
-     A .1507E+00,.3318E+00,.7653E+00,.6647E+00,.3737E+00,.1668E+00,
-     A .2461E+00,.4521E+00,.5043E+00,.3600E+00,.1846E+00,.1462E+00,
-     A .1291E+00,.1265E+00,.1209E+00,.1275E+00,.1363E+00,.1416E+00,
-     A .1447E+00,.1423E+00,.1325E+00,.1364E+00,.1652E+00,.2228E+00,
-     A .2578E+00,.2466E+00,.2693E+00,.3636E+00,.3754E+00,.3435E+00,
-     A .2486E+00,.1598E+00,.1545E+00,.1878E+00,.1846E+00,.1628E+00,
-     A .1408E+00,.1390E+00,.1457E+00,.1624E+00,.1738E+00,.1798E+00,
-     A .1724E+00,.1619E+00,.1718E+00,.2029E+00,.2217E+00,.2084E+00,
-     A .1831E+00,.1698E+00,.1561E+00,.1593E+00,.1678E+00,.2086E+00,
-     A .2436E+00,.2589E+00,.2470E+00,.1890E+00,.1644E+00,.1615E+00,
-     A .1740E+00,.1628E+00,.1453E+00,.1477E+00,.1421E+00,.1522E+00,
-     A .1794E+00,.2062E+00,.1996E+00,.1602E+00,.1481E+00,.1410E+00,
-     A .1548E+00,.1617E+00,.1844E+00,.1965E+00,.1967E+00,.1792E+00,
-     A .1725E+00,.1690E+00,.1741E+00,.1989E+00,.2114E+00,.2041E+00,
-     A .1794E+00,.1819E+00,.1811E+00,.1778E+00,.1838E+00,.1785E+00,
-     A .1836E+00,.1790E+00,.1751E+00,.1904E+00,.1936E+00,.2113E+00,
-     A .2030E+00,.1866E+00,.1798E+00,.1665E+00,.1677E+00,.1720E+00,
-     A .1786E+00,.1686E+00,.1692E+00,.1787E+00,.1920E+00,.1909E+00,
-     A .2046E+00,.2215E+00,.2271E+00,.2173E+00,.2034E+00,.1927E+00,
-     A .1840E+00,.1917E+00,.1888E+00,.1942E+00,.1900E+00,.1918E+00,
-     A .1965E+00,.2146E+00,.2332E+00,.2386E+00,.2010E+00,.1928E+00,
-     A .2151E+00,.2490E+00,.2733E+00,.2421E+00,.2398E+00,.2639E+00,
-     A .2975E+00,.2870E+00,.2444E+00,.2448E+00,.2145E+00,.2094E+00,
-     A .2147E+00,.2261E+00,.2298E+00,.2226E+00,.2409E+00,.2595E+00,
-     A .2469E+00,.2300E+00,.2328E+00,.2353E+00,.2542E+00,.2733E+00,
-     A .2763E+00,.2861E+00,.2949E+00,.2865E+00,.2515E+00,.2605E+00,
-     A .2840E+00,.3372E+00,.3211E+00,.2706E+00,.2700E+00,.2785E+00,
-     A .2656E+00,.2743E+00,.2998E+00,.3088E+00,.2848E+00,.2608E+00,
-     A .2524E+00,.2580E+00,.2740E+00,.3140E+00,.3138E+00,.3211E+00,
-     A .3346E+00,.3074E+00,.2697E+00,.2666E+00,.2659E+00,.2878E+00,
-     A .3302E+00,.3439E+00,.3290E+00,.2851E+00,.2898E+00,.3626E+00,
-     A .4689E+00,.5131E+00,.3929E+00,.3056E+00,.2932E+00,.2999E+00,
-     A .3380E+00,.3758E+00,.3646E+00,.3294E+00,.3146E+00,.3053E+00,
-     A .2960E+00,.2956E+00,.3028E+00,.3061E+00,.2987E+00,.2990E+00,
-     A .3174E+00,.3295E+00,.3071E+00,.2906E+00,.2882E+00,.2965E+00,
-     A .2922E+00,.2956E+00,.2910E+00,.3110E+00,.3676E+00,.3785E+00,
-     A .3582E+00,.3886E+00,.6873E+00,.8989E+00,.9837E+00,.1034E+01,
-     A .9174E+00,.6692E+00,.5701E+00,.5033E+00,.4063E+00,.3548E+00,
-     A .3696E+00,.3622E+00,.3597E+00,.3769E+00,.4057E+00,.4121E+00,
-     A .3792E+00,.3431E+00,.3438E+00,.3648E+00,.3917E+00,.4038E+00,
-     A .3706E+00,.3579E+00,.3490E+00,.3440E+00,.3571E+00,.3749E+00,
-     A .4162E+00,.5798E+00,.5779E+00,.4519E+00,.3319E+00,.3389E+00,
-     A .3765E+00,.4198E+00,.4381E+00,.4563E+00,.4125E+00,.3820E+00,
-     A .3790E+00,.4150E+00,.4280E+00,.4043E+00,.3929E+00,.3921E+00,
-     A .4190E+00,.4334E+00,.4213E+00,.4244E+00,.4586E+00,.4461E+00,
-     A .4017E+00,.4052E+00,.4177E+00,.4331E+00,.4329E+00,.4303E+00,
-     A .4375E+00,.5000E+00,.5797E+00,.6068E+00,.5653E+00,.4928E+00,
-     A .5083E+00,.5403E+00,.5281E+00,.5059E+00,.5432E+00,.5681E+00,
-     A .5967E+00,.5972E+00,.5681E+00,.5609E+00,.5562E+00,.5802E+00,
-     A .6201E+00,.6364E+00,.6333E+00,.6115E+00,.6060E+00,.7001E+00,
-     A .7351E+00,.7093E+00,.6146E+00,.6432E+00,.6808E+00,.6873E+00,
-     A .6568E+00,.6472E+00,.7005E+00,.7783E+00,.8337E+00,.7682E+00,
-     A .6870E+00,.6870E+00,.6753E+00,.6840E+00,.6715E+00,.6532E+00,
-     A .6662E+00,.6700E+00,.6667E+00,.6594E+00,.6959E+00,.7610E+00,
-     A .7808E+00,.7715E+00,.7563E+00,.7345E+00,.7154E+00,.6969E+00,
-     A .6460E+00,.6498E+00,.7316E+00,.6971E+00,.6363E+00,.6097E+00,
-     A .6426E+00,.6797E+00,.7151E+00,.7590E+00,.8054E+00,.7977E+00,
-     A .7620E+00,.7558E+00,.7498E+00,.7381E+00,.7831E+00,.8223E+00,
-     A .8448E+00,.7603E+00,.7240E+00,.7028E+00,.7028E+00,.6890E+00,
-     A .7340E+00,.8046E+00,.8422E+00,.8225E+00,.8033E+00,.8090E+00,
-     A .7976E+00,.7924E+00,.8038E+00,.7899E+00,.7439E+00,.6926E+00,
-     A .6528E+00,.6727E+00,.6943E+00,.7305E+00,.7444E+00,.7406E+00,
-     A .7603E+00,.7747E+00,.7646E+00,.7748E+00,.7795E+00,.7948E+00,
-     A .8122E+00,.8041E+00,.8023E+00,.7901E+00,.7995E+00,.8277E+00,
-     A .8502E+00,.8461E+00,.8464E+00,.8569E+00,.9070E+00,.9231E+00,
-     A .9465E+00,.9472E+00,.9539E+00,.9574E+00,.9611E+00,.1000E+01,
-     A .9809E+00,.9520E+00,.9672E+00,.9701E+00,.8925E+00,.8475E+00,
-     A .8738E+00,.8996E+00,.9403E+00,.9413E+00,.9545E+00,.1005E+01,
-     A .1068E+01,.1103E+01,.1083E+01,.1074E+01,.1075E+01,.1095E+01,
-     A .1118E+01,.1124E+01,.1189E+01,.1169E+01,.1115E+01,.1138E+01,
-     A .1158E+01,.1187E+01,.1171E+01,.1170E+01,.1210E+01,.1202E+01,
-     A .1187E+01,.1191E+01,.1225E+01,.1279E+01,.1278E+01,.1243E+01,
-     A .1141E+01,.1112E+01,.1164E+01,.1166E+01,.1170E+01,.1052E+01,
-     A .1033E+01,.1180E+01,.1312E+01,.1461E+01,.1382E+01,.1298E+01,
-     A .1240E+01,.1258E+01,.1355E+01,.1415E+01,.1467E+01,.1528E+01,
-     A .1577E+01,.1663E+01,.1739E+01,.1686E+01,.1585E+01,.1374E+01,
-     A .1248E+01,.1175E+01,.1236E+01,.1308E+01,.1310E+01,.1332E+01,
-     A .1363E+01,.1479E+01,.1579E+01,.1600E+01,.1598E+01,.1666E+01,
-     A .1657E+01,.1567E+01,.1496E+01,.1461E+01,.1529E+01,.1577E+01,
-     A .1593E+01,.1577E+01,.1583E+01,.1603E+01,.1649E+01,.1636E+01,
-     A .1590E+01,.1594E+01,.1598E+01,.1607E+01,.1735E+01,.1785E+01,
-     A .1748E+01,.1742E+01,.1778E+01,.1786E+01,.1707E+01,.1615E+01,
-     A .1468E+01,.1410E+01,.1398E+01,.1439E+01,.1494E+01,.1581E+01,
-     A .1616E+01,.1598E+01,.1560E+01,.1602E+01,.1664E+01,.1670E+01,
-     A .1650E+01,.1704E+01,.1755E+01,.1772E+01,.1804E+01,.1811E+01,
-     A .1804E+01,.1807E+01,.1818E+01,.1805E+01,.1813E+01,.1870E+01,
-     A .1929E+01,.1902E+01,.1862E+01,.1788E+01,.1792E+01,.2242E+01,
-     A .2891E+01,.2453E+01,.2085E+01,.1836E+01,.1904E+01,.1985E+01,
-     A .1915E+01,.1887E+01,.1854E+01,.1899E+01,.1858E+01,.1809E+01,
-     A .1741E+01,.1778E+01,.1848E+01,.1897E+01,.2315E+01,.3849E+01,
-     A .4406E+01,.3851E+01,.3053E+01,.2220E+01,.2220E+01,.2170E+01,
-     A .2090E+01,.1962E+01,.2066E+01,.2224E+01,.2277E+01,.2279E+01,
-     A .2407E+01,.2493E+01,.2545E+01,.2539E+01,.2415E+01,.2296E+01,
-     A .2210E+01,.2173E+01,.2235E+01,.2128E+01,.2073E+01,.2084E+01,
-     A .2277E+01,.2290E+01,.2237E+01,.2181E+01,.2208E+01,.2350E+01,
-     A .2415E+01,.2388E+01,.2357E+01,.2373E+01,.2455E+01,.2509E+01,
-     A .2579E+01,.2489E+01,.2354E+01,.2318E+01,.2374E+01,.2513E+01,
-     A .2448E+01,.2476E+01,.2640E+01,.2550E+01,.2273E+01,.2227E+01,
-     A .2085E+01,.1975E+01,.2082E+01,.2216E+01,.2296E+01,.2295E+01,
-     A .2251E+01,.2300E+01,.2248E+01,.2072E+01,.2029E+01,.2101E+01,
-     A .1984E+01,.1829E+01,.1738E+01,.1999E+01,.2254E+01,.2391E+01,
-     A .2250E+01,.1929E+01,.1912E+01,.1980E+01,.2034E+01,.2015E+01,
-     A .2115E+01,.2348E+01,.2628E+01,.2851E+01,.2913E+01,.2788E+01,
-     A .2791E+01,.2808E+01,.2672E+01,.2472E+01,.2422E+01,.2513E+01,
-     A .2438E+01,.2389E+01,.2440E+01,.2545E+01,.2580E+01,.2534E+01,
-     A .2584E+01,.2706E+01,.2850E+01,.2675E+01,.2700E+01,.2541E+01,
-     A .2550E+01,.2543E+01,.2655E+01,.2840E+01,.3075E+01,.3212E+01,
-     A .3213E+01,.3222E+01,.3245E+01,.3268E+01,.3297E+01,.3231E+01,
-     A .3341E+01,.3338E+01,.3190E+01,.3144E+01,.3122E+01,.3254E+01,
-     A .3356E+01,.3316E+01,.3184E+01,.3148E+01,.3150E+01,.3183E+01,
-     A .3109E+01,.3124E+01,.3093E+01,.3066E+01,.3056E+01,.3030E+01,
-     A .2994E+01,.3036E+01,.3022E+01,.3016E+01,.3198E+01,.3440E+01,
-     A .3485E+01,.3553E+01,.3532E+01,.3510E+01,.3539E+01,.3484E+01,
-     A .3475E+01,.3535E+01,.3511E+01,.3501E+01,.3410E+01,.3514E+01,
-     A .3610E+01,.3713E+01,.3770E+01,.3719E+01,.3835E+01,.3958E+01,
-     A .4212E+01,.4035E+01,.3650E+01,.3588E+01,.3811E+01,.4020E+01,
-     A .3936E+01,.3793E+01,.3728E+01,.3833E+01,.3731E+01,.3581E+01,
-     A .3417E+01,.3279E+01,.3381E+01,.3609E+01,.3704E+01,.3717E+01,
-     A .3469E+01,.3506E+01,.3618E+01,.3841E+01,.3981E+01,.4102E+01,
-     A .4160E+01,.4122E+01,.4007E+01,.3906E+01,.3861E+01,.3875E+01,
-     A .4057E+01,.4148E+01,.4206E+01,.4348E+01,.4558E+01,.4349E+01,
-     A .4008E+01,.3864E+01,.3889E+01,.4079E+01,.4210E+01,.4197E+01,
-     A .4183E+01,.4075E+01,.4220E+01,.4358E+01,.4493E+01,.4704E+01,
-     A .4627E+01,.4481E+01,.4402E+01,.4335E+01,.4198E+01,.4208E+01,
-     A .4280E+01,.4458E+01,.4626E+01,.4763E+01,.4787E+01,.4906E+01,
-     A .4840E+01,.4665E+01,.4665E+01,.4567E+01,.4567E+01,.4451E+01,
-     A .4430E+01,.4512E+01,.4599E+01,.4418E+01,.4367E+01,.4452E+01,
-     A .4651E+01,.4650E+01,.4525E+01,.4336E+01,.3989E+01,.3514E+01,
-     A .3239E+01,.3183E+01,.3147E+01,.3265E+01,.3441E+01,.3542E+01,
-     A .3590E+01,.3521E+01,.3374E+01,.3254E+01,.3075E+01,.2988E+01,
-     A .3226E+01,.3533E+01,.3826E+01,.4449E+01,.4839E+01,.4975E+01,
-     A .5011E+01,.4975E+01,.5177E+01,.5594E+01,.5885E+01,.6024E+01,
-     A .6088E+01,.6029E+01,.5909E+01,.5681E+01,.5531E+01,.5647E+01,
-     A .5482E+01,.5395E+01,.5404E+01,.6044E+01,.6372E+01,.6329E+01,
-     A .6277E+01,.5985E+01,.5663E+01,.5555E+01,.5489E+01,.5237E+01,
-     A .4952E+01,.4923E+01,.5026E+01,.5734E+01,.6115E+01,.6018E+01,
-     A .5783E+01,.5443E+01,.5661E+01,.5952E+01,.5954E+01,.5704E+01,
-     A .5447E+01,.5649E+01,.5916E+01,.6161E+01,.6005E+01,.5731E+01,
-     A .5574E+01,.5467E+01,.5472E+01,.5545E+01,.5623E+01,.5685E+01,
-     A .5914E+01,.6206E+01,.6482E+01,.6523E+01,.6742E+01,.6828E+01,
-     A .6896E+01,.6894E+01,.6908E+01,.6975E+01,.7019E+01,.6980E+01,
-     A .6867E+01,.6455E+01,.6344E+01,.6412E+01,.6344E+01,.6429E+01,
-     A .6541E+01,.6628E+01,.6403E+01,.6265E+01,.6327E+01,.6368E+01,
-     A .6438E+01,.6337E+01,.6060E+01,.6050E+01,.6286E+01,.6359E+01,
-     A .6151E+01,.6283E+01,.6273E+01,.6298E+01,.6536E+01,.7039E+01,
-     A .7166E+01,.7007E+01,.6584E+01,.6399E+01,.6475E+01,.6613E+01,
-     A .6873E+01,.6607E+01,.6265E+01,.5902E+01,.5887E+01,.6191E+01,
-     A .6295E+01,.6026E+01,.5964E+01,.6231E+01,.6452E+01,.6503E+01,
-     A .6445E+01,.6460E+01,.6690E+01,.6928E+01,.7454E+01,.7723E+01,
-     A .7185E+01,.7028E+01,.6893E+01,.7015E+01,.7033E+01,.6970E+01,
-     A .6666E+01,.6697E+01,.7196E+01,.7468E+01,.7233E+01,.7069E+01,
-     A .7167E+01,.7147E+01,.7012E+01,.7168E+01,.7659E+01,.7637E+01,
-     A .7627E+01,.7720E+01,.7593E+01,.7256E+01,.7402E+01,.7635E+01,
-     A .8142E+01,.7902E+01,.7757E+01,.7465E+01,.7520E+01,.7679E+01,
-     A .7690E+01,.7833E+01,.8122E+01,.8209E+01,.7675E+01,.7246E+01,
-     A .7409E+01,.8272E+01,.8713E+01,.8810E+01,.8517E+01,.8184E+01,
-     A .8039E+01,.8036E+01,.7962E+01,.8101E+01,.8346E+01,.8790E+01,
-     A .9012E+01,.9256E+01,.8948E+01,.8645E+01,.8723E+01,.8774E+01,
-     A .8559E+01,.8236E+01,.7856E+01,.7755E+01,.8223E+01,.8920E+01,
-     A .9122E+01,.8974E+01,.8261E+01,.7110E+01,.6572E+01,.6153E+01,
-     A .7002E+01,.8460E+01,.9075E+01,.9287E+01,.9265E+01,.8997E+01,
-     A .8949E+01,.9225E+01,.9759E+01,.1030E+02,.1028E+02,.9968E+01,
-     A .9471E+01,.8660E+01,.8113E+01,.8142E+01,.8387E+01,.9127E+01,
-     A .9909E+01,.1022E+02,.1026E+02,.1019E+02,.1022E+02,.1011E+02,
-     A .9539E+01,.8931E+01,.8792E+01,.9008E+01,.9691E+01,.1026E+02,
-     A .1081E+02,.1124E+02,.1131E+02,.1109E+02,.1031E+02,.9922E+01,
-     A .1005E+02,.1036E+02,.1116E+02,.1153E+02,.1116E+02,.1056E+02,
-     A .9972E+01,.1034E+02,.1067E+02,.1073E+02,.1060E+02,.1096E+02,
-     A .1113E+02,.1104E+02,.1105E+02,.1119E+02,.1133E+02,.1153E+02,
-     A .1152E+02,.1143E+02,.1102E+02,.1071E+02,.9844E+01,.1014E+02,
-     A .1120E+02,.1143E+02,.1117E+02,.1001E+02,.9846E+01,.1059E+02,
-     A .1139E+02,.1161E+02,.1162E+02,.1142E+02,.1072E+02,.9948E+01,
-     A .1027E+02,.1121E+02,.1151E+02,.1143E+02,.1171E+02,.1182E+02,
-     A .1139E+02,.1114E+02,.1163E+02,.1228E+02,.1235E+02,.1231E+02,
-     A .1198E+02,.1180E+02,.1181E+02,.1195E+02,.1241E+02,.1286E+02,
-     A .1264E+02,.1246E+02,.1239E+02,.1289E+02,.1342E+02,.1342E+02,
-     A .1341E+02,.1359E+02,.1397E+02,.1414E+02,.1445E+02,.1435E+02,
-     A .1409E+02,.1363E+02,.1345E+02,.1362E+02,.1427E+02,.1462E+02,
-     A .1413E+02,.1371E+02,.1343E+02,.1309E+02,.1314E+02,.1365E+02,
-     A .1424E+02,.1363E+02,.1321E+02,.1343E+02,.1563E+02,.1722E+02,
-     A .1735E+02,.1724E+02,.1703E+02,.1958E+02,.2027E+02,.1867E+02,
-     A .1617E+02,.1631E+02,.1695E+02,.1793E+02,.1877E+02,.1931E+02,
-     A .2340E+02,.2493E+02,.2421E+02,.1861E+02,.1809E+02,.2086E+02,
-     A .2320E+02,.2520E+02,.2353E+02,.2323E+02,.2459E+02,.2771E+02,
-     A .2511E+02,.2311E+02,.2106E+02,.1958E+02,.2163E+02,.2775E+02,
-     A .3252E+02,.3564E+02,.2944E+02,.2265E+02,.1773E+02,.2043E+02,
-     A .3096E+02,.3732E+02,.4047E+02,.3824E+02,.3494E+02,.3365E+02,
-     A .3320E+02,.2857E+02,.2347E+02,.1976E+02,.2011E+02,.2106E+02,
-     A .2363E+02,.3299E+02,.3607E+02,.4067E+02,.4017E+02,.3151E+02,
-     A .2890E+02,.2874E+02,.2708E+02,.2474E+02,.3116E+02,.3853E+02,
-     A .4318E+02,.4679E+02,.4353E+02,.3881E+02,.3488E+02,.3790E+02,
-     A .4765E+02,.5191E+02,.5268E+02,.4398E+02,.3387E+02,.3118E+02,
-     A .2888E+02,.2559E+02,.1729E+02,.1381E+02,.1336E+02,.1613E+02,
-     A .2603E+02,.3257E+02,.3605E+02,.3768E+02,.3723E+02,.3743E+02,
-     A .3767E+02,.3844E+02,.3413E+02,.2724E+02,.2481E+02,.2633E+02,
-     A .3072E+02,.3030E+02,.2944E+02,.3010E+02,.3334E+02,.3113E+02,
-     A .2678E+02,.2518E+02,.2706E+02,.3222E+02,.3657E+02,.4307E+02,
-     A .4383E+02,.3415E+02,.2568E+02,.2239E+02,.2425E+02,.3319E+02,
-     A .4729E+02,.5324E+02,.5320E+02,.4998E+02,.4741E+02,.4926E+02,
-     A .5037E+02,.4932E+02,.4522E+02,.4063E+02,.3584E+02,.3468E+02,
-     A .3393E+02,.3443E+02,.3572E+02,.3743E+02,.4190E+02,.4536E+02,
-     A .4721E+02,.4856E+02,.3432E+02,.3011E+02,.3281E+02,.3574E+02,
-     A .3873E+02,.4605E+02,.5042E+02,.5043E+02,.4410E+02,.4005E+02,
-     A .3801E+02,.3524E+02,.3363E+02,.2562E+02,.2291E+02,.2201E+02,
-     A .2164E+02,.2453E+02,.2951E+02,.3591E+02,.4250E+02,.4619E+02,
-     A .4174E+02,.3935E+02,.3955E+02,.4161E+02,.3859E+02,.3710E+02,
-     A .3756E+02,.3693E+02,.2917E+02,.2230E+02,.1895E+02,.1940E+02,
-     A .2693E+02,.3345E+02,.3244E+02,.3037E+02,.2751E+02,.3308E+02,
-     A .3747E+02,.3758E+02,.3706E+02,.3983E+02,.4140E+02,.4172E+02,
-     A .3470E+02,.2888E+02,.2540E+02,.2575E+02,.2843E+02,.3541E+02,
-     A .3671E+02,.3336E+02,.2944E+02,.2537E+02,.3208E+02,.3938E+02,
-     A .4938E+02,.5531E+02,.5595E+02,.5669E+02,.5753E+02,.5920E+02,
-     A .6140E+02,.5830E+02,.5047E+02,.4155E+02,.4151E+02,.4990E+02,
-     A .5399E+02,.5305E+02,.3465E+02,.2456E+02,.2775E+02,.3901E+02,
-     A .4484E+02,.3862E+02,.3719E+02,.4297E+02,.4836E+02,.4424E+02,
-     A .3994E+02,.3754E+02,.4875E+02,.6473E+02,.6742E+02,.6465E+02,
-     A .5485E+02,.4375E+02,.3655E+02,.3354E+02,.3591E+02,.4483E+02,
-     A .5429E+02,.5875E+02,.6214E+02,.6047E+02,.5496E+02,.4795E+02,
-     A .3638E+02,.3063E+02,.4021E+02,.4959E+02,.5851E+02,.6654E+02,
-     A .7084E+02,.6634E+02,.6185E+02,.5814E+02,.6132E+02,.5558E+02,
-     A .5099E+02,.4522E+02,.4192E+02,.3541E+02,.3360E+02,.3702E+02,
-     A .4058E+02,.3081E+02,.2503E+02,.2139E+02,.2124E+02,.2951E+02,
-     A .3991E+02,.4828E+02,.5213E+02,.4494E+02,.4516E+02,.4853E+02,
-     A .4748E+02,.3712E+02,.2604E+02,.2372E+02,.2468E+02,.3016E+02,
-     A .3754E+02,.4480E+02,.5306E+02,.5436E+02,.5392E+02,.5708E+02,
-     A .5984E+02,.5785E+02,.5080E+02,.4516E+02,.4708E+02,.5451E+02,
-     A .5271E+02,.5030E+02,.5014E+02,.5029E+02,.4566E+02,.4316E+02,
-     A .4325E+02,.4676E+02,.5635E+02,.5758E+02,.5534E+02,.5137E+02,
-     A .4633E+02,.4348E+02,.4471E+02,.5293E+02,.7094E+02,.8425E+02,
-     A .8534E+02,.8348E+02,.7560E+02,.7749E+02,.8078E+02,.8101E+02,
-     A .7453E+02,.6808E+02,.6331E+02,.5976E+02,.5278E+02,.6308E+02,
-     A .7235E+02,.7254E+02,.6903E+02,.5591E+02,.5339E+02,.5338E+02,
-     A .5392E+02,.5267E+02,.4974E+02,.4713E+02,.4661E+02,.5589E+02,
-     A .6481E+02,.6614E+02,.6632E+02,.6943E+02,.7600E+02,.7545E+02,
-     A .7015E+02,.5350E+02,.5296E+02,.5608E+02,.5566E+02,.5194E+02,
-     A .5157E+02,.6011E+02,.6452E+02,.5897E+02,.4505E+02,.4683E+02,
-     A .5527E+02,.5780E+02,.5153E+02,.4562E+02,.4689E+02,.5083E+02,
-     A .5478E+02,.5342E+02,.5475E+02,.5873E+02,.5246E+02,.3948E+02,
-     A .3758E+02,.4209E+02,.4795E+02,.5289E+02,.5080E+02,.4838E+02,
-     A .4280E+02,.4018E+02,.3560E+02,.3447E+02,.3281E+02,.3426E+02,
-     A .3572E+02,.3500E+02,.3364E+02,.3323E+02,.3290E+02,.3170E+02,
-     A .3104E+02,.3162E+02,.3147E+02,.3298E+02,.3403E+02,.3519E+02,
-     A .3733E+02,.3846E+02,.3748E+02,.3492E+02,.3738E+02,.4067E+02,
-     A .3797E+02,.3668E+02,.3967E+02,.4467E+02,.4643E+02,.4678E+02,
-     A .4765E+02,.4880E+02,.4791E+02,.4603E+02,.4946E+02,.5925E+02,
-     A .6368E+02,.6616E+02,.6667E+02,.5919E+02,.5033E+02,.5166E+02,
-     A .5482E+02,.6662E+02,.6907E+02,.6237E+02,.5087E+02,.3983E+02,
-     A .3830E+02,.4658E+02,.5374E+02,.5573E+02,.4894E+02,.4377E+02,
-     A .4255E+02,.4408E+02,.4795E+02,.4963E+02,.5068E+02,.5247E+02,
-     A .5451E+02,.5323E+02,.5268E+02,.5521E+02,.6284E+02,.6423E+02,
-     A .5730E+02,.4531E+02,.3313E+02,.3176E+02,.3321E+02,.3743E+02,
-     A .4125E+02,.4120E+02,.4004E+02,.4094E+02,.4860E+02,.5302E+02,
-     A .5165E+02,.4631E+02,.4284E+02,.4975E+02,.5755E+02,.6434E+02,
-     A .7432E+02,.8220E+02,.7850E+02,.7698E+02,.6929E+02,.6490E+02,
-     A .5521E+02,.5595E+02,.5058E+02,.4424E+02,.4066E+02,.3579E+02,
-     A .3448E+02,.3508E+02,.3577E+02,.3521E+02,.3513E+02,.4367E+02,
-     A .5348E+02,.6757E+02,.6996E+02,.6480E+02,.5648E+02,.5538E+02,
-     A .5537E+02,.5874E+02,.6225E+02,.5468E+02,.4673E+02,.3766E+02,
-     A .3574E+02,.4032E+02,.4137E+02,.4864E+02,.6411E+02,.8043E+02,
-     A .8713E+02,.8609E+02,.7458E+02,.5667E+02,.4339E+02,.3768E+02,
-     A .3731E+02,.4008E+02,.4179E+02,.4769E+02,.5530E+02,.6155E+02,
-     A .6202E+02,.5813E+02,.5416E+02,.4698E+02,.3927E+02,.3750E+02,
-     A .3586E+02,.3369E+02,.3955E+02,.4632E+02,.4940E+02,.5429E+02,
-     A .6164E+02,.6440E+02,.5854E+02,.4549E+02,.3306E+02,.2793E+02,
-     A .2776E+02,.3046E+02,.3663E+02,.4120E+02,.4477E+02,.4725E+02,
-     A .5222E+02,.5324E+02,.4725E+02,.3981E+02,.2743E+02,.2379E+02,
-     A .2589E+02,.2979E+02,.3105E+02,.3249E+02,.3622E+02,.3782E+02,
-     A .3559E+02,.2891E+02,.3002E+02,.3308E+02,.4599E+02,.5355E+02,
-     A .5477E+02,.5430E+02,.5589E+02,.6123E+02,.6625E+02,.6717E+02,
-     A .6595E+02,.5709E+02,.4902E+02,.4539E+02,.4879E+02,.6297E+02,
-     A .6814E+02,.6781E+02,.6669E+02,.6518E+02,.5525E+02,.4140E+02,
-     A .3508E+02,.3039E+02,.3306E+02,.4200E+02,.4561E+02,.4797E+02,
-     A .5603E+02,.6438E+02,.6244E+02,.5214E+02,.4195E+02,.3867E+02,
-     A .4161E+02,.4549E+02,.4300E+02,.4015E+02,.4248E+02,.4433E+02,
-     A .4639E+02,.5067E+02,.5604E+02,.5819E+02,.5765E+02,.6292E+02,
-     A .6953E+02,.7197E+02,.6601E+02,.4988E+02,.3598E+02,.3511E+02,
-     A .3887E+02,.4188E+02,.4655E+02,.5357E+02,.5923E+02,.6884E+02,
-     A .6639E+02,.6062E+02,.5043E+02,.4219E+02,.3940E+02,.4034E+02,
-     A .3860E+02,.3363E+02,.2629E+02,.2370E+02,.2254E+02,.2409E+02,
-     A .2764E+02,.3359E+02,.3857E+02,.4353E+02,.5165E+02,.5641E+02,
-     A .5655E+02,.5542E+02,.4922E+02,.3734E+02,.3035E+02,.2953E+02,
-     A .3739E+02,.5329E+02,.6187E+02,.6522E+02,.6034E+02,.5708E+02,
-     A .5840E+02,.5878E+02,.5558E+02,.4813E+02,.4009E+02,.3277E+02,
-     A .2517E+02,.2509E+02,.3256E+02,.3900E+02,.4520E+02,.4840E+02,
-     A .4277E+02,.3623E+02,.3306E+02,.3733E+02,.4906E+02,.5318E+02,
-     A .5342E+02,.5017E+02,.4932E+02,.4956E+02,.4942E+02,.4270E+02,
-     A .2958E+02,.2618E+02,.3064E+02,.3467E+02,.3328E+02,.3320E+02,
-     A .3776E+02,.4525E+02,.5103E+02,.4929E+02,.4906E+02,.4243E+02,
-     A .3275E+02,.2694E+02,.3302E+02,.3736E+02,.4220E+02,.4052E+02,
-     A .3828E+02,.4176E+02,.4893E+02,.5442E+02,.5660E+02,.5757E+02,
-     A .6159E+02,.6287E+02,.6165E+02,.6327E+02,.6919E+02,.7013E+02,
-     A .6900E+02,.7203E+02,.7462E+02,.7695E+02,.8121E+02,.8453E+02,
-     A .8394E+02,.7299E+02,.6376E+02,.6243E+02,.6164E+02,.6343E+02,
-     A .6803E+02,.7547E+02,.8241E+02,.8973E+02,.8435E+02,.7442E+02,
-     A .7017E+02,.6517E+02,.6824E+02,.7542E+02,.7758E+02,.7907E+02,
-     A .7606E+02,.6735E+02,.6221E+02,.6078E+02,.6516E+02,.6919E+02,
-     A .6534E+02,.5371E+02,.5308E+02,.5814E+02,.6076E+02,.6406E+02,
-     A .7192E+02,.7439E+02,.6681E+02,.6334E+02,.5602E+02,.5864E+02,
-     A .6658E+02,.7258E+02,.7678E+02,.7883E+02,.7827E+02,.7369E+02,
-     A .6655E+02,.6194E+02,.6367E+02,.6500E+02,.6552E+02,.6271E+02,
-     A .6004E+02,.5518E+02,.5323E+02,.4977E+02,.5042E+02,.5478E+02,
-     A .5593E+02,.5263E+02,.5011E+02,.4819E+02,.4746E+02,.4551E+02,
-     A .4649E+02,.4742E+02,.4656E+02,.4662E+02,.4907E+02,.5316E+02,
-     A .5282E+02,.5027E+02,.4809E+02,.5038E+02,.5338E+02,.5700E+02,
-     A .5552E+02,.5094E+02,.5055E+02,.5095E+02,.4990E+02,.4645E+02,
-     A .4501E+02,.4205E+02,.3961E+02,.4030E+02,.4564E+02,.4883E+02,
-     A .5208E+02,.5292E+02,.5167E+02,.5156E+02,.5074E+02,.5211E+02,
-     A .5595E+02,.5737E+02,.5753E+02,.5750E+02,.5635E+02,.5521E+02,
-     A .5540E+02,.5878E+02,.6227E+02,.5458E+02,.5044E+02,.4242E+02,
-     A .4952E+02,.6341E+02,.6597E+02,.6484E+02,.6443E+02,.6304E+02,
-     A .6110E+02,.5983E+02,.5969E+02,.5601E+02,.5225E+02,.4961E+02,
-     A .4345E+02,.4555E+02,.5302E+02,.6125E+02,.5995E+02,.5257E+02,
-     A .4027E+02,.3543E+02,.3001E+02,.3244E+02,.4503E+02,.4755E+02,
-     A .5538E+02,.5621E+02,.5192E+02,.4877E+02,.4323E+02,.3602E+02,
-     A .3515E+02,.3682E+02,.3679E+02,.3442E+02,.3033E+02,.3017E+02,
-     A .3339E+02,.4278E+02,.4992E+02,.5560E+02,.5636E+02,.6028E+02,
-     A .6771E+02,.7413E+02,.7496E+02,.6884E+02,.6441E+02,.6748E+02,
-     A .7059E+02,.7001E+02,.6774E+02,.7046E+02,.7444E+02,.7735E+02,
-     A .7051E+02,.5140E+02,.4618E+02,.5086E+02,.6004E+02,.6514E+02,
-     A .6768E+02,.6980E+02,.7199E+02,.6471E+02,.5804E+02,.4960E+02,
-     A .4310E+02,.3771E+02,.4229E+02,.5056E+02,.6145E+02,.6706E+02,
-     A .6950E+02,.6877E+02,.6482E+02,.5381E+02,.5229E+02,.5433E+02,
-     A .5501E+02,.5338E+02,.4846E+02,.4438E+02,.3924E+02,.3891E+02,
-     A .3912E+02,.3588E+02,.3428E+02,.3697E+02,.4037E+02,.4044E+02,
-     A .3989E+02,.3934E+02,.4013E+02,.4673E+02,.5147E+02,.5319E+02,
-     A .5001E+02,.4500E+02,.4026E+02,.3685E+02,.3536E+02,.3572E+02,
-     A .3671E+02,.4036E+02,.4587E+02,.4910E+02,.5003E+02,.4837E+02,
-     A .4227E+02,.3648E+02,.3433E+02,.3269E+02,.3417E+02,.4412E+02,
-     A .5043E+02,.5908E+02,.6269E+02,.6077E+02,.5835E+02,.5733E+02,
-     A .5702E+02,.5623E+02,.5729E+02,.5607E+02,.5317E+02,.5058E+02,
-     A .5161E+02,.5324E+02,.5584E+02,.5867E+02,.5473E+02,.5377E+02,
-     A .5748E+02,.6353E+02,.5885E+02,.5407E+02,.5380E+02,.5782E+02,
-     A .6113E+02,.6742E+02,.6993E+02,.6832E+02,.6529E+02,.6284E+02,
-     A .6124E+02,.5712E+02,.5451E+02,.5886E+02,.6178E+02,.6190E+02,
-     A .5583E+02,.5012E+02,.4821E+02,.5230E+02,.6253E+02,.7651E+02,
-     A .8560E+02,.9392E+02,.9243E+02,.7992E+02,.8516E+02,.9309E+02,
-     A .9752E+02,.8947E+02,.8220E+02,.8345E+02,.8601E+02,.8143E+02,
-     A .7935E+02,.8424E+02,.9403E+02,.1052E+03,.1058E+03,.9903E+02,
-     A .9685E+02,.9574E+02,.8828E+02,.7864E+02,.7098E+02,.6508E+02,
-     A .6887E+02,.7736E+02,.8624E+02,.9606E+02,.1132E+03,.1284E+03,
-     A .1283E+03,.1224E+03,.1185E+03,.1201E+03,.1195E+03,.1226E+03,
-     A .1352E+03,.1426E+03,.1413E+03,.1331E+03,.1319E+03,.1367E+03,
-     A .1364E+03,.1428E+03,.1550E+03,.1503E+03,.1336E+03,.1089E+03,
-     A .8521E+02,.6881E+02,.7376E+02,.8922E+02,.1028E+03,.1187E+03,
-     A .1345E+03,.1390E+03,.1488E+03,.1595E+03,.1689E+03,.1772E+03,
-     A .1953E+03,.1820E+03,.1290E+03,.1137E+03,.1244E+03,.1320E+03,
-     A .1081E+03,.8765E+02,.7623E+02,.6129E+02,.7103E+02,.9396E+02,
-     A .1110E+03,.1180E+03,.1340E+03,.1676E+03,.1864E+03,.1947E+03,
-     A .1613E+03,.1362E+03,.1154E+03,.1160E+03,.1255E+03,.1104E+03,
-     A .9631E+02,.7680E+02,.9063E+02,.1160E+03,.1255E+03,.1218E+03,
-     A .1142E+03,.1031E+03,.8989E+02,.7208E+02,.5276E+02,.4122E+02,
-     A .4110E+02,.4725E+02,.6363E+02,.9057E+02,.1119E+03,.1218E+03,
-     A .1272E+03,.1268E+03,.1223E+03,.1155E+03,.1121E+03,.1002E+03,
-     A .8104E+02,.7191E+02,.6451E+02,.5719E+02,.6288E+02,.7703E+02,
-     A .8859E+02,.9974E+02,.1057E+03,.1081E+03,.1067E+03,.8739E+02,
-     A .6538E+02,.5545E+02,.5773E+02,.6674E+02,.6894E+02,.6506E+02,
-     A .6918E+02,.9121E+02,.1164E+03,.1268E+03,.1243E+03,.1155E+03,
-     A .9024E+02,.7794E+02,.8261E+02,.1005E+03,.1284E+03,.1340E+03,
-     A .1263E+03,.1156E+03,.1102E+03,.1122E+03,.1306E+03,.1383E+03,
-     A .1355E+03,.1388E+03,.1412E+03,.1292E+03,.1035E+03,.8556E+02,
-     A .9319E+02,.1057E+03,.1086E+03,.9213E+02,.8300E+02,.8730E+02,
-     A .9729E+02,.9734E+02,.8167E+02,.6837E+02,.6072E+02,.6770E+02,
-     A .8646E+02,.1059E+03,.1277E+03,.1500E+03,.1760E+03,.1785E+03,
-     A .1759E+03,.1803E+03,.2094E+03,.2221E+03,.2381E+03,.2723E+03,
-     A .2986E+03,.2988E+03,.2852E+03,.2571E+03,.2408E+03,.2352E+03,
-     A .2329E+03,.2506E+03,.3148E+03,.3534E+03,.3528E+03,.3357E+03,
-     A .2920E+03,.2688E+03,.2634E+03,.2453E+03,.2373E+03,.2367E+03,
-     A .2311E+03,.2104E+03,.1877E+03,.1808E+03,.2010E+03,.2154E+03,
-     A .2209E+03,.2191E+03,.2216E+03,.2287E+03,.2396E+03,.2565E+03,
-     A .2570E+03,.2573E+03,.2922E+03,.3301E+03,.3230E+03,.2914E+03,
-     A .2757E+03,.2944E+03,.3014E+03,.2868E+03,.2670E+03,.2610E+03,
-     A .2897E+03,.3009E+03,.2960E+03,.2820E+03,.2447E+03,.2307E+03,
-     A .2440E+03,.2557E+03,.2231E+03,.2066E+03,.2201E+03,.2690E+03,
-     A .2880E+03,.2566E+03,.2120E+03,.2117E+03,.2651E+03,.2898E+03,
-     A .2636E+03,.2510E+03,.2229E+03,.2351E+03,.2778E+03,.3029E+03,
-     A .2928E+03,.2026E+03,.1805E+03,.2013E+03,.2139E+03,.3016E+03,
-     A .3203E+03,.3282E+03,.3214E+03,.3088E+03,.2970E+03,.2753E+03,
-     A .2466E+03,.2364E+03,.2119E+03,.2069E+03,.2129E+03,.2331E+03,
-     A .2505E+03,.2632E+03,.2717E+03,.2726E+03,.2665E+03,.2596E+03,
-     A .2513E+03,.2461E+03,.2379E+03,.2468E+03,.2601E+03,.2760E+03,
-     A .2807E+03,.2791E+03,.2735E+03,.2539E+03,.2399E+03,.2272E+03,
-     A .2131E+03,.2041E+03,.2141E+03,.2305E+03,.2468E+03,.2581E+03,
-     A .2603E+03,.2611E+03,.2686E+03,.2814E+03,.2629E+03,.2089E+03,
-     A .1796E+03,.1851E+03,.2112E+03,.2460E+03,.2523E+03,.2347E+03,
-     A .2260E+03,.2323E+03,.2990E+03,.3365E+03,.3458E+03,.3047E+03,
-     A .2585E+03,.2496E+03,.2761E+03,.2997E+03,.3008E+03,.2953E+03,
-     A .3116E+03,.3484E+03,.3202E+03,.2681E+03,.2490E+03,.2461E+03,
-     A .2653E+03,.2651E+03,.2546E+03,.2468E+03,.2646E+03,.2738E+03,
-     A .2693E+03,.2623E+03,.2478E+03,.2731E+03,.2901E+03,.3255E+03,
-     A .3047E+03,.2247E+03,.1904E+03,.1860E+03,.2101E+03,.2524E+03,
-     A .2579E+03,.2650E+03,.2469E+03,.2045E+03,.1554E+03,.1262E+03,
-     A .1129E+03,.1255E+03,.1279E+03,.1391E+03,.1547E+03,.2003E+03,
-     A .2133E+03,.2149E+03,.1968E+03,.1785E+03,.1853E+03,.1947E+03,
-     A .2083E+03,.2180E+03,.2115E+03,.2023E+03,.1866E+03,.1985E+03,
-     A .2574E+03,.2786E+03,.3316E+03,.3308E+03,.2793E+03,.2491E+03,
-     A .2562E+03,.2663E+03,.2592E+03,.2297E+03,.1883E+03,.1811E+03,
-     A .1957E+03,.2094E+03,.2107E+03,.2075E+03,.1830E+03,.1439E+03,
-     A .1243E+03,.1481E+03,.1778E+03,.1591E+03,.1322E+03,.1180E+03,
-     A .1406E+03,.1647E+03,.1621E+03,.1479E+03,.1171E+03,.9899E+02,
-     A .9858E+02,.1044E+03,.1293E+03,.1640E+03,.1847E+03,.1704E+03,
-     A .1180E+03,.1055E+03,.1144E+03,.1421E+03,.1529E+03,.1247E+03,
-     A .9368E+02,.8662E+02,.1060E+03,.1468E+03,.1947E+03,.2245E+03,
-     A .2408E+03,.2370E+03,.2119E+03,.1921E+03,.1745E+03,.1543E+03,
-     A .1216E+03,.1040E+03,.1084E+03,.1468E+03,.1973E+03,.2502E+03,
-     A .2912E+03,.3203E+03,.2862E+03,.2654E+03,.2652E+03,.2686E+03,
-     A .2364E+03,.2010E+03,.1795E+03,.2009E+03,.2451E+03,.2685E+03,
-     A .2832E+03,.3107E+03,.3159E+03,.2935E+03,.2627E+03,.2498E+03,
-     A .2486E+03,.2430E+03,.2303E+03,.2202E+03,.2219E+03,.2522E+03,
-     A .2793E+03,.2912E+03,.2890E+03,.2622E+03,.2407E+03,.2528E+03,
-     A .2887E+03,.3035E+03,.2929E+03,.2784E+03,.2629E+03,.2466E+03,
-     A .2262E+03,.2201E+03,.2261E+03,.2098E+03,.1788E+03,.1741E+03,
-     A .1723E+03,.1702E+03,.1689E+03,.1708E+03,.1726E+03,.1802E+03,
-     A .1840E+03,.1735E+03,.1676E+03,.1679E+03,.1797E+03,.1848E+03,
-     A .1859E+03,.1853E+03,.1827E+03,.1811E+03,.1708E+03,.1490E+03,
-     A .1388E+03,.1351E+03,.1339E+03,.1241E+03,.1161E+03,.1073E+03,
-     A .1016E+03,.1009E+03,.9008E+02,.8593E+02,.7438E+02,.7001E+02,
-     A .6397E+02,.7339E+02,.9721E+02,.1008E+03,.8343E+02,.6165E+02,
-     A .6161E+02,.6489E+02,.7001E+02,.7997E+02,.8649E+02,.8916E+02,
-     A .8558E+02,.7638E+02,.6955E+02,.7610E+02,.8231E+02,.8930E+02,
-     A .7931E+02,.7377E+02,.7451E+02,.8829E+02,.1034E+03,.1114E+03,
-     A .1151E+03,.1249E+03,.1355E+03,.1488E+03,.1561E+03,.1668E+03,
-     A .1777E+03,.1825E+03,.1809E+03,.1781E+03,.1782E+03,.1805E+03,
-     A .1812E+03,.1817E+03,.2038E+03,.2429E+03,.2501E+03,.2740E+03,
-     A .2669E+03,.2599E+03,.2515E+03,.2475E+03,.2512E+03,.2649E+03,
-     A .2752E+03,.2824E+03,.2981E+03,.3102E+03,.3101E+03,.3074E+03,
-     A .2977E+03,.2945E+03,.2908E+03,.3043E+03,.3279E+03,.3524E+03,
-     A .3593E+03,.3177E+03,.2822E+03,.2856E+03,.3011E+03,.3146E+03,
-     A .3180E+03,.3187E+03,.3266E+03,.3354E+03,.3549E+03,.3701E+03,
-     A .3611E+03,.3608E+03,.3566E+03,.3459E+03,.3288E+03,.3338E+03,
-     A .3561E+03,.3453E+03,.3177E+03,.2807E+03,.2436E+03,.2471E+03,
-     A .3227E+03,.3567E+03,.3717E+03,.3684E+03,.3579E+03,.3481E+03,
-     A .3465E+03,.3234E+03,.2884E+03,.2845E+03,.3110E+03,.3401E+03,
-     A .3229E+03,.2623E+03,.2215E+03,.2229E+03,.2786E+03,.3099E+03,
-     A .2802E+03,.2551E+03,.2280E+03,.2166E+03,.1977E+03,.1871E+03,
-     A .1581E+03,.1408E+03,.1264E+03,.1184E+03,.1010E+03,.8693E+02,
-     A .6969E+02,.5835E+02,.4953E+02,.5788E+02,.7748E+02,.9271E+02,
-     A .1105E+03,.1311E+03,.1439E+03,.1551E+03,.1696E+03,.1972E+03,
-     A .2220E+03,.2245E+03,.2268E+03,.2583E+03,.3102E+03,.3312E+03,
-     A .3396E+03,.3302E+03,.3368E+03,.3412E+03,.3367E+03,.3324E+03,
-     A .3574E+03,.3717E+03,.3853E+03,.3719E+03,.3629E+03,.3785E+03,
-     A .3807E+03,.3544E+03,.3165E+03,.3145E+03,.3123E+03,.3012E+03,
-     A .3027E+03,.3476E+03,.3959E+03,.4310E+03,.4630E+03,.4622E+03,
-     A .4377E+03,.4234E+03,.3810E+03,.3570E+03,.3664E+03,.3860E+03,
-     A .3760E+03,.3404E+03,.3288E+03,.3442E+03,.3752E+03,.3683E+03,
-     A .3390E+03,.3011E+03,.2630E+03,.2412E+03,.2094E+03,.1604E+03,
-     A .1367E+03,.1292E+03,.1784E+03,.2215E+03,.2630E+03,.3218E+03,
-     A .4017E+03,.4283E+03,.4560E+03,.4417E+03,.4267E+03,.4171E+03,
-     A .4118E+03,.4063E+03,.4180E+03,.4244E+03,.4129E+03,.4055E+03,
-     A .4173E+03,.4150E+03,.4141E+03,.4236E+03,.4266E+03,.4265E+03,
-     A .4247E+03,.4262E+03,.4420E+03,.4698E+03,.5109E+03,.5446E+03,
-     A .5536E+03,.5450E+03,.5460E+03,.5374E+03,.5371E+03,.5589E+03,
-     A .6109E+03,.6543E+03,.6931E+03,.6761E+03,.6239E+03,.5735E+03,
-     A .5718E+03,.6440E+03,.6836E+03,.6945E+03,.6932E+03,.6820E+03,
-     A .6635E+03,.6362E+03,.6091E+03,.6119E+03,.5980E+03,.5902E+03,
-     A .5739E+03,.5765E+03,.5831E+03,.5918E+03,.5841E+03,.5800E+03,
-     A .5935E+03,.6028E+03,.6370E+03,.7088E+03,.7283E+03,.6645E+03,
-     A .6002E+03,.5658E+03,.5320E+03,.5516E+03,.5667E+03,.5878E+03,
-     A .5576E+03,.5266E+03,.5228E+03,.5693E+03,.5919E+03,.5948E+03,
-     A .5821E+03,.5829E+03,.6027E+03,.6011E+03,.5931E+03,.5665E+03,
-     A .4992E+03,.4823E+03,.4962E+03,.5076E+03,.4796E+03,.4408E+03,
-     A .4419E+03,.4591E+03,.5053E+03,.4928E+03,.4255E+03,.3932E+03,
-     A .4395E+03,.6074E+03,.6589E+03,.6638E+03,.6531E+03,.6821E+03,
-     A .6699E+03,.6407E+03,.5983E+03,.6037E+03,.6557E+03,.6883E+03,
-     A .6982E+03,.5994E+03,.4302E+03,.3431E+03,.3516E+03,.4227E+03,
-     A .4759E+03,.4804E+03,.4784E+03,.5302E+03,.5575E+03,.5203E+03,
-     A .4724E+03,.4823E+03,.6050E+03,.6422E+03,.6193E+03,.5562E+03,
-     A .5131E+03,.5186E+03,.5709E+03,.6615E+03,.6829E+03,.5779E+03,
-     A .4601E+03,.3460E+03,.3070E+03,.3481E+03,.3948E+03,.4546E+03,
-     A .5415E+03,.6070E+03,.6480E+03,.6789E+03,.6944E+03,.6719E+03,
-     A .5511E+03,.4434E+03,.4566E+03,.5951E+03,.6437E+03,.6513E+03,
-     A .5979E+03,.5002E+03,.4904E+03,.5248E+03,.6584E+03,.6877E+03,
-     A .6532E+03,.5960E+03,.5563E+03,.5645E+03,.5870E+03,.6399E+03,
-     A .6858E+03,.7378E+03,.7198E+03,.6762E+03,.5990E+03,.4404E+03,
-     A .3660E+03,.3327E+03,.3107E+03,.2817E+03,.3633E+03,.4463E+03,
-     A .5014E+03,.5012E+03,.3955E+03,.3346E+03,.3179E+03,.4131E+03,
-     A .5371E+03,.5631E+03,.5162E+03,.4162E+03,.3368E+03,.4378E+03,
-     A .5345E+03,.6456E+03,.6557E+03,.6141E+03,.6060E+03,.6855E+03,
-     A .8106E+03,.8338E+03,.7915E+03,.6751E+03,.5880E+03,.5659E+03,
-     A .5569E+03,.5113E+03,.4115E+03,.3679E+03,.4052E+03,.4293E+03,
-     A .3605E+03,.2919E+03,.2888E+03,.3069E+03,.3168E+03,.3545E+03,
-     A .4143E+03,.4364E+03,.4282E+03,.4402E+03,.4881E+03,.5396E+03,
-     A .5977E+03,.6790E+03,.7260E+03,.7113E+03,.6773E+03,.6046E+03,
-     A .5762E+03,.5757E+03,.5665E+03,.4365E+03,.3412E+03,.3105E+03,
-     A .3744E+03,.5318E+03,.6173E+03,.6478E+03,.6810E+03,.7001E+03,
-     A .6205E+03,.5251E+03,.4172E+03,.3286E+03,.2879E+03,.2836E+03,
-     A .2931E+03,.3257E+03,.3107E+03,.2909E+03,.2918E+03,.4177E+03,
-     A .5294E+03,.5869E+03,.5987E+03,.5936E+03,.4916E+03,.4515E+03,
-     A .3964E+03,.3660E+03,.3545E+03,.3858E+03,.4276E+03,.4724E+03,
-     A .5786E+03,.6383E+03,.5885E+03,.5199E+03,.5041E+03,.5760E+03,
-     A .5958E+03,.5880E+03,.5798E+03,.5738E+03,.5769E+03,.5688E+03,
-     A .5602E+03,.5031E+03,.4645E+03,.4098E+03,.3871E+03,.3596E+03,
-     A .3395E+03,.2891E+03,.2240E+03,.1755E+03,.2960E+03,.3169E+03,
-     A .5179E+03,.6025E+03,.6408E+03,.6164E+03,.5608E+03,.5126E+03,
-     A .4503E+03,.3964E+03,.4582E+03,.5913E+03,.7519E+03,.8129E+03,
-     A .8330E+03,.7430E+03,.6791E+03,.6367E+03,.6280E+03,.6052E+03,
-     A .5913E+03,.6721E+03,.7162E+03,.7974E+03,.8081E+03,.7616E+03,
-     A .7480E+03,.7709E+03,.7931E+03,.7986E+03,.7621E+03,.5723E+03,
-     A .4194E+03,.4217E+03,.4380E+03,.5779E+03,.6705E+03,.6461E+03,
-     A .6250E+03,.6052E+03,.5210E+03,.4966E+03,.5534E+03,.5330E+03,
-     A .6664E+03,.7387E+03,.7518E+03,.7425E+03,.7586E+03,.7465E+03,
-     A .7544E+03,.5987E+03,.4935E+03,.4320E+03,.4723E+03,.5859E+03,
-     A .7036E+03,.7289E+03,.6667E+03,.6448E+03,.7237E+03,.8742E+03,
-     A .8306E+03,.8642E+03,.7996E+03,.5934E+03,.5643E+03,.6223E+03,
-     A .6363E+03,.6681E+03,.6655E+03,.5398E+03,.3972E+03,.3480E+03,
-     A .3338E+03,.3492E+03,.3822E+03,.4433E+03,.6129E+03,.6784E+03,
-     A .7147E+03,.7505E+03,.7413E+03,.7151E+03,.6960E+03,.5862E+03,
-     A .5345E+03,.5748E+03,.6135E+03,.6146E+03,.4967E+03,.4543E+03,
-     A .4170E+03,.4616E+03,.5525E+03,.6434E+03,.7115E+03,.7460E+03,
-     A .7447E+03,.7263E+03,.7271E+03,.6417E+03,.6404E+03,.6708E+03,
-     A .6909E+03,.7060E+03,.7113E+03,.6082E+03,.5593E+03,.5268E+03,
-     A .6264E+03,.7289E+03,.7337E+03,.6894E+03,.6315E+03,.6599E+03,
-     A .7494E+03,.7740E+03,.7442E+03,.7021E+03,.5904E+03,.5391E+03,
-     A .5278E+03,.5444E+03,.5904E+03,.5840E+03,.7286E+03,.8250E+03,
-     A .8448E+03,.8154E+03,.8040E+03,.6977E+03,.6107E+03,.5828E+03,
-     A .5830E+03,.6268E+03,.6576E+03,.6275E+03,.5976E+03,.5535E+03,
-     A .4920E+03,.4653E+03,.4531E+03,.3950E+03,.3828E+03,.3920E+03,
-     A .5111E+03,.6473E+03,.6747E+03,.5894E+03,.5554E+03,.4616E+03,
-     A .4274E+03,.5223E+03,.5915E+03,.6119E+03,.5349E+03,.3989E+03,
-     A .3112E+03,.2902E+03,.3153E+03,.3540E+03,.4488E+03,.5404E+03,
-     A .6738E+03,.7725E+03,.7880E+03,.7711E+03,.7502E+03,.7316E+03,
-     A .7665E+03,.7769E+03,.8233E+03,.8616E+03,.9103E+03,.9126E+03,
-     A .9008E+03,.8157E+03,.7629E+03,.7268E+03,.7633E+03,.8125E+03,
-     A .8557E+03,.8829E+03,.8895E+03,.8128E+03,.7448E+03,.7520E+03,
-     A .8064E+03,.8276E+03,.7839E+03,.6732E+03,.6465E+03,.6523E+03,
-     A .6398E+03,.6393E+03,.6285E+03,.6094E+03,.6032E+03,.6072E+03,
-     A .6091E+03,.5980E+03,.6196E+03,.6964E+03,.7318E+03,.7963E+03,
-     A .8055E+03,.7412E+03,.6640E+03,.6159E+03,.6359E+03,.6979E+03,
-     A .7349E+03,.7512E+03,.7347E+03,.7268E+03,.7339E+03,.7565E+03,
-     A .7378E+03,.7069E+03,.7003E+03,.7070E+03,.7022E+03,.7016E+03,
-     A .6936E+03,.6711E+03,.6370E+03,.6778E+03,.7311E+03,.7522E+03,
-     A .7298E+03,.7455E+03,.7820E+03,.8210E+03,.8846E+03,.9064E+03,
-     A .8719E+03,.8385E+03,.8145E+03,.8315E+03,.8745E+03,.8675E+03,
-     A .8637E+03,.6584E+03,.5241E+03,.4359E+03,.3730E+03,.3695E+03,
-     A .5342E+03,.6023E+03,.6355E+03,.6615E+03,.6460E+03,.6676E+03,
-     A .6842E+03,.8125E+03,.8391E+03,.8086E+03,.7858E+03,.7482E+03,
-     A .7698E+03,.7606E+03,.7591E+03,.7768E+03,.7840E+03,.7875E+03,
-     A .7475E+03,.7220E+03,.7256E+03,.7274E+03,.6846E+03,.6652E+03,
-     A .5111E+03,.4472E+03,.4358E+03,.4282E+03,.4395E+03,.4757E+03,
-     A .4912E+03,.4901E+03,.4865E+03,.5175E+03,.5718E+03,.6448E+03,
-     A .6933E+03,.7143E+03,.6955E+03,.6528E+03,.5316E+03,.6799E+03,
-     A .6972E+03,.6989E+03,.7470E+03,.7715E+03,.7141E+03,.6800E+03,
-     A .6951E+03,.7639E+03,.8585E+03,.9064E+03,.9505E+03,.9666E+03,
-     A .9467E+03,.9562E+03,.9384E+03,.9085E+03,.8604E+03,.8401E+03,
-     A .8347E+03,.8812E+03,.9446E+03,.9393E+03,.9483E+03,.8606E+03,
-     A .7224E+03,.6490E+03,.5800E+03,.5229E+03,.5281E+03,.5539E+03,
-     A .5470E+03,.5367E+03,.5559E+03,.5954E+03,.6038E+03,.6280E+03,
-     A .6522E+03,.6662E+03,.6912E+03,.7158E+03,.7510E+03,.7378E+03,
-     A .7291E+03,.7514E+03,.7787E+03,.8587E+03,.9643E+03,.9757E+03,
-     A .8688E+03,.7628E+03,.6855E+03,.6427E+03,.5367E+03,.4773E+03,
-     A .5401E+03,.5766E+03,.6606E+03,.7134E+03,.7185E+03,.7217E+03,
-     A .7199E+03,.6906E+03,.6958E+03,.7924E+03,.8242E+03,.9081E+03,
-     A .9575E+03,.8809E+03,.7491E+03,.7630E+03,.8399E+03,.8974E+03,
-     A .8753E+03,.8458E+03,.8754E+03,.8994E+03,.9703E+03,.9845E+03,
-     A .9255E+03,.9060E+03,.9358E+03,.9572E+03,.9616E+03,.9166E+03,
-     A .8395E+03,.7650E+03,.7419E+03,.6974E+03,.7072E+03,.6443E+03,
-     A .6039E+03,.5974E+03,.5925E+03,.6025E+03,.6138E+03,.5632E+03,
-     A .5601E+03,.6134E+03,.6927E+03,.7540E+03,.7609E+03,.7311E+03,
-     A .6956E+03,.7505E+03,.8491E+03,.9217E+03,.8997E+03,.8708E+03,
-     A .8603E+03,.9111E+03,.8653E+03,.7610E+03,.6794E+03,.6575E+03,
-     A .6909E+03,.8178E+03,.8486E+03,.8311E+03,.7478E+03,.6404E+03,
-     A .6167E+03,.6373E+03,.6508E+03,.6122E+03,.5734E+03,.5556E+03,
-     A .5442E+03,.5457E+03,.6071E+03,.6183E+03,.7068E+03,.7885E+03,
-     A .8002E+03,.8018E+03,.7580E+03,.6847E+03,.5937E+03,.6012E+03,
-     A .6348E+03,.6942E+03,.6544E+03,.6185E+03,.6570E+03,.7563E+03,
-     A .7954E+03,.8078E+03,.7138E+03,.6984E+03,.8442E+03,.8943E+03,
-     A .9037E+03,.8434E+03,.8180E+03,.8088E+03,.7876E+03,.7903E+03,
-     A .7766E+03,.8367E+03,.8710E+03,.9011E+03,.9282E+03,.8693E+03,
-     A .8438E+03,.7417E+03,.7017E+03,.7183E+03,.7443E+03,.7698E+03,
-     A .7732E+03,.7647E+03,.7737E+03,.8087E+03,.8347E+03,.8425E+03,
-     A .8357E+03,.8265E+03,.8055E+03,.9406E+03,.1005E+04,.1082E+04,
-     A .1055E+04,.1029E+04,.9936E+03,.9878E+03,.9994E+03,.1080E+04,
-     A .1110E+04,.1111E+04,.1104E+04,.1052E+04,.1050E+04,.1007E+04,
-     A .1011E+04,.1057E+04,.1070E+04,.1017E+04,.9238E+03,.8702E+03,
-     A .8732E+03,.9255E+03,.9877E+03,.1085E+04,.1093E+04,.1073E+04,
-     A .1080E+04,.1073E+04,.1065E+04,.1040E+04,.1017E+04,.9685E+03,
-     A .8825E+03,.8864E+03,.9564E+03,.9962E+03,.1055E+04,.1013E+04,
-     A .1014E+04,.1035E+04,.1076E+04,.1055E+04,.1012E+04,.9393E+03,
-     A .9481E+03,.9591E+03,.9959E+03,.9750E+03,.9384E+03,.9181E+03,
-     A .9285E+03,.9690E+03,.1004E+04,.9723E+03,.9537E+03,.9061E+03,
-     A .9495E+03,.9849E+03,.1010E+04,.1021E+04,.9360E+03,.9111E+03,
-     A .8382E+03,.7967E+03,.7368E+03,.7951E+03,.8579E+03,.9216E+03,
-     A .1010E+04,.1105E+04,.1159E+04,.1140E+04,.1106E+04,.1080E+04,
-     A .1066E+04,.1086E+04,.1114E+04,.1186E+04,.1196E+04,.1190E+04,
-     A .1130E+04,.1106E+04,.1129E+04,.1144E+04,.1164E+04,.1153E+04,
-     A .1126E+04,.1101E+04,.1113E+04,.1192E+04,.1303E+04,.1343E+04,
-     A .1280E+04,.1184E+04,.1061E+04,.9664E+03,.9691E+03,.1039E+04,
-     A .1087E+04,.1007E+04,.1005E+04,.8930E+03,.7938E+03,.7762E+03,
-     A .8475E+03,.9245E+03,.1023E+04,.1060E+04,.1073E+04,.1084E+04,
-     A .1061E+04,.1049E+04,.1064E+04,.1064E+04,.1037E+04,.9907E+03,
-     A .9871E+03,.9564E+03,.9282E+03,.8761E+03,.8760E+03,.9163E+03,
-     A .1002E+04,.1058E+04,.1065E+04,.1073E+04,.1093E+04,.1089E+04,
-     A .1093E+04,.1066E+04,.1032E+04,.1025E+04,.1005E+04,.1035E+04,
-     A .9213E+03,.8364E+03,.7921E+03,.7941E+03,.8952E+03,.9676E+03,
-     A .1072E+04,.1102E+04,.1130E+04,.1054E+04,.9987E+03,.9781E+03,
-     A .9965E+03,.9521E+03,.9051E+03,.8625E+03,.8725E+03,.9932E+03,
-     A .1055E+04,.1082E+04,.1027E+04,.1024E+04,.1059E+04,.1090E+04,
-     A .1018E+04,.9326E+03,.8855E+03,.8027E+03,.7631E+03,.7400E+03,
-     A .7991E+03,.8355E+03,.9292E+03,.9910E+03,.1004E+04,.9533E+03,
-     A .9775E+03,.9746E+03,.9982E+03,.9633E+03,.9481E+03,.9044E+03,
-     A .1018E+04,.1070E+04,.1103E+04,.1098E+04,.1094E+04,.1102E+04,
-     A .1116E+04,.1091E+04,.1076E+04,.1059E+04,.1043E+04,.8910E+03,
-     A .7495E+03,.6864E+03,.7627E+03,.8717E+03,.1069E+04,.1102E+04,
-     A .1111E+04,.1105E+04,.1089E+04,.1035E+04,.1018E+04,.1042E+04,
-     A .1109E+04,.1175E+04,.1153E+04,.1148E+04,.1120E+04,.1081E+04,
-     A .1016E+04,.8497E+03,.6928E+03,.5711E+03,.5098E+03,.4860E+03,
-     A .4643E+03,.5135E+03,.6580E+03,.7003E+03,.8984E+03,.9819E+03,
-     A .1023E+04,.1043E+04,.1104E+04,.1069E+04,.9964E+03,.9353E+03,
-     A .8974E+03,.8080E+03,.7741E+03,.7656E+03,.7056E+03,.6721E+03,
-     A .7047E+03,.7429E+03,.7588E+03,.7260E+03,.6942E+03,.6899E+03,
-     A .7160E+03,.8145E+03,.8865E+03,.8933E+03,.9954E+03,.1094E+04,
-     A .1152E+04,.1154E+04,.1145E+04,.1135E+04,.1045E+04,.9241E+03,
-     A .8769E+03,.7815E+03,.6515E+03,.6408E+03,.6814E+03,.8950E+03,
-     A .1011E+04,.1010E+04,.9785E+03,.9158E+03,.9287E+03,.9662E+03,
-     A .1035E+04,.1054E+04,.1097E+04,.1154E+04,.1112E+04,.1070E+04,
-     A .8917E+03,.9006E+03,.1040E+04,.1118E+04,.1170E+04,.1094E+04,
-     A .9832E+03,.9500E+03,.8107E+03,.7553E+03,.7099E+03,.7316E+03,
-     A .8256E+03,.9218E+03,.9631E+03,.1002E+04,.1021E+04,.1050E+04,
-     A .1088E+04,.1111E+04,.1121E+04,.1138E+04,.1143E+04,.1126E+04,
-     A .1223E+04,.1291E+04,.1248E+04,.1077E+04,.1083E+04,.1060E+04,
-     A .1073E+04,.1080E+04,.1029E+04,.1007E+04,.1007E+04,.1007E+04,
-     A .1047E+04,.1024E+04,.9110E+03,.8848E+03,.9219E+03,.9529E+03,
-     A .9492E+03,.9338E+03,.9503E+03,.1011E+04,.1090E+04,.1117E+04,
-     A .1052E+04,.1057E+04,.8313E+03,.8326E+03,.7518E+03,.6958E+03,
-     A .7294E+03,.8314E+03,.8769E+03,.1007E+04,.1006E+04,.9759E+03,
-     A .9818E+03,.1022E+04,.1126E+04,.1183E+04,.1205E+04,.1192E+04,
-     A .1133E+04,.1102E+04,.1097E+04,.9892E+03,.9002E+03,.8646E+03,
-     A .8604E+03,.9113E+03,.1048E+04,.1093E+04,.1088E+04,.1038E+04,
-     A .9117E+03,.9311E+03,.9963E+03,.1003E+04,.1121E+04,.1226E+04,
-     A .1273E+04,.1244E+04,.1213E+04,.1107E+04,.1043E+04,.9732E+03,
-     A .9228E+03,.8196E+03,.8918E+03,.1011E+04,.1168E+04,.1187E+04,
-     A .1132E+04,.1067E+04,.9934E+03,.9234E+03,.9294E+03,.9616E+03,
-     A .9753E+03,.8413E+03,.7828E+03,.6104E+03,.4720E+03,.5256E+03,
-     A .5850E+03,.6583E+03,.6704E+03,.6415E+03,.6686E+03,.7419E+03,
-     A .7797E+03,.8460E+03,.8015E+03,.7803E+03,.8138E+03,.9126E+03,
-     A .9742E+03,.9839E+03,.9962E+03,.1010E+04,.1091E+04,.1169E+04,
-     A .1206E+04,.1096E+04,.1006E+04,.8781E+03,.8375E+03,.8681E+03,
-     A .1036E+04,.1168E+04,.1197E+04,.1145E+04,.1050E+04,.1036E+04,
-     A .1010E+04,.1003E+04,.9028E+03,.8341E+03,.8316E+03,.8443E+03,
-     A .8153E+03,.7868E+03,.7700E+03,.7461E+03,.7861E+03,.8809E+03,
-     A .1013E+04,.1041E+04,.1120E+04,.1140E+04,.1075E+04,.1005E+04,
-     A .8238E+03,.8591E+03,.9326E+03,.1055E+04,.1113E+04,.1122E+04,
-     A .1042E+04,.1039E+04,.1131E+04,.1196E+04,.1203E+04,.1161E+04,
-     A .9649E+03,.9205E+03,.9317E+03,.9283E+03,.8868E+03,.8197E+03,
-     A .7285E+03,.6884E+03,.6650E+03,.6830E+03,.7510E+03,.8687E+03,
-     A .9534E+03,.1038E+04,.1066E+04,.1050E+04,.1046E+04,.1028E+04,
-     A .1023E+04,.1038E+04,.1008E+04,.9482E+03,.8673E+03,.8508E+03,
-     A .8652E+03,.9006E+03,.8945E+03,.9018E+03,.9460E+03,.1099E+04,
-     A .1195E+04,.1213E+04,.1103E+04,.1007E+04,.8244E+03,.8003E+03,
-     A .7551E+03,.7137E+03,.8081E+03,.9349E+03,.9077E+03,.8166E+03,
-     A .7817E+03,.9307E+03,.1018E+04,.1047E+04,.9362E+03,.8742E+03,
-     A .8240E+03,.7578E+03,.7125E+03,.7520E+03,.8566E+03,.9949E+03,
-     A .1196E+04,.1216E+04,.1194E+04,.1166E+04,.1146E+04,.1147E+04,
-     A .1132E+04,.1169E+04,.1278E+04,.1323E+04,.1294E+04,.1118E+04,
-     A .1066E+04,.1028E+04,.1026E+04,.1026E+04,.1082E+04,.1149E+04,
-     A .1190E+04,.1183E+04,.1133E+04,.1012E+04,.8714E+03,.9166E+03,
-     A .9888E+03,.1028E+04,.1007E+04,.9780E+03,.8809E+03,.8249E+03,
-     A .7947E+03,.7765E+03,.8229E+03,.9806E+03,.1082E+04,.1146E+04,
-     A .1200E+04,.1277E+04,.1254E+04,.1223E+04,.1184E+04,.1102E+04,
-     A .1037E+04,.9724E+03,.9266E+03,.9205E+03,.9747E+03,.9708E+03,
-     A .9339E+03,.7991E+03,.7295E+03,.7199E+03,.7212E+03,.7020E+03,
-     A .6495E+03,.6804E+03,.8295E+03,.9953E+03,.1091E+04,.1169E+04,
-     A .1148E+04,.1111E+04,.1091E+04,.1131E+04,.1115E+04,.1075E+04,
-     A .9344E+03,.8783E+03,.9406E+03,.1037E+04,.1184E+04,.1221E+04,
-     A .1185E+04,.1148E+04,.1102E+04,.1080E+04,.1064E+04,.1054E+04,
-     A .1092E+04,.1234E+04,.1307E+04,.1319E+04,.1205E+04,.1072E+04,
-     A .1005E+04,.1005E+04,.1043E+04,.1100E+04,.1155E+04,.1208E+04,
-     A .1227E+04,.1219E+04,.1178E+04,.1163E+04,.1188E+04,.1200E+04,
-     A .1140E+04,.1128E+04,.1075E+04,.1142E+04,.1245E+04,.1241E+04,
-     A .1235E+04,.1195E+04,.1161E+04,.1150E+04,.1124E+04,.1070E+04,
-     A .1012E+04,.9741E+03,.9220E+03,.9011E+03,.9871E+03,.1146E+04,
-     A .1136E+04,.1114E+04,.1103E+04,.1082E+04,.1012E+04,.9636E+03,
-     A .1011E+04,.1038E+04,.1060E+04,.1069E+04,.1062E+04,.1104E+04,
-     A .1172E+04,.1250E+04,.1292E+04,.1278E+04,.1167E+04,.9438E+03,
-     A .6831E+03,.5447E+03,.5923E+03,.7113E+03,.8794E+03,.1008E+04,
-     A .9964E+03,.8966E+03,.6964E+03,.5406E+03,.5312E+03,.6215E+03,
-     A .7429E+03,.8141E+03,.8502E+03,.8959E+03,.9533E+03,.9358E+03,
-     A .9399E+03,.9278E+03,.9520E+03,.9788E+03,.1009E+04,.1048E+04,
-     A .1066E+04,.9974E+03,.8694E+03,.8249E+03,.8119E+03,.8154E+03,
-     A .7711E+03,.6182E+03,.4364E+03,.4451E+03,.5049E+03,.6126E+03,
-     A .7555E+03,.8065E+03,.7970E+03,.7189E+03,.5693E+03,.4925E+03,
-     A .5422E+03,.5608E+03,.5946E+03,.6666E+03,.7374E+03,.7900E+03,
-     A .7822E+03,.7897E+03,.8388E+03,.9248E+03,.1097E+04,.1193E+04,
-     A .1169E+04,.1052E+04,.9886E+03,.9445E+03,.1006E+04,.1049E+04,
-     A .1098E+04,.1178E+04,.1225E+04,.1265E+04,.1259E+04,.1198E+04,
-     A .1179E+04,.1149E+04,.1167E+04,.1207E+04,.1315E+04,.1346E+04,
-     A .1351E+04,.1184E+04,.1029E+04,.9685E+03,.9340E+03,.9442E+03,
-     A .9493E+03,.9450E+03,.8985E+03,.8619E+03,.9223E+03,.9927E+03,
-     A .1041E+04,.1023E+04,.8902E+03,.7030E+03,.6237E+03,.6570E+03,
-     A .7418E+03,.8072E+03,.9245E+03,.1038E+04,.1078E+04,.1020E+04,
-     A .9741E+03,.8957E+03,.9290E+03,.1020E+04,.1081E+04,.1160E+04,
-     A .1171E+04,.1123E+04,.1069E+04,.8842E+03,.6725E+03,.5089E+03,
-     A .4872E+03,.6021E+03,.7666E+03,.8928E+03,.8931E+03,.9406E+03,
-     A .1073E+04,.1157E+04,.1116E+04,.1085E+04,.9982E+03,.1029E+04,
-     A .1174E+04,.1196E+04,.1342E+04,.1366E+04,.1389E+04,.1341E+04,
-     A .1308E+04,.1307E+04,.1314E+04,.1264E+04,.1116E+04,.7879E+03,
-     A .6907E+03,.5603E+03,.6743E+03,.8468E+03,.9622E+03,.9752E+03,
-     A .9486E+03,.8859E+03,.9639E+03,.1016E+04,.1059E+04,.1059E+04,
-     A .1050E+04,.1076E+04,.1110E+04,.1189E+04,.1251E+04,.1270E+04,
-     A .1282E+04,.1267E+04,.1265E+04,.1209E+04,.1187E+04,.1107E+04,
-     A .1097E+04,.1067E+04,.1033E+04,.9507E+03,.9430E+03,.9473E+03,
-     A .1033E+04,.1053E+04,.8858E+03,.8575E+03,.7471E+03,.8767E+03,
-     A .9570E+03,.9023E+03,.9218E+03,.1044E+04,.1102E+04,.1106E+04,
-     A .1157E+04,.1299E+04,.1355E+04,.1285E+04,.1289E+04,.1278E+04,
-     A .1263E+04,.1236E+04,.1269E+04,.1340E+04,.1352E+04,.1325E+04,
-     A .1332E+04,.1405E+04,.1437E+04,.1416E+04,.1373E+04,.1365E+04,
-     A .1395E+04,.1396E+04,.1385E+04,.1312E+04,.1252E+04,.1196E+04,
-     A .1179E+04,.1219E+04,.1318E+04,.1350E+04,.1290E+04,.1269E+04,
-     A .1254E+04,.1287E+04,.1313E+04,.1240E+04,.1123E+04,.1072E+04,
-     A .1070E+04,.1153E+04,.1242E+04,.1391E+04,.1437E+04,.1434E+04,
-     A .1357E+04,.1275E+04,.1274E+04,.1286E+04,.1350E+04,.1384E+04,
-     A .1378E+04,.1226E+04,.1179E+04,.1045E+04,.1075E+04,.1137E+04,
-     A .1126E+04,.1060E+04,.9821E+03,.1009E+04,.1064E+04,.1173E+04,
-     A .1187E+04,.1183E+04,.1207E+04,.1287E+04,.1291E+04,.1252E+04,
-     A .1171E+04,.1088E+04,.1079E+04,.1058E+04,.9797E+03,.9062E+03,
-     A .9680E+03,.1029E+04,.1079E+04,.1184E+04,.1263E+04,.1359E+04,
-     A .1448E+04,.1498E+04,.1497E+04,.1422E+04,.1297E+04,.1202E+04,
-     A .1175E+04,.1200E+04,.1275E+04,.1290E+04,.1266E+04,.1264E+04,
-     A .1263E+04,.1291E+04,.1321E+04,.1365E+04,.1439E+04,.1504E+04,
-     A .1509E+04,.1455E+04,.1415E+04,.1375E+04,.1382E+04,.1364E+04,
-     A .1339E+04,.1210E+04,.1060E+04,.9972E+03,.9610E+03,.8558E+03,
-     A .8618E+03,.9548E+03,.9995E+03,.9913E+03,.9767E+03,.9705E+03,
-     A .9276E+03,.9136E+03,.1082E+04,.1208E+04,.1279E+04,.1299E+04,
-     A .1338E+04,.1388E+04,.1483E+04,.1512E+04,.1592E+04,.1596E+04,
-     A .1519E+04,.1441E+04,.1359E+04,.1394E+04,.1429E+04,.1427E+04,
-     A .1320E+04,.1152E+04,.9414E+03,.8051E+03,.6224E+03,.6505E+03,
-     A .7033E+03,.7125E+03,.7098E+03,.7966E+03,.8969E+03,.1104E+04,
-     A .1153E+04,.1268E+04,.1302E+04,.1416E+04,.1418E+04,.1221E+04,
-     A .1045E+04,.9016E+03,.9799E+03,.1184E+04,.1338E+04,.1399E+04,
-     A .1315E+04,.1203E+04,.1135E+04,.1142E+04,.1118E+04,.9892E+03,
-     A .8524E+03,.7399E+03,.6875E+03,.5583E+03,.5063E+03,.5843E+03,
-     A .6212E+03,.6261E+03,.6352E+03,.6809E+03,.7743E+03,.1001E+04,
-     A .1128E+04,.1194E+04,.1224E+04,.1360E+04,.1348E+04,.1343E+04,
-     A .1301E+04,.1112E+04,.9566E+03,.9186E+03,.9318E+03,.9440E+03,
-     A .7892E+03,.7076E+03,.6966E+03,.7813E+03,.9161E+03,.8236E+03,
-     A .7522E+03,.6064E+03,.5095E+03,.5481E+03,.6151E+03,.8432E+03,
-     A .1053E+04,.1184E+04,.1249E+04,.1254E+04,.1252E+04,.1289E+04,
-     A .1374E+04,.1445E+04,.1539E+04,.1559E+04,.1522E+04,.1446E+04,
-     A .1212E+04,.9425E+03,.7658E+03,.7354E+03,.8211E+03,.1008E+04,
-     A .1135E+04,.1178E+04,.1192E+04,.1181E+04,.1221E+04,.1197E+04,
-     A .1064E+04,.9627E+03,.1003E+04,.1121E+04,.1224E+04,.1254E+04,
-     A .1158E+04,.1004E+04,.9442E+03,.9525E+03,.1159E+04,.1161E+04,
-     A .1249E+04,.1242E+04,.1080E+04,.1060E+04,.1084E+04,.1181E+04,
-     A .1325E+04,.1382E+04,.1422E+04,.1431E+04,.1404E+04,.1384E+04,
-     A .1369E+04,.1350E+04,.1358E+04,.1402E+04,.1430E+04,.1415E+04,
-     A .1368E+04,.1370E+04,.1390E+04,.1478E+04,.1565E+04,.1588E+04,
-     A .1556E+04,.1529E+04,.1501E+04,.1504E+04,.1527E+04,.1556E+04,
-     A .1633E+04,.1672E+04,.1569E+04,.1355E+04,.1152E+04,.1120E+04,
-     A .1151E+04,.1168E+04,.1161E+04,.1150E+04,.1093E+04,.1068E+04,
-     A .1066E+04,.1145E+04,.1217E+04,.1316E+04,.1296E+04,.1237E+04,
-     A .1182E+04,.1116E+04,.1051E+04,.9967E+03,.9802E+03,.1006E+04,
-     A .1099E+04,.1106E+04,.1042E+04,.8935E+03,.8225E+03,.8103E+03,
-     A .8386E+03,.9439E+03,.1097E+04,.1239E+04,.1264E+04,.1238E+04,
-     A .1271E+04,.1340E+04,.1404E+04,.1459E+04,.1454E+04,.1422E+04,
-     A .1400E+04,.1386E+04,.1290E+04,.1173E+04,.1098E+04,.1091E+04,
-     A .1225E+04,.1334E+04,.1379E+04,.1410E+04,.1463E+04,.1473E+04,
-     A .1453E+04,.1427E+04,.1369E+04,.1236E+04,.1100E+04,.1057E+04,
-     A .1034E+04,.1007E+04,.9270E+03,.8178E+03,.7721E+03,.9013E+03,
-     A .1046E+04,.1166E+04,.1226E+04,.1203E+04,.1104E+04,.9165E+03,
-     A .7222E+03,.6028E+03,.6667E+03,.7821E+03,.9722E+03,.1156E+04,
-     A .1119E+04,.1087E+04,.9148E+03,.7431E+03,.6894E+03,.6283E+03,
-     A .6077E+03,.6586E+03,.7114E+03,.7116E+03,.7018E+03,.7242E+03,
-     A .7378E+03,.7429E+03,.8136E+03,.9002E+03,.8662E+03,.7804E+03,
-     A .6987E+03,.5854E+03,.6082E+03,.6162E+03,.6120E+03,.6473E+03,
-     A .7198E+03,.8205E+03,.8445E+03,.8589E+03,.8301E+03,.6959E+03,
-     A .6322E+03,.5805E+03,.6415E+03,.6773E+03,.6865E+03,.6290E+03,
-     A .6744E+03,.8807E+03,.1000E+04,.1154E+04,.1151E+04,.1139E+04,
-     A .1173E+04,.1203E+04,.1192E+04,.1165E+04,.1142E+04,.1134E+04,
-     A .1198E+04,.1268E+04,.1316E+04,.1302E+04,.1084E+04,.1013E+04,
-     A .9354E+03,.9204E+03,.1045E+04,.1234E+04,.1306E+04,.1280E+04,
-     A .1205E+04,.1127E+04,.1091E+04,.1072E+04,.1072E+04,.1014E+04,
-     A .9254E+03,.9235E+03,.1033E+04,.1066E+04,.9938E+03,.8652E+03,
-     A .7097E+03,.6158E+03,.5987E+03,.6297E+03,.7898E+03,.9760E+03,
-     A .1119E+04,.1300E+04,.1349E+04,.1327E+04,.1284E+04,.1273E+04,
-     A .1197E+04,.1121E+04,.1157E+04,.1174E+04,.1183E+04,.1150E+04,
-     A .1136E+04,.1135E+04,.1115E+04,.1044E+04,.9334E+03,.8875E+03,
-     A .7909E+03,.7574E+03,.7667E+03,.7839E+03,.8638E+03,.1021E+04,
-     A .1153E+04,.1271E+04,.1356E+04,.1369E+04,.1319E+04,.1317E+04,
-     A .1203E+04,.1028E+04,.8211E+03,.8321E+03,.8714E+03,.1057E+04,
-     A .1128E+04,.1128E+04,.1075E+04,.9737E+03,.8498E+03,.8241E+03,
-     A .8891E+03,.1099E+04,.1291E+04,.1294E+04,.1194E+04,.1011E+04,
-     A .8193E+03,.7686E+03,.8519E+03,.9850E+03,.9389E+03,.8978E+03,
-     A .8636E+03,.9215E+03,.1049E+04,.1170E+04,.1231E+04,.1339E+04,
-     A .1373E+04,.1349E+04,.1325E+04,.1307E+04,.1323E+04,.1282E+04,
-     A .1249E+04,.1174E+04,.1229E+04,.1417E+04,.1482E+04,.1457E+04,
-     A .1361E+04,.1340E+04,.1295E+04,.1228E+04,.1219E+04,.1309E+04,
-     A .1403E+04,.1449E+04,.1345E+04,.1166E+04,.1126E+04,.1152E+04,
-     A .1228E+04,.1200E+04,.1148E+04,.1006E+04,.9786E+03,.1164E+04,
-     A .1207E+04,.1352E+04,.1416E+04,.1452E+04,.1470E+04,.1437E+04,
-     A .1373E+04,.1373E+04,.1401E+04,.1475E+04,.1563E+04,.1535E+04,
-     A .1536E+04,.1450E+04,.1408E+04,.1457E+04,.1474E+04,.1456E+04,
-     A .1377E+04,.1354E+04,.1378E+04,.1404E+04,.1392E+04,.1303E+04,
-     A .1289E+04,.1258E+04,.1165E+04,.1022E+04,.1004E+04,.1050E+04,
-     A .1121E+04,.1120E+04,.1120E+04,.1163E+04,.1276E+04,.1271E+04,
-     A .1217E+04,.1155E+04,.1062E+04,.1037E+04,.9766E+03,.9336E+03,
-     A .7666E+03,.6929E+03,.6690E+03,.6394E+03,.5889E+03,.5242E+03,
-     A .4950E+03,.4691E+03,.4256E+03,.3553E+03,.3031E+03,.2631E+03,
-     A .2516E+03,.2938E+03,.3419E+03,.3898E+03,.4409E+03,.5326E+03,
-     A .6067E+03,.6318E+03,.6838E+03,.7927E+03,.8823E+03,.9404E+03,
-     A .1002E+04,.1014E+04,.1014E+04,.1012E+04,.1054E+04,.1078E+04,
-     A .1025E+04,.9437E+03,.8893E+03,.8983E+03,.1059E+04,.1178E+04,
-     A .1337E+04,.1412E+04,.1356E+04,.1283E+04,.1236E+04,.1225E+04,
-     A .1294E+04,.1396E+04,.1450E+04,.1510E+04,.1532E+04,.1482E+04,
-     A .1416E+04,.1238E+04,.1238E+04,.1333E+04,.1467E+04,.1552E+04,
-     A .1510E+04,.1427E+04,.1327E+04,.1242E+04,.1293E+04,.1347E+04,
-     A .1394E+04,.1449E+04,.1517E+04,.1509E+04,.1458E+04,.1245E+04,
-     A .9816E+03,.8695E+03,.8172E+03,.8490E+03,.8989E+03,.9140E+03,
-     A .9110E+03,.8610E+03,.8048E+03,.7170E+03,.6353E+03,.5451E+03,
-     A .4482E+03,.3753E+03,.3407E+03,.2967E+03,.2898E+03,.3393E+03,
-     A .4312E+03,.4787E+03,.6118E+03,.6815E+03,.7431E+03,.8003E+03,
-     A .8591E+03,.9084E+03,.9458E+03,.9973E+03,.1134E+04,.1199E+04,
-     A .1207E+04,.1229E+04,.1270E+04,.1354E+04,.1397E+04,.1447E+04,
-     A .1517E+04,.1582E+04,.1616E+04,.1640E+04,.1624E+04,.1542E+04,
-     A .1521E+04,.1512E+04,.1509E+04,.1471E+04,.1462E+04,.1508E+04,
-     A .1568E+04,.1583E+04,.1547E+04,.1483E+04,.1452E+04,.1658E+04,
-     A .1739E+04,.1763E+04,.1699E+04,.1630E+04,.1608E+04,.1626E+04,
-     A .1693E+04,.1732E+04,.1740E+04,.1760E+04,.1782E+04,.1737E+04,
-     A .1699E+04,.1674E+04,.1659E+04,.1659E+04,.1648E+04,.1613E+04,
-     A .1552E+04,.1476E+04,.1507E+04,.1697E+04,.1718E+04,.1852E+04,
-     A .1859E+04,.1787E+04,.1740E+04,.1761E+04,.1791E+04,.1876E+04,
-     A .1922E+04,.1898E+04,.1812E+04,.1639E+04,.1371E+04,.1324E+04,
-     A .1403E+04,.1483E+04,.1613E+04,.1713E+04,.1835E+04,.1824E+04,
-     A .1787E+04,.1758E+04,.1771E+04,.1786E+04,.1816E+04,.1818E+04,
-     A .1815E+04,.1840E+04,.1850E+04,.1808E+04,.1766E+04,.1786E+04,
-     A .1840E+04,.1885E+04,.1841E+04,.1787E+04,.1680E+04,.1622E+04,
-     A .1706E+04,.1816E+04,.1904E+04,.1913E+04,.1825E+04,.1823E+04,
-     A .1793E+04,.1803E+04,.1809E+04,.1851E+04,.1859E+04,.1841E+04,
-     A .1773E+04,.1707E+04,.1708E+04,.1769E+04,.1844E+04,.1893E+04,
-     A .1905E+04,.1934E+04,.1951E+04,.1959E+04,.1947E+04,.1776E+04,
-     A .1584E+04,.1443E+04,.1458E+04,.1548E+04,.1553E+04,.1486E+04,
-     A .1484E+04,.1514E+04,.1575E+04,.1600E+04,.1648E+04,.1706E+04,
-     A .1817E+04,.1926E+04,.1989E+04,.2023E+04,.2031E+04,.2013E+04,
-     A .1982E+04,.1949E+04,.1836E+04,.1761E+04,.1771E+04,.1811E+04,
-     A .1976E+04,.2058E+04,.2000E+04,.1863E+04,.1633E+04,.1384E+04,
-     A .1164E+04,.1056E+04,.1043E+04,.1413E+04,.1679E+04,.1816E+04,
-     A .1909E+04,.1865E+04,.1851E+04,.1881E+04,.1964E+04,.2016E+04,
-     A .1990E+04,.1928E+04,.1804E+04,.1750E+04,.1779E+04,.1793E+04,
-     A .1750E+04,.1676E+04,.1660E+04,.1691E+04,.1759E+04,.1739E+04,
-     A .1616E+04,.1541E+04,.1519E+04,.1563E+04,.1656E+04,.1727E+04,
-     A .1856E+04,.1922E+04,.1905E+04,.1862E+04,.1726E+04,.1492E+04,
-     A .1253E+04,.1166E+04,.1243E+04,.1529E+04,.1701E+04,.1756E+04,
-     A .1695E+04,.1594E+04,.1554E+04,.1585E+04,.1745E+04,.1884E+04,
-     A .1961E+04,.1969E+04,.1885E+04,.1651E+04,.1365E+04,.1286E+04,
-     A .1314E+04,.1629E+04,.1828E+04,.1875E+04,.1852E+04,.1789E+04,
-     A .1740E+04,.1710E+04,.1591E+04,.1444E+04,.1370E+04,.1375E+04,
-     A .1452E+04,.1568E+04/
-      
-        n=natlas
-	x1(1:n)=x1_atlas(1:n)
-	y1(1:n)=y1_atlas(1:n)
-      end 	
 
+      IMPLICIT NONE
+      INCLUDE 'tuv.params'
+
+      integer natlas
+      parameter(natlas=5160)
+
+      integer n, i, nhead, kdata
+      real x1(kdata),y1(kdata),x1_atlas(natlas),y1_atlas(natlas)
+      CHARACTER*40 fil
+
+      fil = 'DATAE1/SUN/atlas3_1994_317_a.dat'
+      write(kout,*) fil
+      OPEN(UNIT=kin,FILE=fil,STATUS='old')
+      nhead = 13
+      n = 5160
+      DO i = 1, nhead
+         READ(kin,*)
+      ENDDO
+      DO i = 1, n
+         READ(kin,*) x1(i), y1(i)
+         y1(i) = y1(i) * 1.E-3
+      ENDDO
+      CLOSE (kin)
+
+      n=natlas
+      x1(1:n)=x1_atlas(1:n)
+      y1(1:n)=y1_atlas(1:n)
+      end
+*_______________________________________________________________________
       Subroutine read_neck(x1,y1,kdata,n) ! data neckel extra-terrestrial flux data
       parameter (neckel=496)
       real x1(kdata),y1(kdata),x1_neck(neckel),y1_neck(neckel)
@@ -13811,7 +11451,7 @@ C inter3 is used for interpolation
      A 1135.0,1140.0,1145.0,1150.0,1155.0,1160.0,1165.0,1170.0,1175.0,
      A 1180.0,1185.0,1190.0,1195.0,1200.0,1205.0,1210.0,1215.0,1220.0,
      A 1225.0,1230.0,1235.0,1240.0,1245.0/
-     
+
        data y1_neck/.1006E+01,.9682E+00,.9213E+00,.9053E+00,
      A .9402E+00,.9822E+00,.7654E+00,.8663E+00,.9163E+00,.9372E+00,
      A .9922E+00,.9362E+00,.9952E+00,.9852E+00,.7194E+00,.9672E+00,
@@ -13898,7 +11538,7 @@ C inter3 is used for interpolation
         n=neckel
 	x1(1:n)=x1_neck(1:n)
 	y1(1:n)=y1_neck(1:n)
-      end 	
+      end
 
 
       SUBROUTINE rn_O3(nw,wl,wc,nz,tlev,airlev,j,sq,jlabel)
@@ -13979,7 +11619,7 @@ C inter3 is used for interpolation
       PARAMETER (kdata=250,ny=21,nwmo=158,ns=220)
       REAL xs1(kdata), xs2(kdata), xs3(kdata), xs1wmo(kdata)
       REAL ys1(kdata), ys2(kdata), ys3(kdata), ys1wmo(kdata)
-      real xy1(kdata), xy2(kdata), yy1(kdata), yy2(kdata), 
+      real xy1(kdata), xy2(kdata), yy1(kdata), yy2(kdata),
      1 xwork(kdata), ywork(kdata)
 
        data xs1wmo(1:nwmo)/176.2,177.8,179.4,181.0,182.7,184.3,185.7,
@@ -14190,10 +11830,10 @@ C inter3 is used for interpolation
 
       j = j + 1
       jlabel(j) = 'O3 -> O2 + O(3P)'
-      
+
       j = j + 1
       jlabel(j) = 'O3 -> O2 + O(1D)'
-      
+
 * cross sections:
 * from WMO 1985 Ozone Assessment
 * from 175.439 to 847.500 nm
@@ -14202,7 +11842,7 @@ C inter3 is used for interpolation
       n = nwmo
       xwork(1:n)=xs1wmo(1:n)
       ywork(1:n)=ys1wmo(1:n)
-      
+
       CALL addpnt(xwork,ywork,kdata,n,xwork(1)*(1.-deltax),0.)
       CALL addpnt(xwork,ywork,kdata,n,               0.,0.)
       CALL addpnt(xwork,ywork,kdata,n,xwork(n)*(1.+deltax),0.)
@@ -14229,9 +11869,9 @@ C inter3 is used for interpolation
          xs2(i) = xs1(i)
          xs3(i) = xs1(i)
       ENDDO
-      
+
       xwork(1:n1)=xs1(1:n1)
-      ywork(1:n1)=ys1(1:n1)      
+      ywork(1:n1)=ys1(1:n1)
       CALL addpnt(xwork,ywork,kdata,n1,xwork(1)*(1.-deltax),0.)
       CALL addpnt(xwork,ywork,kdata,n1,               0.,0.)
       CALL addpnt(xwork,ywork,kdata,n1,xwork(n1)*(1.+deltax),0.)
@@ -14286,7 +11926,7 @@ C inter3 is used for interpolation
         ENDDO
 
         xwork(1:n1)=xy1(1:n1)
-        ywork(1:n1)=yy1(1:n1)        
+        ywork(1:n1)=yy1(1:n1)
         CALL addpnt(xwork,ywork,kdata,n1,xwork(1)*(1.-deltax),ywork(1))
         CALL addpnt(xwork,ywork,kdata,n1,               0.,ywork(1))
         CALL addpnt(xwork,ywork,kdata,n1,xwork(n1)*(1.+deltax),
@@ -14299,7 +11939,7 @@ C inter3 is used for interpolation
         ENDIF
 
         xwork(1:n2)=xy2(1:n2)
-        ywork(1:n2)=yy2(1:n2)        
+        ywork(1:n2)=yy2(1:n2)
         CALL addpnt(xwork,ywork,kdata,n2,xwork(1)*(1.-deltax),ywork(1))
         CALL addpnt(xwork,ywork,kdata,n2,               0.,ywork(1))
         CALL addpnt(xwork,ywork,kdata,n2,xwork(n2)*(1.+deltax),
@@ -14400,7 +12040,7 @@ C inter3 is used for interpolation
 
       INTEGER nw
       REAL wl(kw), wc(kw)
-      
+
       INTEGER nz
 
       REAL tlev(kz)
@@ -14422,7 +12062,7 @@ C inter3 is used for interpolation
       INTEGER n1
       REAL xs1(kdata), xs2(kdata), xs3(kdata), xy1(kdata)
       REAL ys1(kdata), ys2(kdata),yy1(kdata),xwork(kdata),ywork(kdata),
-     1 ywork2(kdata) 
+     1 ywork2(kdata)
       data xs1(1:ns)/202.02,204.08,206.19,208.33,210.53,212.77,215.09,
      1   217.39,219.78,222.22,224.72,227.27,229.89,232.56,
      2   235.29,238.09,240.96,243.90,246.91,250.00,253.17,
@@ -14504,11 +12144,11 @@ C inter3 is used for interpolation
 * cross section data from JPL 94 recommendation
 * JPL 97 recommendation is identical
 
-         n=ns                ! obsorption coefficient 
+         n=ns                ! obsorption coefficient
          DO i = 1, n
             ywork(i) = (xs3(i)-xs1(i)) * ys1(i)*1.E-20
             ywork2(i) = (xs3(i)-xs1(i)) * ys2(i)*1.E-22
-            xs2(i) = xs1(i) 
+            xs2(i) = xs1(i)
          ENDDO
          CLOSE(kin)
 
@@ -14517,7 +12157,7 @@ C inter3 is used for interpolation
          n = n+1
          n1 = n
 
-	 xwork(1:n)=xs1(1:n)	  
+	 xwork(1:n)=xs1(1:n)
          CALL inter3(nw,wl,yg1,n,xwork,ywork,0)
 	 xwork(1:n1)=xs2(1:n1)
          CALL inter3(nw,wl,yg2,n1,xwork,ywork2,0)
@@ -14533,7 +12173,7 @@ C inter3 is used for interpolation
             DO i = 1, nz
                xsno2(i,iw) = yg1(iw) + yg2(iw)*(tlev(i)-273.15)
             ENDDO
-         ENDDO 
+         ENDDO
 
 
 * quantum yield
@@ -14612,7 +12252,7 @@ C inter3 is used for interpolation
 
       INTEGER nw
       REAL wl(kw), wc(kw)
-      
+
       INTEGER nz
 
       REAL tlev(kz)
@@ -14698,8 +12338,8 @@ C inter3 is used for interpolation
      7   51.,  49.,  52.,  55.,  61.,  76.,  93.,
      8  131., 172., 222., 356., 658.,1308.,2000.,
      9 1742.,1110., 752., 463., 254., 163., 113.,
-     a   85./     
-     
+     a   85./
+
 * local
 
       REAL yg(kw), yg1(kw)
@@ -14714,9 +12354,9 @@ C inter3 is used for interpolation
 
 * cross section
 *     measurements of Graham and Johnston 1978
-      
+
       n=ngj
-       
+
       DO i = 1, ngj
          ywork(i) =  y1gj(i) * 1.E-19
          x1(i) = 400. + 1.*FLOAT(i-1)
@@ -14733,12 +12373,12 @@ C inter3 is used for interpolation
       ENDIF
 
 *     cross section from JPL94:
-      
+
       n=njpl
       DO i = 1, njpl
-        ywork(i) = y1jpl(i)*1E-20	
+        ywork(i) = y1jpl(i)*1E-20
 	xwork(i) = x1jpl(i)
-      ENDDO 
+      ENDDO
 
       CALL addpnt(xwork,ywork,kdata,n,xwork(1)*(1.-deltax),0.)
       CALL addpnt(xwork,ywork,kdata,n,               0.,0.)
@@ -14764,11 +12404,11 @@ C inter3 is used for interpolation
       j = j + 1
       jlabel(j) = 'NO3 -> NO + O2'
       DO iw = 1, nw - 1
-         IF (wc(iw).LT.584.) THEN 
+         IF (wc(iw).LT.584.) THEN
             qy = 0.
          ELSEIF (wc(iw).GE.640.) THEN
             qy = 0.
-         ELSEIF (wc(iw).GE.595.) THEN 
+         ELSEIF (wc(iw).GE.595.) THEN
             qy = 0.35*(1.-(wc(iw)-595.)/45.)
          ELSE
             qy = 0.35*(wc(iw)-584.)/11.
@@ -14828,7 +12468,7 @@ C inter3 is used for interpolation
 *-----------------------------------------------------------------------------*
 *=  EDIT HISTORY:                                                            =*
 *=  05/98  Original, adapted from former JSPEC1 subroutine                   =*
-*=  07/01  tyh add HNO2 + hv -> NO2 + HO2                                    =* 
+*=  07/01  tyh add HNO2 + hv -> NO2 + HO2                                    =*
 *-----------------------------------------------------------------------------*
 *= This program is free software;  you can redistribute it and/or modify     =*
 *= it under the terms of the GNU General Public License as published by the  =*
@@ -14849,7 +12489,7 @@ C inter3 is used for interpolation
 
       INTEGER nw
       REAL wl(kw), wc(kw)
-      
+
       INTEGER nz
 
       REAL tlev(kz)
@@ -14946,13 +12586,13 @@ C inter3 is used for interpolation
       INTEGER ierr
 
 **************** HNO2-NO photodissociation
-* cross section 
+* cross section
       j=j+1
       jlabel(j)='HNO2 + hv -> NO + OH'
-      n = nno      
-      x1(1:n)=x1no(1:n) 
-      ywork(1:n)=s1no(1:n) 
-      
+      n = nno
+      x1(1:n)=x1no(1:n)
+      ywork(1:n)=s1no(1:n)
+
       CALL addpnt(x1,ywork,kdata,n,x1(1)*(1.-deltax),0.)
       CALL addpnt(x1,ywork,kdata,n,               0.,0.)
       CALL addpnt(x1,ywork,kdata,n,x1(n)*(1.+deltax),0.)
@@ -14963,11 +12603,11 @@ C inter3 is used for interpolation
          STOP
       ENDIF
 
-* quantum yield 
+* quantum yield
       n=nno
-      xwork(1:n)=x1no(1:n) 
-      ywork(1:n)=y1no(1:n) 
-       
+      xwork(1:n)=x1no(1:n)
+      ywork(1:n)=y1no(1:n)
+
       CALL addpnt(xwork,ywork,kdata,n,xwork(1)*(1.-deltax),0.)
       CALL addpnt(xwork,ywork,kdata,n,               0.,0.)
       CALL addpnt(xwork,ywork,kdata,n,xwork(n)*(1.+deltax),0.)
@@ -14983,15 +12623,15 @@ C inter3 is used for interpolation
             sq(j,i,iw) = yg(iw)*yg1(iw)
          ENDDO
       ENDDO
-      
+
 **************** HNO2-NO2 photodissociation
-* cross section 
+* cross section
       j=j+1
       jlabel(j)='HNO2 + hv -> NO2 + HO2'
       n=nno2
       x1(1:n)=x1no2(1:n)
       ywork(1:n)=s1no2(1:n)
-      
+
       CALL addpnt(x1,ywork,kdata,n,x1(1)*(1.-deltax),0.)
       CALL addpnt(x1,ywork,kdata,n,               0.,0.)
       CALL addpnt(x1,ywork,kdata,n,x1(n)*(1.+deltax),0.)
@@ -15002,11 +12642,11 @@ C inter3 is used for interpolation
          STOP
       ENDIF
 
-* quantum yield 
+* quantum yield
       n=nno2
       xwork(1:n)=x1no2(1:n)
       ywork(1:n)=y1no2(1:n)
-      
+
       CALL addpnt(xwork,ywork,kdata,n,xwork(1)*(1.-deltax),0.)
       CALL addpnt(xwork,ywork,kdata,n,               0.,0.)
       CALL addpnt(xwork,ywork,kdata,n,xwork(n)*(1.+deltax),0.)
@@ -15022,9 +12662,9 @@ C inter3 is used for interpolation
             sq(j,i,iw) = yg(iw)*yg1(iw)
          ENDDO
       ENDDO
-            
+
       END
-      
+
       SUBROUTINE rn_HNO3(nw,wl,wc,nz,tlev,airlev,j,sq,jlabel)
 
 *-----------------------------------------------------------------------------*
@@ -15073,7 +12713,7 @@ C inter3 is used for interpolation
 
       INTEGER nw
       REAL wl(kw), wc(kw)
-      
+
       INTEGER nz
 
       REAL tlev(kz)
@@ -15095,7 +12735,7 @@ C inter3 is used for interpolation
       INTEGER n1, n2
       REAL x1(kdata), x2(kdata)
       REAL y1(kdata), y2(kdata), ywork(kdata)
-       
+
       data y1(1:ns)/1580.0,1480.0,1360.0,1225.0,1095.0, 940.0, 770.0,
      1  0.588E+03,0.447E+03, 0.328E+03,0.231E+03,0.156E+03,0.104E+03,
      2  0.675E+02,0.439E+02,0.292E+02,0.200E+02,0.149E+02,0.118E+02,
@@ -15142,8 +12782,8 @@ C inter3 is used for interpolation
          x1(i) = 184. + i*2.
          x2(i) = x1(i)
       END DO
-      
-      ywork(1:n1)=y1(1:n1) 
+
+      ywork(1:n1)=y1(1:n1)
       CALL addpnt(x1,ywork,kdata,n1,x1(1)*(1.-deltax),0.)
       CALL addpnt(x1,ywork,kdata,n1,               0.,0.)
       CALL addpnt(x1,ywork,kdata,n1,x1(n1)*(1.+deltax),0.)
@@ -15154,7 +12794,7 @@ C inter3 is used for interpolation
          STOP
       ENDIF
 
-      ywork(1:n2)=y2(1:n2) 
+      ywork(1:n2)=y2(1:n2)
       CALL addpnt(x2,ywork,kdata,n2,x2(1)*(1.-deltax),ywork(1))
       CALL addpnt(x2,ywork,kdata,n2,               0.,ywork(1))
       CALL addpnt(x2,ywork,kdata,n2,x2(n2)*(1.+deltax),ywork(n2))
@@ -15226,7 +12866,7 @@ C inter3 is used for interpolation
 
       INTEGER nw
       REAL wl(kw), wc(kw)
-      
+
       INTEGER nz
 
       REAL tlev(kz)
@@ -15256,9 +12896,9 @@ C inter3 is used for interpolation
      2 .411E-18,.349E-18,.284E-18,.229E-18,.180E-18,.133E-18,.930E-19,
      3 .620E-19,.390E-19,.240E-19,.140E-19,.850E-20,.530E-20,.390E-20,
      4 .240E-20,.150E-20,.900E-21,.000E+00/
- 
+
 C* local
- 
+
       REAL yg(kw)
       REAL qy
       INTEGER i, iw, n
@@ -15266,14 +12906,14 @@ C* local
 
 **************** HNO4 photodissociation
 
-* cross section 
+* cross section
 
       j = j + 1
       jlabel(j) = 'HNO4 -> 0.61(HO2 + NO2) + 0.39(OH+NO3)'
 
       n = ns
       xwork(1:n)=x1(1:n)
-      ywork(1:n)=y1(1:n)       
+      ywork(1:n)=y1(1:n)
       CALL addpnt(xwork,ywork,kdata,n,xwork(1)*(1.-deltax),0.)
       CALL addpnt(xwork,ywork,kdata,n,               0.,0.)
       CALL addpnt(xwork,ywork,kdata,n,xwork(n)*(1.+deltax),0.)
@@ -15293,8 +12933,8 @@ C* local
          ENDDO
       ENDDO
       END
-      
-      
+
+
       SUBROUTINE rn_H2O2(nw,wl,wc,nz,tlev,airlev,j,sq,jlabel)
 
 *-----------------------------------------------------------------------------*
@@ -15344,7 +12984,7 @@ C* local
 
       INTEGER nw
       REAL wl(kw), wc(kw)
-      
+
       INTEGER nz
 
       REAL tlev(kz)
@@ -15415,11 +13055,11 @@ C     INTEGER n1, n2, n3, n4, n5
          STOP
       ENDIF
 
-      A0 = 6.4761E+04            
-      A1 = -9.2170972E+02        
-      A2 = 4.535649              
-      A3 = -4.4589016E-03        
-      A4 = -4.035101E-05         
+      A0 = 6.4761E+04
+      A1 = -9.2170972E+02
+      A2 = 4.535649
+      A3 = -4.4589016E-03
+      A4 = -4.035101E-05
       A5 = 1.6878206E-07
       A6 = -2.652014E-10
       A7 = 1.5534675E-13
@@ -15442,14 +13082,14 @@ C     INTEGER n1, n2, n3, n4, n5
          IF ((wl(iw) .GE. 260.) .AND. (wl(iw) .LT. 350.)) THEN
 
            lambda = wc(iw)
-           sumA = ((((((A7*lambda + A6)*lambda + A5)*lambda + 
-     >                  A4)*lambda +A3)*lambda + A2)*lambda + 
+           sumA = ((((((A7*lambda + A6)*lambda + A5)*lambda +
+     >                  A4)*lambda +A3)*lambda + A2)*lambda +
      >                  A1)*lambda + A0
-           sumB = (((B4*lambda + B3)*lambda + B2)*lambda + 
+           sumB = (((B4*lambda + B3)*lambda + B2)*lambda +
      >               B1)*lambda + B0
 
            DO i = 1, nz
-              t = MIN(MAX(tlev(i),200.),400.)            
+              t = MIN(MAX(tlev(i),200.),400.)
               chi = 1./(1.+EXP(-1265./t))
               xs = (chi * sumA + (1.-chi)*sumB)*1E-21
               sq(j,i,iw) = xs*qy
@@ -15471,7 +13111,7 @@ C     INTEGER n1, n2, n3, n4, n5
 *=  PURPOSE:                                                                 =*
 *=  Provide product of (cross section) x (quantum yield) for CH2O photolysis =*
 *=        (a) CH2O + hv -> 2HO2 + CO                                         =*
-*=        (b) CH2O + hv -> CO                                                =* 
+*=        (b) CH2O + hv -> CO                                                =*
 *=  Cross section: Choice between                                            =*
 *=                 1) Bass et al., 1980 (resolution: 0.025 nm)               =*
 *=                 2) Moortgat and Schneider (resolution: 1 nm)              =*
@@ -15531,7 +13171,7 @@ C     INTEGER n1, n2, n3, n4, n5
 
       INTEGER nw
       REAL wl(kw), wc(kw)
-      
+
       INTEGER nz
 
       REAL tlev(kz)
@@ -15680,13 +13320,13 @@ C     INTEGER n1, n2, n3, n4, n5
 **************** CH2O photodissociatation
 
       j = j+1
-      jlabel(j) = 'HCHO -> 2HO2 + CO' 
+      jlabel(j) = 'HCHO -> 2HO2 + CO'
 
-* cross section 
+* cross section
       n = nr
-      x1(1:n)=x1r(1:n) 
+      x1(1:n)=x1r(1:n)
       ywork(1:n)=s1r(1:n)
-      
+
       CALL addpnt(x1,ywork,kdata,n,x1(1)*(1.-deltax),0.)
       CALL addpnt(x1,ywork,kdata,n,               0.,0.)
       CALL addpnt(x1,ywork,kdata,n,x1(n)*(1.+deltax),0.)
@@ -15697,11 +13337,11 @@ C     INTEGER n1, n2, n3, n4, n5
          STOP
       ENDIF
 
-* quantum yield 
+* quantum yield
       n=nr
       xwork(1:n)=x1r(1:n)
       ywork(1:n)=y1r(1:n)
-       
+
       CALL addpnt(xwork,ywork,kdata,n,xwork(1)*(1.-deltax),0.)
       CALL addpnt(xwork,ywork,kdata,n,               0.,0.)
       CALL addpnt(xwork,ywork,kdata,n,xwork(n)*(1.+deltax),0.)
@@ -15721,11 +13361,11 @@ C     INTEGER n1, n2, n3, n4, n5
       j = j+1
       jlabel(j) = 'HCHO -> CO'
 
-* cross section 
+* cross section
       n = nm
-      x1(1:n)=x1m(1:n) 
+      x1(1:n)=x1m(1:n)
       ywork(1:n)=s1m(1:n)
-      
+
       CALL addpnt(x1,ywork,kdata,n,x1(1)*(1.-deltax),0.)
       CALL addpnt(x1,ywork,kdata,n,               0.,0.)
       CALL addpnt(x1,ywork,kdata,n,x1(n)*(1.+deltax),0.)
@@ -15736,11 +13376,11 @@ C     INTEGER n1, n2, n3, n4, n5
          STOP
       ENDIF
 
-* quantum yield 
+* quantum yield
       n=nm
       xwork(1:n)=x1m(1:n)
       ywork(1:n)=y1m(1:n)
-       
+
       CALL addpnt(xwork,ywork,kdata,n,xwork(1)*(1.-deltax),0.)
       CALL addpnt(xwork,ywork,kdata,n,               0.,0.)
       CALL addpnt(xwork,ywork,kdata,n,xwork(n)*(1.+deltax),0.)
@@ -15815,7 +13455,7 @@ C     INTEGER n1, n2, n3, n4, n5
 
       INTEGER nw
       REAL wl(kw), wc(kw)
-      
+
       INTEGER nz
 
       REAL tlev(kz)
@@ -15880,8 +13520,8 @@ C     INTEGER n1, n2, n3, n4, n5
        data y2(1:ny)/0.46,0.31,0.05,0.01,0.00,0.00,0.00,
      1  0.00,0.00,0.00,0.00,0.00/
        data xp(1:np)/290.,300.,313.,320.,331.2/
-       data yp(1:np)/0.59,1.51,5.83,8.48,2.88/ 
-       
+       data yp(1:np)/0.59,1.51,5.83,8.48,2.88/
+
 * local
 
       REAL yg(kw), yg1(kw), yg2(kw), yg3(kw), yg4(kw)
@@ -15912,9 +13552,9 @@ C     INTEGER n1, n2, n3, n4, n5
 * pressure correction using Horowitz and Calvert 1982, based on slope/intercepth
 * of Stern-Volmer plots
 
-      n = ns      
+      n = ns
       xwork(1:n)=xs1(1:n)
-      ywork(1:n)=ss1(1:n)      
+      ywork(1:n)=ss1(1:n)
 
       CALL addpnt(xwork,ywork,kdata,n,xwork(1)*(1.-deltax),0.)
       CALL addpnt(xwork,ywork,kdata,n,               0.,0.)
@@ -15933,7 +13573,7 @@ C     INTEGER n1, n2, n3, n4, n5
          n2 = ny
 	 do i=1,ny
 	  x2(i)=xy1(i)
-	 enddo 
+	 enddo
 
          xwork(1:n)=xy1(1:n)
 	 ywork(1:n)=y1(1:n)
@@ -15963,11 +13603,11 @@ C     INTEGER n1, n2, n3, n4, n5
          ENDDO
 
 * pressure-dependence parameters
-      
+
          n = np
 
          xwork(1:n)=xp(1:n)
-	 ywork(1:n)=yp(1:n) 
+	 ywork(1:n)=yp(1:n)
          CALL addpnt(xwork,ywork,kdata,n,xwork(1)*(1.-deltax),0.)
          CALL addpnt(xwork,ywork,kdata,n,               0.,0.)
          CALL addpnt(xwork,ywork,kdata,n,xwork(n)*(1.+deltax),0.)
@@ -16052,7 +13692,7 @@ c            sq(j  ,i,iw) = sig * qy3
 
       INTEGER nw
       REAL wl(kw), wc(kw)
-      
+
       INTEGER nz
 
       REAL tlev(kz)
@@ -16073,7 +13713,7 @@ c            sq(j  ,i,iw) = sig * qy3
       PARAMETER(kdata=150,ns=50)
 
       INTEGER i, n
-      REAL x1(kdata), s1(kdata), y1(kdata),xp(kdata), xwork(kdata), 
+      REAL x1(kdata), s1(kdata), y1(kdata),xp(kdata), xwork(kdata),
      1 ywork(kdata)
 
        data x1(1:ns)/294.0,295.0,296.0,297.0,298.0,299.0,300.0,
@@ -16116,11 +13756,11 @@ c            sq(j  ,i,iw) = sig * qy3
       j = j+1
       jlabel(j) = 'C2CHO -> CCHO + RO2_R + CO + HO2'
 
-* cross section 
+* cross section
       n = ns
-      xp(1:n)=x1(1:n) 
+      xp(1:n)=x1(1:n)
       ywork(1:n)=s1(1:n)
-      
+
       CALL addpnt(xp,ywork,kdata,n,xp(1)*(1.-deltax),0.)
       CALL addpnt(xp,ywork,kdata,n,               0.,0.)
       CALL addpnt(xp,ywork,kdata,n,xp(n)*(1.+deltax),0.)
@@ -16131,11 +13771,11 @@ c            sq(j  ,i,iw) = sig * qy3
          STOP
       ENDIF
 
-* quantum yield 
+* quantum yield
       n=ns
       xwork(1:n)=x1(1:n)
       ywork(1:n)=y1(1:n)
-       
+
       CALL addpnt(xwork,ywork,kdata,n,xwork(1)*(1.-deltax),0.)
       CALL addpnt(xwork,ywork,kdata,n,               0.,0.)
       CALL addpnt(xwork,ywork,kdata,n,xwork(n)*(1.+deltax),0.)
@@ -16207,7 +13847,7 @@ c            sq(j  ,i,iw) = sig * qy3
 
       INTEGER nw
       REAL wl(kw), wc(kw)
-      
+
       INTEGER nz
 
       REAL tlev(kz)
@@ -16306,11 +13946,11 @@ c            sq(j  ,i,iw) = sig * qy3
       jlabel(j) = 'GLY ->  2CO + 2HO2'
 
 * Absorption:
-* cross section 
+* cross section
       n = nr
-      x1(1:n)=x1r(1:n) 
+      x1(1:n)=x1r(1:n)
       ywork(1:n)=s1r(1:n)
-      
+
       CALL addpnt(x1,ywork,kdata,n,x1(1)*(1.-deltax),0.)
       CALL addpnt(x1,ywork,kdata,n,               0.,0.)
       CALL addpnt(x1,ywork,kdata,n,x1(n)*(1.+deltax),0.)
@@ -16322,7 +13962,7 @@ c            sq(j  ,i,iw) = sig * qy3
       ENDIF
 c      print*,'yg=',yg
 
-* quantum yield 
+* quantum yield
 
       DO iw = 1, nw - 1
        if(wc(iw) .lt. 325.) then
@@ -16338,11 +13978,11 @@ c      print*,'yg=',yg
       j = j+1
       jlabel(j) = 'GLY -> HCHO + CO'
 
-* cross section 
+* cross section
       n = na
-      x1(1:n)=x1a(1:n) 
+      x1(1:n)=x1a(1:n)
       ywork(1:n)=s1a(1:n)
-      
+
       CALL addpnt(x1,ywork,kdata,n,x1(1)*(1.-deltax),0.)
       CALL addpnt(x1,ywork,kdata,n,               0.,0.)
       CALL addpnt(x1,ywork,kdata,n,x1(n)*(1.+deltax),0.)
@@ -16356,7 +13996,7 @@ c      print*,'s1a=',s1a
          STOP
       ENDIF
 c      print*,'yg=',yg
-      
+
 * quantum yield is 0.006 for all wavelength
       qy=0.006
       DO iw = 1, nw - 1
@@ -16366,7 +14006,7 @@ c      print*,'yg=',yg
       ENDDO
 c      open(111,file='tmp.111')
 c      write(111,*)'sq=',(sq(j,1,iw),iw=1,nw-1)
-       
+
       END
 
       SUBROUTINE rn_MGLY(nw,wl,wc,nz,tlev,airlev,j,sq,jlabel)
@@ -16419,7 +14059,7 @@ c      write(111,*)'sq=',(sq(j,1,iw),iw=1,nw-1)
 
       INTEGER nw
       REAL wl(kw), wc(kw)
-      
+
       INTEGER nz
 
       REAL tlev(kz)
@@ -16642,13 +14282,13 @@ c      write(111,*)'sq=',(sq(j,1,iw),iw=1,nw-1)
 **************** CH2O photodissociatation
 
       j = j+1
-      jlabel(j) = 'MGLY -> HO2 + CO + CCO_O2' 
+      jlabel(j) = 'MGLY -> HO2 + CO + CCO_O2'
 
-* cross section 
+* cross section
       n = ns
-      x1(1:n)=xs1(1:n) 
+      x1(1:n)=xs1(1:n)
       ywork(1:n)=s1(1:n)
-      
+
       CALL addpnt(x1,ywork,kdata,n,x1(1)*(1.-deltax),0.)
       CALL addpnt(x1,ywork,kdata,n,               0.,0.)
       CALL addpnt(x1,ywork,kdata,n,x1(n)*(1.+deltax),0.)
@@ -16659,11 +14299,11 @@ c      write(111,*)'sq=',(sq(j,1,iw),iw=1,nw-1)
          STOP
       ENDIF
 
-* quantum yield 
+* quantum yield
       n=ns
-      x1(1:n)=xs1(1:n) 
+      x1(1:n)=xs1(1:n)
       ywork(1:n)=y1(1:n)
-       
+
       CALL addpnt(x1,ywork,kdata,n,x1(1)*(1.-deltax),0.)
       CALL addpnt(x1,ywork,kdata,n,               0.,0.)
       CALL addpnt(x1,ywork,kdata,n,x1(n)*(1.+deltax),0.)
@@ -16680,7 +14320,7 @@ c      write(111,*)'sq=',(sq(j,1,iw),iw=1,nw-1)
          ENDDO
       ENDDO
       end
-      
+
 
       SUBROUTINE rn_acet(nw,wl,wc,nz,tlev,airlev,j,sq,jlabel)
 
@@ -16737,7 +14377,7 @@ c      write(111,*)'sq=',(sq(j,1,iw),iw=1,nw-1)
 
       INTEGER nw
       REAL wl(kw), wc(kw)
-      
+
       INTEGER nz
 
       REAL tlev(kz)
@@ -16761,7 +14401,7 @@ c      write(111,*)'sq=',(sq(j,1,iw),iw=1,nw-1)
       INTEGER n1, n2, n3
       REAL x1(kdata), x2(kdata), x3(kdata), xwork(kdata), ywork(kdata)
       REAL y1(kdata), y2(kdata), y3(kdata)
-      
+
        data x1(1:ns)/202.,206.,210.,214.,218.,222.,226.,
      1 230.,234.,238.,242.,246.,250.,254.,
      2 258.,262.,266.,270.,274.,278.,280.,
@@ -16816,8 +14456,8 @@ c      write(111,*)'sq=',(sq(j,1,iw),iw=1,nw-1)
 
 * Quantum yield
 * 3:  McKeen, S. A., T. Gierczak, J. B. Burkholder, P. O. Wennberg, T. F. Hanisco,
-*       E. R. Keim, R.-S. Gao, S. C. Liu, A. R. Ravishankara, and D. W. Fahey, 
-*       The photochemistry of acetone in the upper troposphere:  a source of 
+*       E. R. Keim, R.-S. Gao, S. C. Liu, A. R. Ravishankara, and D. W. Fahey,
+*       The photochemistry of acetone in the upper troposphere:  a source of
 *       odd-hydrogen radicals, Geophys. Res. Lett., 24, 3177-3180, 1997.
 
       mabs = 2
@@ -16827,8 +14467,8 @@ c      write(111,*)'sq=',(sq(j,1,iw),iw=1,nw-1)
       DO i = 1, n
        ywork(i) = y1(i) * 1.e-20
        xwork(i) = x1(i)
-      ENDDO      
-         
+      ENDDO
+
       CALL addpnt(xwork,ywork,kdata,n,xwork(1)*(1.-deltax),0.)
       CALL addpnt(xwork,ywork,kdata,n,               0.,0.)
       CALL addpnt(xwork,ywork,kdata,n,xwork(n)*(1.+deltax),0.)
@@ -16862,7 +14502,7 @@ c      write(111,*)'sq=',(sq(j,1,iw),iw=1,nw-1)
 
                qy = max(0., qy)
                qy = min(1., qy)
-            
+
 
             sq(j,i,iw) = sig*qy
 
@@ -16915,7 +14555,7 @@ c      write(111,*)'sq=',(sq(j,1,iw),iw=1,nw-1)
 
       INTEGER nw
       REAL wl(kw), wc(kw)
-      
+
       INTEGER nz
 
       REAL tlev(kz)
@@ -17037,11 +14677,11 @@ c      write(111,*)'sq=',(sq(j,1,iw),iw=1,nw-1)
       j = j+1
       jlabel(j) = 'MEK -> CCO_O2 + CCHO + RO2_R'
 
-* cross section 
+* cross section
       n = ns
       xwork(1:n)=x1(1:n)
       ywork(1:n)=s1(1:n)
-      
+
       CALL addpnt(xwork,ywork,kdata,n,xwork(1)*(1.-deltax),0.)
       CALL addpnt(xwork,ywork,kdata,n,               0.,0.)
       CALL addpnt(xwork,ywork,kdata,n,xwork(n)*(1.+deltax),0.)
@@ -17054,9 +14694,9 @@ c      write(111,*)'sq=',(sq(j,1,iw),iw=1,nw-1)
 
 * all quantum yield equal 0.15
 
-      yg1=0.15 
-      DO iw = 1, nw - 1             
-         DO i = 1, nz	  
+      yg1=0.15
+      DO iw = 1, nw - 1
+         DO i = 1, nz
             sq(j,i,iw) = yg(iw)*yg1
          ENDDO
       ENDDO
@@ -17067,16 +14707,16 @@ c      write(111,*)'sq=',(sq(j,1,iw),iw=1,nw-1)
 
 * all quantum yield equal 0.02
 
-      yg1=0.02 
-      DO iw = 1, nw - 1             
-         DO i = 1, nz	  
+      yg1=0.02
+      DO iw = 1, nw - 1
+         DO i = 1, nz
             sq(j,i,iw) = yg(iw)*yg1
          ENDDO
       ENDDO
 
       END
 
-      
+
       SUBROUTINE rn_COOH(nw,wl,wc,nz,tlev,airlev,j,sq,jlabel)
 
 *-----------------------------------------------------------------------------*
@@ -17132,7 +14772,7 @@ c      write(111,*)'sq=',(sq(j,1,iw),iw=1,nw-1)
 
       INTEGER nw
       REAL wl(kw), wc(kw)
-      
+
       INTEGER nz
 
       REAL tlev(kz)
@@ -17221,7 +14861,7 @@ c      write(111,*)'sq=',(sq(j,1,iw),iw=1,nw-1)
 *=  PURPOSE:                                                                 =*
 *=  Provide product of (cross section) x (quantum yield) for CH2O photolysis =*
 *=        (a) BACL + hv = 2 CCO_O2                                           =*
-*=        (b) BALD + hv = products                                           =* 
+*=        (b) BALD + hv = products                                           =*
 *=                tyh created for SAPRC99   07/01                            =*
 *-----------------------------------------------------------------------------*
 *=  PARAMETERS:                                                              =*
@@ -17266,7 +14906,7 @@ c      write(111,*)'sq=',(sq(j,1,iw),iw=1,nw-1)
 
       INTEGER nw
       REAL wl(kw), wc(kw)
-      
+
       INTEGER nz
 
       REAL tlev(kz)
@@ -17366,13 +15006,13 @@ c      write(111,*)'sq=',(sq(j,1,iw),iw=1,nw-1)
 ****************************************************************
 
       j = j+1
-      jlabel(j) = 'BACL -> 2 CCO_O2' 
+      jlabel(j) = 'BACL -> 2 CCO_O2'
 
-* cross section 
+* cross section
       n = nr
-      x1(1:n)=x1r(1:n) 
+      x1(1:n)=x1r(1:n)
       y1(1:n)=s1r(1:n)
-      
+
       CALL addpnt(x1,y1,kdata,n,x1(1)*(1.-deltax),0.)
       CALL addpnt(x1,y1,kdata,n,               0.,0.)
       CALL addpnt(x1,y1,kdata,n,x1(n)*(1.+deltax),0.)
@@ -17383,11 +15023,11 @@ c      write(111,*)'sq=',(sq(j,1,iw),iw=1,nw-1)
          STOP
       ENDIF
 
-* quantum yield 
+* quantum yield
       n=nr
-      x1(1:n)=x1r(1:n) 
+      x1(1:n)=x1r(1:n)
       y1(1:n)=y1r(1:n)
-      
+
       CALL addpnt(x1,y1,kdata,n,x1(1)*(1.-deltax),0.)
       CALL addpnt(x1,y1,kdata,n,               0.,0.)
       CALL addpnt(x1,y1,kdata,n,x1(n)*(1.+deltax),0.)
@@ -17407,11 +15047,11 @@ c      write(111,*)'sq=',(sq(j,1,iw),iw=1,nw-1)
       j = j+1
       jlabel(j) = 'BALD -> Products'
 
-* cross section 
+* cross section
       n = nm
-      x1(1:n)=x1m(1:n) 
+      x1(1:n)=x1m(1:n)
       y1(1:n)=s1m(1:n)
-      
+
       CALL addpnt(x1,y1,kdata,n,x1(1)*(1.-deltax),0.)
       CALL addpnt(x1,y1,kdata,n,               0.,0.)
       CALL addpnt(x1,y1,kdata,n,x1(n)*(1.+deltax),0.)
@@ -17424,7 +15064,7 @@ c      write(111,*)'sq=',(sq(j,1,iw),iw=1,nw-1)
 
 * quantum yield is 0.05 for all wavelength
       qy=0.05
-       
+
       DO iw = 1, nw - 1
          DO i = 1, nz
             sq(j,i,iw) = yg(iw)*qy
@@ -17484,7 +15124,7 @@ c      write(111,*)'sq=',(sq(j,1,iw),iw=1,nw-1)
 
       INTEGER nw
       REAL wl(kw), wc(kw)
-      
+
       INTEGER nz
 
       REAL tlev(kz)
@@ -17557,7 +15197,7 @@ c      write(111,*)'sq=',(sq(j,1,iw),iw=1,nw-1)
       INTEGER mabs
 
 
-* Absorption cross section 
+* Absorption cross section
 
          n = ns
 	 xwork(1:n)=x1(1:n)
@@ -17584,7 +15224,7 @@ c      write(111,*)'sq=',(sq(j,1,iw),iw=1,nw-1)
             sq(j,i,iw) = yg(iw)*qy
          ENDDO
       ENDDO
-      
+
 
       j=j+1
       jlabel(j)='MVK->C_O2+CO+PROD2+MA_RCO3'
@@ -17596,7 +15236,7 @@ c      write(111,*)'sq=',(sq(j,1,iw),iw=1,nw-1)
          DO i = 1, nz
             sq(j,i,iw) = yg(iw)*qy
          ENDDO
-      ENDDO       
+      ENDDO
 
 
       j=j+1
@@ -17609,7 +15249,7 @@ c      write(111,*)'sq=',(sq(j,1,iw),iw=1,nw-1)
          DO i = 1, nz
             sq(j,i,iw) = yg(iw)*qy
          ENDDO
-      ENDDO       
+      ENDDO
 
       j=j+1
       jlabel(j)='DCB3->RO2_R+CCO_O2+HO2+CO+R2O2+GLY+MGLY'
@@ -17621,7 +15261,7 @@ c      write(111,*)'sq=',(sq(j,1,iw),iw=1,nw-1)
          DO i = 1, nz
             sq(j,i,iw) = yg(iw)*qy
          ENDDO
-      ENDDO       
+      ENDDO
 
       END
 
@@ -17673,7 +15313,7 @@ c      write(111,*)'sq=',(sq(j,1,iw),iw=1,nw-1)
 
       INTEGER nw
       REAL wl(kw), wc(kw)
-      
+
       INTEGER nz
 
       REAL tlev(kz)
@@ -17695,7 +15335,7 @@ c      write(111,*)'sq=',(sq(j,1,iw),iw=1,nw-1)
 
       INTEGER i, n
       REAL x1(kdata),y1(kdata),xwork(kdata),ywork(kdata)
-      
+
        data x1(1:ns)/185.0,188.0,190.0,195.0,200.0,205.0,210.0,
      1  215.0,220.0,225.0,230.0,235.0,240.0,245.0,
      2  250.0,255.0,260.0,265.0,270.0,275.0,280.0,
@@ -17758,7 +15398,7 @@ c      write(111,*)'sq=',(sq(j,1,iw),iw=1,nw-1)
 *=  PURPOSE:                                                                 =*
 *=  Provide product (cross section) x (quantum yield) for CH3OOH photolysis: =*
 *=         DCB2 + hv -> Products                                             =*
-*=                                                                           =* 
+*=                                                                           =*
 *=    tyh created for SAPRC99                                                =*
 *=  Quantum yield: Assumed to be unity                                       =*
 *-----------------------------------------------------------------------------*
@@ -17801,7 +15441,7 @@ c      write(111,*)'sq=',(sq(j,1,iw),iw=1,nw-1)
 
       INTEGER nw
       REAL wl(kw), wc(kw)
-      
+
       INTEGER nz
 
       REAL tlev(kz)
@@ -17823,7 +15463,7 @@ c      write(111,*)'sq=',(sq(j,1,iw),iw=1,nw-1)
 
       INTEGER i, n
       REAL x1(kdata),y1(kdata),xwork(kdata),ywork(kdata)
-      
+
        data x1(1:ns)/219.0,219.5,220.0,220.5,221.0,221.5,222.0,
      1 222.5,223.0,223.5,224.0,224.5,225.0,225.5,
      2 226.0,226.5,227.0,227.5,228.0,228.5,229.0,
@@ -18028,13 +15668,13 @@ c      write(111,*)'sq=',(sq(j,1,iw),iw=1,nw-1)
       END
 
       SUBROUTINE rtlink(nz,z,
-     $     iw, ag, zen, 
+     $     iw, ag, zen,
      $     dsdh, nid,
-     $     dtrl, 
-     $     dto3, 
-     $     dto2, 
-     $     dtso2, 
-     $     dtno2, 
+     $     dtrl,
+     $     dto3,
+     $     dto2,
+     $     dtso2,
+     $     dtno2,
      $     dtcld, omcld, gcld,
      $     dtaer,omaer,gaer,
      $     edir, edn, eup, fdir, fdn, fup)
@@ -18088,7 +15728,7 @@ c      write(111,*)'sq=',(sq(j,1,iw),iw=1,nw-1)
          edn(i) = 0.
  5    CONTINUE
 
-*  set here any coefficients specific to rt scheme, 
+*  set here any coefficients specific to rt scheme,
 * ----
 
       DO 10, i = 1, nz - 1
@@ -18100,7 +15740,7 @@ c      write(111,*)'sq=',(sq(j,1,iw),iw=1,nw-1)
          daaer = dtaer(i,iw)*(1.-omaer(i,iw))
 
          dtsct = dtrl(i,iw) + dscld + dsaer
-         dtabs = dto3(i,iw) + dto2(i,iw) + dtso2(i,iw) + 
+         dtabs = dto3(i,iw) + dto2(i,iw) + dtso2(i,iw) +
      >           dtno2(i,iw) + dacld + daaer
 
  	 dtabs = AMAX1(dtabs,1./largest)
@@ -18120,11 +15760,11 @@ c      write(111,*)'sq=',(sq(j,1,iw),iw=1,nw-1)
      1	   gcld(i,iw),dscld,gaer(i,iw),dsaer, dtsct,dtrl(i,iw)
           print*,'dtcld(i,iw),omcld(i,iw),dtaer(i,iw),omaer(i,iw)=',
      1	     dtcld(i,iw),omcld(i,iw),dtaer(i,iw),omaer(i,iw)
-          print*,'dtabs, dto3(i,iw), dto2(i,iw), dtso2(i,iw), 
+          print*,'dtabs, dto3(i,iw), dto2(i,iw), dtso2(i,iw),
      1	   dtno2(i,iw), dacld, daaer=',dtabs, dto3(i,iw), dto2(i,iw),
      2     dtso2(i,iw), dtno2(i,iw), dacld, daaer
           stop
-	 endif 
+	 endif
    10 CONTINUE
 
 *  call rt routine:
@@ -18133,11 +15773,11 @@ c      write(kout,*)'in rtlink g=',g
 c      write(kout,*)'in rtlink om=',om
 c      om(11)=0.25
 c      endif
-       
+
       CALL ps2str(nz,zen,ag,dt,om,g,
      $         dsdh, nid, delta,
      $         fdiri, fupi, fdni, ediri, eupi, edni)
-      
+
 
 * put on upright z-coordinate
 
@@ -18155,7 +15795,7 @@ c	  print*,'g =', g
 c	  print*,'om=',om
 c	  print*,'dt=',dt
 c	  stop
-c	 endif 
+c	 endif
          edir(i) = ediri(ii)
          eup(i) = eupi(ii)
          edn(i) = edni(ii)
@@ -18163,7 +15803,7 @@ c	 endif
 *_______________________________________________________________________
 
       RETURN
-      END   
+      END
       SUBROUTINE schu(nz,o2col,secchi,iw,dto2,xscho2)
 
 *-----------------------------------------------------------------------------*
@@ -18224,7 +15864,7 @@ c  a(16,12)             coefficients for Rj(M) (Table 1 in Kockarts 1994)
 c  b(16,12)                              Rj(O2)(Table 2 in Kockarts 1994)
 c  rjm                  attenuation coefficients Rj(M)
 c  rjo2                 Rj(O2)
-      
+
       data((a(i,j),j=1,12),i=1,16)/
 ca 57000-56500.5 cm-1
      l 1.13402D-01,1.00088D-20,3.48747D-01,2.76282D-20,3.47322D-01
@@ -18252,7 +15892,7 @@ ca 55000-54500.5 cm-1
      l,2.80694D-01,1.33362D-21,3.26867D-01,6.10533D-21,1.96539D-01
      l,7.83142D-20
 ca 54500-54000.5 cm-1
-     l,9.33711D-03,1.32897D-22,3.63980D-02,1.78786D-22,1.46182D-01 
+     l,9.33711D-03,1.32897D-22,3.63980D-02,1.78786D-22,1.46182D-01
      l,3.38285D-22
      l,3.81762D-01,8.93773D-22,2.58549D-01,4.28115D-21,1.64773D-01
      l,4.67537D-20
@@ -18267,12 +15907,12 @@ ca 53500-53000.5 cm-1
      l,3.05103D-01,2.36167D-22,3.35007D-01,8.59109D-22,1.49766D-01
      l,9.63516D-21
 ca 53000-52500.5 cm-1
-     l,6.92175D-02,1.56323D-23,1.44403D-01,3.03795D-23,2.94489D-01 
+     l,6.92175D-02,1.56323D-23,1.44403D-01,3.03795D-23,2.94489D-01
      l,1.13219D-22
-     l,3.34773D-01,3.48121D-22,9.73632D-02,2.10693D-21,5.94308D-02 
+     l,3.34773D-01,3.48121D-22,9.73632D-02,2.10693D-21,5.94308D-02
      l,1.26195D-20
 ca 52500-52000.5 cm-1
-     l,1.47873D-01,8.62033D-24,3.15881D-01,3.51859D-23,4.08077D-01 
+     l,1.47873D-01,8.62033D-24,3.15881D-01,3.51859D-23,4.08077D-01
      l,1.90524D-22
      l,8.08029D-02,9.93062D-22,3.90399D-02,6.38738D-21,8.13330D-03
      l,9.93644D-22
@@ -18282,7 +15922,7 @@ ca 52000-51500.5 cm-1
      l,1.61277D-01,6.59294D-22,8.89713D-02,2.94571D-21,3.25063D-03
      l,1.25548D-20
 ca 51500-51000.5 cm-1
-     l,2.55746D-01,8.49877D-24,2.94733D-01,2.06878D-23,2.86382D-01 
+     l,2.55746D-01,8.49877D-24,2.94733D-01,2.06878D-23,2.86382D-01
      l,9.30992D-23
      l,1.21011D-01,3.66239D-22,4.21105D-02,1.75700D-21,0.00000D+00
      l,0.00000D+00
@@ -18292,14 +15932,14 @@ ca 51000-50500.5 cm-1
      l,3.23781D-03,2.15052D-21,0.00000D+00,0.00000D+00,0.00000D+00
      l,0.00000D+00
 ca 50500-50000.5 cm-1
-     l,8.18514D-01,7.17937D-24,1.82262D-01,4.17496D-23,0.00000D+00 
+     l,8.18514D-01,7.17937D-24,1.82262D-01,4.17496D-23,0.00000D+00
      l,0.00000D+00
      l,0.00000D+00,0.00000D+00,0.00000D+00,0.00000D+00,0.00000D+00
      l,0.00000D+00
 ca 50000-49500.5 cm-1
-     l,8.73680D-01,7.13444D-24,1.25583D-01,2.77819D-23,0.00000D+00 
+     l,8.73680D-01,7.13444D-24,1.25583D-01,2.77819D-23,0.00000D+00
      l,0.00000D+00
-     l,0.00000D+00,0.00000D+00,0.00000D+00,0.00000D+00,0.00000D+00 
+     l,0.00000D+00,0.00000D+00,0.00000D+00,0.00000D+00,0.00000D+00
      l,0.00000D+00
 ca 49500-49000.5 cm-1
      l,3.32476D-04,7.00362D-24,9.89000D-01,6.99600D-24,0.00000D+00
@@ -18360,12 +16000,12 @@ c  52500-52000.5 cm-1
      l,2.84356D-22,3.39699D-21,1.94524D-22,2.72227D-19,1.18924D-21
      l,3.20246D-17
 c  52000-51500.5 cm-1
-     l,1.52817D-24,1.01885D-23,1.22946D-23,4.16517D-23,9.01287D-23 
+     l,1.52817D-24,1.01885D-23,1.22946D-23,4.16517D-23,9.01287D-23
      l,2.34869D-22
      l,1.93510D-22,1.44956D-21,1.81051D-22,5.17773D-21,9.82059D-22
      l,6.22768D-17
 c  51500-51000.5 cm-1
-     l,2.12813D-24,8.48035D-24,5.23338D-24,1.93052D-23,1.99464D-23 
+     l,2.12813D-24,8.48035D-24,5.23338D-24,1.93052D-23,1.99464D-23
      l,7.48997D-23
      l,4.96642D-22,6.15691D-17,4.47504D-23,2.76004D-22,8.26788D-23
      l,1.65278D-21
@@ -18380,14 +16020,14 @@ c  50500-50000.5 cm-1
      l,8.55920D-24,1.66709D-17,0.00000D+00,0.00000D+00,0.00000D+00
      l,0.00000D+00
 c  50000-49500.5 cm-1
-     l,6.21281D-24,7.13108D-24,3.30780D-24,2.61196D-23,1.30783D-22 
+     l,6.21281D-24,7.13108D-24,3.30780D-24,2.61196D-23,1.30783D-22
      l,9.42550D-17
-     l,2.69241D-24,1.46500D-17,0.00000D+00,0.00000D+00,0.00000D+00 
+     l,2.69241D-24,1.46500D-17,0.00000D+00,0.00000D+00,0.00000D+00
      l,0.00000D+00
 c  49500-49000.5 cm-1
-     l,6.81118D-24,6.98767D-24,7.55667D-25,2.75124D-23,1.94044D-22 
+     l,6.81118D-24,6.98767D-24,7.55667D-25,2.75124D-23,1.94044D-22
      l,1.45019D-16
-     l,1.92236D-24,3.73223D-17,0.00000D+00,0.00000D+00,0.00000D+00 
+     l,1.92236D-24,3.73223D-17,0.00000D+00,0.00000D+00,0.00000D+00
      l,0.00000D+00/
 
 c initialize R(M)
@@ -18465,8 +16105,8 @@ c calculate sum of exponentials (eqs 7 and 8 of Kockarts 1994)
 *=  GAER    - REAL, aerosol asymmetry factor at each defined altitude and (O)=*
 *=            wavelength                                                     =*
 *=  nzstem  - input data layers                                              =*
-*=  mss     - inputted aerosol concentrations in molecular/cm3               =*   
-*=  rhu     - inputted relative humidity for each layer                      =* 
+*=  mss     - inputted aerosol concentrations in molecular/cm3               =*
+*=  rhu     - inputted relative humidity for each layer                      =*
 *-----------------------------------------------------------------------------*
 *=  EDIT HISTORY:                                                            =*
 *=  Original                                                                 =*
@@ -18523,17 +16163,17 @@ c calculate sum of exponentials (eqs 7 and 8 of Kockarts 1994)
 
       REAL fsum
       EXTERNAL fsum
-      
-      INTEGER  ierr,n 
+
+      INTEGER  ierr,n
       INTEGER  IATP, ILAY, IRH  !loop control
 
 
       REAL     RH00(8),  RHUM
       REAL     WAVEI(7)
-      
+
       REAL     Naer(nzstem)
       REAL     NDS(nzstem,NAETP), CONV(NAETP)
-      
+
       REAL     SBEA(6,8,NAETP), SBAA(6,8,NAETP), SGA(6,8,NAETP)
       REAL     ABEAR(7,NAETP), AGAR(7,NAETP), AOMR(7,NAETP)
       REAL     extaer(7), albaer(7), asmaer(7)
@@ -18556,14 +16196,14 @@ c calculate sum of exponentials (eqs 7 and 8 of Kockarts 1994)
      7     3.83E-05,2.93E-05,2.25E-05,1.72E-05,1.32E-05,1.01E-05,
      8     7.72E-06,5.91E-06,4.53E-06,3.46E-06,2.66E-06,2.04E-06,
      9     1.56E-06,1.19E-06,9.14E-07/
-      
+
       DATA WAVEI /.185E+3,.25E+3,.3E+3,
      >               .4E+3,.55E+3,.7E+3,1.5E+3/
       DATA RH00  /.0,.50,.70,.80,.90,.95,.98,.99/
 
 C---------------------------------------------------------------------------
 C** CONV convert ug/m3 to #/cm3 for dust 1, sulfate 2, soot 3, sea salt 4 **
-C** aerosol size distributions follow OPAC 
+C** aerosol size distributions follow OPAC
 C** organic carbon 5, optical from Liousse et al., 1996 & Cooke et al., 1999
 C** r=0.0212micron+-2.24, density=1.8g/cm3, optcial reliable between
 C** 300~1060nm wavelength
@@ -18628,7 +16268,7 @@ C** watersoluable particles.
      >  6.014E-05,5.020E-05,3.840E-05,2.869E-05,2.251E-05,10.88E-06,                    
      >  9.083E-05,7.582E-05,5.801E-05,4.333E-05,3.401E-05,1.643E-05,                    
      >  11.79E-05,9.844E-05,7.530E-05,5.625E-05,4.415E-05,2.133E-05/                    
-     
+
       DATA SBAA  /
 C** mineral dust                                 **
      >  6.234E-01,6.539E-01,7.549E-01,8.732E-01,9.125E-01,9.313E-01,
@@ -18676,8 +16316,8 @@ C ** at other wavelength and RH, is the same as 550nm, be careful.
      >  9.800E-01,9.800E-01,9.800E-01,9.800E-01,9.800E-01,9.800E-01,
      >  9.800E-01,9.800E-01,9.800E-01,9.800E-01,9.800E-01,9.800E-01,
      >  9.800E-01,9.800E-01,9.800E-01,9.800E-01,9.800E-01,9.800E-01/
-     
-     
+
+
       DATA SGA   /
 C** mineral dust                                 **
      >  8.572E-01,8.363E-01,7.849E-01,7.329E-01,7.112E-01,6.933E-01,
@@ -18726,7 +16366,7 @@ C** wavlength and RH, can not be used for radiative transfer calculation.
      >  7.090E-01,7.090E-01,7.090E-01,7.090E-01,7.090E-01,7.090E-01,
      >  7.090E-01,7.090E-01,7.090E-01,7.090E-01,7.090E-01,7.090E-01,
      >  7.090E-01,7.090E-01,7.090E-01,7.090E-01,7.090E-01,7.090E-01/
-      
+
 C-------------------------------------------------------------------------C
 C   SBEA(6,8,5) extinction coefficient                                    C
 C   SBAA(6,8,5) single scattering albedo                                  C
@@ -18744,10 +16384,10 @@ C ** 2) water soluble  28000 particles/cm3, 56.0 ug/m3                    **
 C ** 3) black carbon 130,000 particles/cm3,  7.8 ug/m3                    **
 C ** 4) sea salt 20.0032 part/cm3, 39.5ug/m3                              **
 C **    number density: acc 20.(99.98%), coa 3.2E-3(0.02%)                **
-C **    mass : acc 38.6 (97.72%), coa 0.9 (2.28%)                         ** 
+C **    mass : acc 38.6 (97.72%), coa 0.9 (2.28%)                         **
 C ** 5) organic carbon as Watersoluable in OPAC,1.34ug/m3/part/cm3        **
 C-------------------------------------------------------------------------C
-     
+
 *_______________________________________________________________________
 
 * initialize
@@ -18814,7 +16454,7 @@ c      WRITE(kout,*)'aerosols:  Elterman (1968)'
       DO 50, iw = 1, nw - 1
          wc = (wl(iw)+wl(iw+1))/2.
 
-* Elterman's data are for 340 nm, so assume optical depth scales 
+* Elterman's data are for 340 nm, so assume optical depth scales
 * inversely with first power of wavelength.
 
          wscale = 340./wc
@@ -18836,7 +16476,7 @@ C--- transfer aerosol concentration ---------------------------------------C
       DO ILAY= 1, nzstem                   !vertical layer loop
 
        Naer(ILAY)      = 0.               !aerosol total number density
-      
+
        DO IATP=1, NAETP                   !aerosol  loop
 C        MSS(ILAY,IATP) = 0.               !mass concentration
         NDS(ILAY,IATP) = 0.               !number density
@@ -18848,14 +16488,14 @@ C    IATP=3, black carbon;  IATP=4, sea salt;                             C
 C    For example:                                                         C
 C    MSS(ILAY,1) = total dust concentration at layer ILAY                 C
 C--- aerosol mass concentration input END --------------------------------C
-        
+
 C--- convert aerosol mass ug/m3 to #/cm3 ---------------------------------C
-       DO IATP=1, NAETP                     !aerosol type loop       
+       DO IATP=1, NAETP                     !aerosol type loop
         IF(MSS(ILAY,IATP).LT.(1.E-3)) MSS(ILAY,IATP)=0.0
         NDS (ILAY,IATP)=MSS (ILAY,IATP)*CONV(IATP)
         Naer(ILAY)=Naer(ILAY)+NDS(ILAY,IATP)
        END DO                               !aerosol type loop END
-       
+
       END DO                               !vertical layer loop END
 C-------------------------------------------------------------------------C
 
@@ -18865,12 +16505,12 @@ C--- optical properties calculation at each level ------------------------C
 C--- get relative humidity value -----------------------------------------C
 C    RH value rhu(COL,ROW,ILAY) is required                               C
 C      rhu(ILAY)= 0.
-      
+
       RHUM = rhu(ILAY)/100.
-      
+
       IF(RHUM.GT.0.99) RHUM=0.99
       IF(RHUM.LT.0.00) RHUM=0.00
-       
+
       DO IATP=1, NAETP               !aerosol type loop
          ABEAR(1,IATP)=0.
          AOMR (1,IATP)=0.
@@ -18900,7 +16540,7 @@ C      rhu(ILAY)= 0.
          AOMR (IW,IATP)=SBAA(IW-1,1,IATP)
          AGAR (IW,IATP)=SGA (IW-1,1,IATP)
        END IF                                 !RH ENDIF
-        
+
        END DO                        !wavelength loop END
 
        ABEAR(1,IATP)= ABEAR(2,IATP)+(ABEAR(2,IATP)-ABEAR(3,IATP))*
@@ -18909,7 +16549,7 @@ C      rhu(ILAY)= 0.
      >          (wavei(1)-wavei(2))/(wavei(2)-wavei(3))
        AGAR (1,IATP)= AGAR (2,IATP)+(AGAR (2,IATP) -AGAR(3,IATP))*
      >          (wavei(1)-wavei(2))/(wavei(2)-wavei(3))
-     
+
        DO IW=1,7                     !wavelength loop
         extaer(IW)=ABEAR(IW,IATP)
         albaer(IW)=AOMR (IW,IATP)
@@ -18922,7 +16562,7 @@ C      rhu(ILAY)= 0.
       CALL addpnt(x1,y1,kdata,n,x1(1)*(1.-deltax),y1(1))
       CALL addpnt(x1,y1,kdata,n,          0.,y1(1))
       CALL addpnt(x1,y1,kdata,n,x1(n)*(1.+deltax),   0.)
-      CALL addpnt(x1,y1,kdata,n,      1.e+38,   0.)     
+      CALL addpnt(x1,y1,kdata,n,      1.e+38,   0.)
       CALL inter2(NW, wl, BEA, n, x1, y1, ierr)
 
       n=7
@@ -18931,9 +16571,9 @@ C      rhu(ILAY)= 0.
       CALL addpnt(x1,y1,kdata,n,x1(1)*(1.-deltax),y1(1))
       CALL addpnt(x1,y1,kdata,n,          0.,y1(1))
       CALL addpnt(x1,y1,kdata,n,x1(n)*(1.+deltax),   0.)
-      CALL addpnt(x1,y1,kdata,n,      1.e+38,   0.)           
+      CALL addpnt(x1,y1,kdata,n,      1.e+38,   0.)
       CALL inter2(NW, wl, OMA, n, x1, y1, ierr)
-      
+
       n=7
       x1(1:n)=wavei(1:n)
       y1(1:n)=asmaer(1:n)
@@ -18942,9 +16582,9 @@ C      rhu(ILAY)= 0.
       CALL addpnt(x1,y1,kdata,n,x1(n)*(1.+deltax),   0.)
       CALL addpnt(x1,y1,kdata,n,      1.e+38,   0.)
       CALL inter2(NW, wl, GA,  n, x1, y1, ierr)
-       
+
       DO IW=1,NW-1                    !wavelength loop
-       
+
        IF(BEA(IW).LT.0.OR.OMA(IW).LT.0.OR.GA(IW).LT.0) THEN
         print *, "Optical < 0 for aerosol ", IATP, " at layer ",ILAY
         STOP
@@ -18953,7 +16593,7 @@ C      rhu(ILAY)= 0.
        if(ga(iw).gt.1) then
         print*,'ga(iw)>1 at iw,ilay=',iw,ilay, ga(iw)
 	stop
-       endif	
+       endif
 
 C--- calculating aerosol optical depth -----------------------------------C
 C    Z(I) = altitude in km for each level, BEA = extin in 1/km per 1/cm3  C
@@ -18969,14 +16609,14 @@ C    watch out for the unit                                               C
          print*,'nz,nztem,z=',nz,nzstem,z(1:nzstem)
          stop
 	endif
-       endif	 
-       
+       endif
+
        omaerwl (ILAY,IW,IATP) = OMA(IW)
        gaerwl  (ILAY,IW,IATP) = GA (IW)
-       
+
        END DO                        !wavelength loop END
       END DO                         !aerosol type loop END
-      
+
       IF(Naer(ILAY).GE.1.E-6) THEN   !IF Naer, avoid zero
 C--- aerosol external mixture --------------------------------------------C
        DO IW=1,NW                    !wavelength loop
@@ -18984,7 +16624,7 @@ C--- aerosol external mixture --------------------------------------------C
 	omaerwl(ILAY,IW,NAETP+1)=0.
 	gaerwl (ILAY,IW,NAETP+1)=0.
 	absorp (ILAY,IW)=0.
-	
+
         DO IATP=1, NAETP             !aerosol type loop
          dtaerwl(ILAY,IW,NAETP+1)= dtaerwl(ILAY,IW,NAETP+1)
      >                         + dtaerwl(ILAY,IW,IATP)                 ! total aerosol optical depth  
@@ -18995,44 +16635,44 @@ C--- aerosol external mixture --------------------------------------------C
          gaerwl (ILAY,IW,NAETP+1)= gaerwl (ILAY,IW,NAETP+1)
      >                         + gaerwl(ILAY,IW,IATP)*NDS(ILAY,IATP)
         END DO                       !aerosol type loop END
-             
+
          omaerwl(ILAY,IW,NAETP+1)= omaerwl (ILAY,IW,NAETP+1)/Naer(ILAY)   ! average back-scattering albedo
          gaerwl (ILAY,IW,NAETP+1)= gaerwl (ILAY,IW,NAETP+1)/Naer(ILAY)    ! average asymmetry factor
-	 
+
          dtaer(ilay,iw)= amax1(dtaerwl(ILAY,IW,NAETP+1),dtaer(ilay,iw))   ! avoid dtaer from zero 
 	 if(dtaer(ilay,iw).lt.1e-25) then
 	  omaer(ilay,iw)= 1.
-	 else 
+	 else
  	  omaer(ilay,iw)= 1-absorp(ILAY,IW)/dtaer(ilay,iw)
-	 endif 
+	 endif
 cccc	   omaer(ilay,iw)= omaerwl(ILAY,IW,NAETP+1)
-	 gaer(ilay,iw)=gaerwl(ILAY,IW,NAETP+1) 
+	 gaer(ilay,iw)=gaerwl(ILAY,IW,NAETP+1)
          if(gaer(ilay,iw).gt.1.or.gaer(ilay,iw).lt.0.) then
           print*,'gaer wrong at setaer, iw,ilay=',iw,ilay,gaer(ilay,iw)
 	  print*,'gaerwl(ilay,iw,1:5)=',gaerwl(ilay,iw,1:5)
 	  print*,'nds(ilay,1:5),naer(ilay)=',nds(ilay,1:5),naer(ilay)
 	  stop
-         endif	
-	 
+         endif
+
        END DO                        !wavelength loop END
 
       END IF                         !Naer ENDIF
-      END DO                         !vertical layer loop END 
-  
+      END DO                         !vertical layer loop END
+
 
 C---- DAOD is at 550nm wavelength (IW=102)?-------------------------------C
       DO iw=1,nw
        if(wl(iw).ge.550) goto 23
       enddo
  23   if(abs(wl(iw-1)-550).lt.abs(wl(iw)-550)) iw=iw-1
-   
+
       DO ILAY=1, NZSTEM-1
-       DO IATP=1, NAETP+1      
+       DO IATP=1, NAETP+1
         DAOD(ILAY,IATP)=dtaerwl(ilay,iw,iatp)/(Z(ILAY+1)-Z(ILAY))  ! extincting coefficient for each species
        END DO                                                      ! and total
 c       DAOD(ILAY,NAETP+2)= omaer(ILAY,IW)   ! the 7th variable is Single Scaterring Albedo
       END DO
-      
+
 c      DO ILAY=NZSTEM-1, 1, -1
 c      DAOD(ILAY,IATP+1)=DAOD(ILAY+1,IATP+1)           ! aerosol optical depth from top layer
 c     >                       +dtaerwl(ILAY,IW,IATP+1)
@@ -19065,7 +16705,7 @@ c      END DO
 *=            wavelength grid                                                =*
 *=  WL      - REAL, vector of lower limits of wavelength intervals in     (I)=*
 *=            working wavelength grid                                        =*
-*=  AIRLEV  - REAL, air density (molec/cc) at each specified altitude     (O)=* 
+*=  AIRLEV  - REAL, air density (molec/cc) at each specified altitude     (O)=*
 *=  DTRL    - REAL, Rayleigh optical depth at each specified altitude     (O)=*
 *=            and each specified wavelength                                  =*
 *=  CZ      - REAL, number of air molecules per cm^2 at each specified    (O)=*
@@ -19128,10 +16768,10 @@ c      END DO
       REAL srayl(kw)
       REAL deltaz
       REAL colz, pressz
-      REAL wc, wmicrn, xx 
+      REAL wc, wmicrn, xx
       INTEGER i, iw, nd
       parameter(nd=121)
-      
+
        data zd(1:nd)/0.,  1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,
      1   9., 10., 11., 12., 13., 14., 15., 16., 17.,
      2  18., 19., 20., 21., 22., 23., 24., 25., 26.,
@@ -19176,9 +16816,9 @@ c      END DO
 * compute column increments (logarithmic integrals)
 
       DO 6, i = 1, nd - 1
-         deltaz = 1.E5 * (zd(i+1)-zd(i)) 
+         deltaz = 1.E5 * (zd(i+1)-zd(i))
          cd(i) =  (air(i+1)-air(i)) /ALOG(air(i+1)/air(i)) * deltaz
-C         cd(i) = (air(i+1)+air(i)) * deltaz / 2. 
+C         cd(i) = (air(i+1)+air(i)) * deltaz / 2.
     6 CONTINUE
 
 * Include exponential tail integral from infinity to 50 km,
@@ -19193,7 +16833,7 @@ C         cd(i) = (air(i+1)+air(i)) * deltaz / 2.
 * If want, can rescale to any total pressure:
 
       colold = fsum(nd-1,cd)
-      pmbold = colold * pconv 
+      pmbold = colold * pconv
 c      WRITE(kout,100) colold, pmbold
   100 FORMAT(5x,'old sea level air column = ', 1pe11.4,1x,'# cm-2  = ',
      $     0pf8.2,' mbar')
@@ -19211,7 +16851,7 @@ c      WRITE(kout,100) colold, pmbold
          airnew(i) = air(i) * scale
       ENDDO
       airnew(nd) = air(nd) * scale
-      
+
       colnew = fsum(nd-1,cd)
 c      WRITE(kout,105) colnew, colnew * pconv
   105 FORMAT(5x,'new sea level air column = ', 1pe11.4,1x,'# cm-2  = ',
@@ -19222,30 +16862,30 @@ c      WRITE(kout,105) colnew, colnew * pconv
 * Compute air density at each level
 
       CALL inter1(nz,z,airlev,nd,zd,airnew)
-      airlev(1:nzstem)=airstem(1:nzstem)   ! air density from STEM 
-      
-* Compute column increments on standard z-grid.  
+      airlev(1:nzstem)=airstem(1:nzstem)   ! air density from STEM
+
+* Compute column increments on standard z-grid.
 
       CALL inter3(nz,z,cz, nd,zd,cd, 1) ! perform weight interpolation, the overlapped
-                                        ! length is taken as weight. 
+                                        ! length is taken as weight.
       DO i = 1, nzstem- 1
         deltaz = 1.E5 * (z(i+1)-z(i))
-	if(abs(airstem(i+1)-airstem(i)).lt.1.and.i.le.(nzstem-2)) 
+	if(abs(airstem(i+1)-airstem(i)).lt.1.and.i.le.(nzstem-2))
      1	  then
 	 airstem(i+1)=airstem(i)+(airstem(i+2)-airstem(i))/(
      1	  z(i+2)-z(i))*(z(i+1)-z(i))        ! avoid zero difference of airstem
         endif
         cz(i) =  (airstem(i+1)-airstem(i))/         ! loading data from STEM
      1	   ALOG(airstem(i+1)/airstem(i)) * deltaz
-         
+
 	if(cz(i).lt.0.or.(.not.abs(cz(i)).lt.1e25)) then
 	 print*,'cz wrong in setair ',i,cz(i),deltaz
 	 print*,'z=',z(1:nzstem)
 	 print*,'airstem=',airstem(1:nzstem)
 	 stop
-	endif 
-      enddo  
-      
+	endif
+      enddo
+
       colz = fsum(nz-1,cz)
       pressz =  colz * pconv
 c      write(kout,110) colz, pressz
@@ -19279,14 +16919,14 @@ C     srayl(iw) = 3.90e-28/(wmicrn)**xx
          DO 40, i = 1, nz - 1
            dtrl(i,iw) = cz(i)*srayl(iw)
 c	   if(.not.(dtrl(i,iw).gt.-1.e36)) dtrl(i,iw)=0.   ! avoid overflow
-	   
+
 	   if(dtrl(i,iw).lt.0.or.(.not.abs(dtrl(i,iw)).lt.1e20)) then
 	    print*,'wrong dtrl ',dtrl(i,iw),cz(i),srayl(iw)
-	    print*,'airlev=',airlev(1:nz) 
+	    print*,'airlev=',airlev(1:nz)
 	    print*,'z=',z(1:nzstem)
 	    print*,'airstem=',airstem(1:nzstem)
 	    stop
-	   endif  
+	   endif
    40    CONTINUE
 
    30 CONTINUE
@@ -19413,7 +17053,7 @@ c      WRITE(kout,*)'wavelength-independent albedo = ', alb
       INTEGER nz
       INTEGER nw
 
-* Output: 
+* Output:
       REAL dtcld(kz,kw), omcld(kz,kw), gcld(kz,kw)
 
 * local:
@@ -19441,7 +17081,7 @@ c      WRITE(kout,*)'wavelength-independent albedo = ', alb
 * Can allow altitude variation of omega, g:
 
       n = 4
-      
+
       zd(1) = 5.
       cd(1) = 0.          ! cloud optical depth
       omd(1) = .9999
@@ -19483,7 +17123,7 @@ C     DO 11, i = 1, n    !***** CHANGED!!See header!!*****
          ENDIF
    15 CONTINUE
 
-c      WRITE(kout,*) 'Cloud: ', n, 'levels, tot opt. dep. = ', 
+c      WRITE(kout,*) 'Cloud: ', n, 'levels, tot opt. dep. = ',
 c     $     fsum(nz-1,cz)
 
 * assign at all wavelengths
@@ -19568,7 +17208,7 @@ c     $     fsum(nz-1,cz)
 
 * mid-layer temperature:
 
-      REAL tlay(kz) 
+      REAL tlay(kz)
 
 ********
 * output:
@@ -19580,7 +17220,7 @@ c     $     fsum(nz-1,cz)
 * local:
 ********
 
-* absorption cross sections 
+* absorption cross sections
 
       REAL xsno2(kw)
       REAL cz(kz)
@@ -19622,13 +17262,13 @@ c      write(kout,*) 'NO2:  1 ppb in lowest 1 km, 0 above'
       zd(3) = zd(2)* 1.000001
       no2(3) = 0.
 
-C     zd(4) = zd(3)*1.1 
+C     zd(4) = zd(3)*1.1
 C     no2(4) = 0.
 
 * compute column increments (alternatively, can specify these directly)
 
       DO 11, i = 1, nd - 1
-         cd(i) = (no2(i+1)+no2(i)) * 1.E5 * (zd(i+1)-zd(i)) / 2. 
+         cd(i) = (no2(i+1)+no2(i)) * 1.E5 * (zd(i+1)-zd(i)) / 2.
    11 CONTINUE
 
 * Include exponential tail integral from top level to infinity.
@@ -19641,10 +17281,10 @@ C     no2(4) = 0.
 ***********
 *********** end data input.
 
-* Compute column increments on standard z-grid.  
+* Compute column increments on standard z-grid.
 
       CALL inter3(nz,z,cz, nd,zd,cd, 1)
-* scale values of cz(i) 
+* scale values of cz(i)
 
       colold = fsum(nz-1,cz)
 c      WRITE(kout,100) colold, colold/2.687E16
@@ -19662,7 +17302,7 @@ c      WRITE(kout,100) colold, colold/2.687E16
       enddo
       DO i = 1, nzstem - 1
          cz(i) = (no2stem(i+1)+no2stem(i)) * 1.E5 *  ! load NO2 from STEM
-     1	 (z(i+1)-z(i)) / 2. 
+     1	 (z(i+1)-z(i)) / 2.
       enddo
 
       colnew = fsum(nz-1,cz)
@@ -19671,7 +17311,7 @@ c      WRITE(kout,105) colnew, colnew/2.687E16
      $     0pf8.2, '  Dobson Units ')
 
 ************************************
-* calculate optical depth for each layer, with temperature 
+* calculate optical depth for each layer, with temperature
 * correction.  Output, dtno2(kz,kw)
 
       DO 20, l = 1, nw-1
@@ -19754,7 +17394,7 @@ c      WRITE(kout,105) colnew, colnew/2.687E16
       PARAMETER (ngast = 17)
       REAL wlgast(ngast)
       SAVE wlgast
- 
+
 * O2 optical depth and equivalent cross section on Kockarts' grid
       REAL dto2k(kz,ngast-1), xso2k(kz,ngast-1)
 
@@ -19847,18 +17487,18 @@ c      WRITE(kout,105) colnew, colnew/2.687E16
 
 * sec Xhi or Chapman calculation
 * for zen > 95 degrees, use zen = 95.  (this is only to compute effective O2
-* cross sections. Still, better than setting dto2 = 0. as was done up to 
+* cross sections. Still, better than setting dto2 = 0. as was done up to
 * version 4.0) sm 1/2000
 * In future could replace with mu2(iz) (but mu2 is also wavelength-depenedent)
-* or imporved chapman function 
+* or imporved chapman function
 
-* slant O2 column 
+* slant O2 column
 
       DO i = 1, nz
          o2col(i) = 0.2095 * scol(i)
       ENDDO
 
-* effective secant of solar zenith angle.  Use 2.0 if no direct sun. 
+* effective secant of solar zenith angle.  Use 2.0 if no direct sun.
 * For nz, use value at nz-1
 
       do i = 1, nz - 1
@@ -19877,7 +17517,7 @@ c      WRITE(kout,105) colnew, colnew/2.687E16
 * overwrite from 204 to 241 nm (Herzberg continuum)
 
         icount=io2
-	 
+
 * set values to zero outside the wavelength range defined by the data files
 
         CALL addpnt(x1,y1,nosr,icount,     x1(1)-deltax,0.)
@@ -19893,7 +17533,7 @@ c      WRITE(kout,105) colnew, colnew/2.687E16
         wlla(1) = 121.4
         wlla(2) = 121.9
 
-* put together the internal grid by "pasting" the Lyman-Alpha grid and 
+* put together the internal grid by "pasting" the Lyman-Alpha grid and
 * Kockarts' grid into the combination of Brasseur/Solomon and JPL grid
         nwint = 0
         DO iw = 1, 9
@@ -19928,7 +17568,7 @@ c      WRITE(kout,105) colnew, colnew/2.687E16
 * if necessary:
 * do Kockarts' parameterization of the SR bands, output values of O2
 * optical depth and O2 equivalent cross section are on his grid
-      IF ((wl(1) .LT. wlgast(ngast)) .AND. 
+      IF ((wl(1) .LT. wlgast(ngast)) .AND.
      >    (wl(nw) .GT. wlgast(1))) THEN
         DO iw = 1, ngast-1
            CALL schu(nz,o2col,secchi,iw,dto2k,xso2k)
@@ -19942,7 +17582,7 @@ c      WRITE(kout,105) colnew, colnew/2.687E16
          CALL lymana(nz,o2col,secchi,dto2la,xso2la)
       ENDIF
 
-* loop through the altitude levels 
+* loop through the altitude levels
       DO iz = 1, nz
 
          igast = 0
@@ -19951,7 +17591,7 @@ c      WRITE(kout,105) colnew, colnew/2.687E16
 * loop through the internal wavelength grid
          DO iw = 1, nwint-1
 
-* if outside Kockarts' grid and outside Lyman-Alpha, use the 
+* if outside Kockarts' grid and outside Lyman-Alpha, use the
 * JPL/Brasseur+Solomon data, if inside
 * Kockarts' grid, use the parameterized values from the call to SCHU,
 * if inside Lyman-Alpha, use the paraemterized values from call to LYMANA
@@ -19989,7 +17629,7 @@ c      WRITE(kout,105) colnew, colnew/2.687E16
 	    print*,'scol=',scol(1:nz)
 	    print*,'z=',z(1:nz)
 	    stop
-	   endif 
+	   endif
          ENDDO
 
 * interpolate O2 optical depth from the internal grid onto the user grid
@@ -19997,23 +17637,23 @@ c      WRITE(kout,105) colnew, colnew/2.687E16
          DO iw = 1, nw-1
           dto2(iz,iw) = dtuser(iw)/(wl(iw+1)-wl(iw))
 c	    if(.not.(dto2(iz,iw).gt.-1.e36)) dto2(iz,iw)=0.   ! avoid overflow
-	    
+
 	  if(dto2(iz,iw).lt.0.or.(.not.abs(dto2(iz,iw)).lt.1e20)) then
 	   print*,'wrong dto2 ',iz,iw,dto2(iz,iw)
 	   print*,'dtuser=',dtuser(iw)
 	   print*,'wl(iw+1),wl(iw)=',wl(iw+1),wl(iw)
 	   stop
-	  endif  
-	    
+	  endif
+
 c	    if(dto2(iz,iw).lt.0) then
 c	     print*,'negative dto2 ',iz,iw,dto2(iz,iw),dtuser(iw),
 c     1	      wl(iw+1),wl(iw)
 c             print*,'cz=',cz(1:nz)
 c	     print*,'z=',z(1:nz)
 c	     stop
-c	    endif 
+c	    endif
          ENDDO
-      
+
 * interpolate O2 cross section from the internal grid onto the user grid
          CALL inter3(nw,wl,xsuser, nwint,wlint,xstmp, 0)
 
@@ -20027,7 +17667,7 @@ c	    endif
 
       RETURN
       END
-      
+
       SUBROUTINE setozo(dobnew,
      $     nz,z,nw,wl,
      $     xso3,s226,s263,s298,tlay,
@@ -20101,7 +17741,7 @@ c	    endif
       REAL xso3(kw), s226(kw),s263(kw),s298(kw)
       REAL dobnew
 * mid-layer temperature:
-      REAL tlay(kz) 
+      REAL tlay(kz)
 
 ********
 * output:
@@ -20123,7 +17763,7 @@ c	    endif
      1  16.,18.,20.,22.,24.,26.,28.,30.,32.,
      2  34.,36.,38.,40.,42.,44.,46.,48.,50.,
      3  52.,54.,56.,58.,60.,62.,64.,66.,68.,70.,72.,74./
-     
+
        data o3(1:nd)/.102E+13,.920E+12,.680E+12,.580E+12,.570E+12,
      1  .650E+12,.113E+13,.202E+13,.235E+13,.295E+13,.404E+13,.477E+13,
      2  .486E+13,.454E+13,.403E+13,.324E+13,.252E+13,.203E+13,
@@ -20131,7 +17771,7 @@ c	    endif
      4  .169E+12,.103E+12,.664E+11,.384E+11,.255E+11,.161E+11,
      5 .112E+11,.733E+10,.481E+10,.317E+10,.172E+10,.750E+09,
      6 .540E+09,.220E+09,.170E+09/
-     
+
       REAL cd(kdata)
       REAL hscale
       REAL dobold, scale, dobstem, doboldstem
@@ -20156,7 +17796,7 @@ c      WRITE(kout,*) 'ozone profile: USSA, 1976'
 * compute column increments
 
       DO 11, i = 1, nd - 1
-         cd(i) = (o3(i+1)+o3(i)) * 1.E5 * (zd(i+1)-zd(i)) / 2. 
+         cd(i) = (o3(i+1)+o3(i)) * 1.E5 * (zd(i+1)-zd(i)) / 2.
    11 CONTINUE
 
 * Include exponential tail integral from infinity to 50 km,
@@ -20166,16 +17806,16 @@ c      WRITE(kout,*) 'ozone profile: USSA, 1976'
       hscale = 4.50e5
       cd(nd-1) = cd(nd-1) + hscale * o3(nd)
 
-* alternative input ozone concentration data could include, e.g., 
+* alternative input ozone concentration data could include, e.g.,
 * a read file here:
 
 ***********
 *********** end data input.
 
-* Compute column increments on standard z-grid.  
+* Compute column increments on standard z-grid.
 
       CALL inter3(nz,z,cz, nd,zd,cd, 1)
-       
+
 * scale values of cz(i) by any dobson unit
 
       colold = fsum(nz-1,cz)
@@ -20187,10 +17827,10 @@ c      WRITE(kout,100) colold, dobold
 
       DO i = 1, nzstem - 1
          cz(i) = (o3stem(i+1)+o3stem(i)) * 1.E5 *  ! load ozone from STEM
-     1	 (z(i+1)-z(i)) / 2. 
+     1	 (z(i+1)-z(i)) / 2.
       enddo
       dobstem=fsum(nzstem-1,cz)/ 2.687e16        ! dobson depth of STEM ozone
-            
+
 c      if (dobnew .lt. 0.) then
 c         scale = 1.
 c      else
@@ -20202,7 +17842,7 @@ c      endif
       else
         scale=(dobnew-dobstem)/(dobold-doboldstem)
       endif
-        	
+
       do i = nzstem, nz-1
          cz(i) = cz(i) * scale
       enddo
@@ -20213,7 +17853,7 @@ c      WRITE(kout,105) colnew, colnew/2.687E16
      $     0pf8.2, '  Dobson Units ')
 
 ************************************
-* calculate ozone optical depth for each layer, with temperature 
+* calculate ozone optical depth for each layer, with temperature
 * correction.  Output, dto3(kz,kw)
 
       DO 20, iw = 1, nw-1
@@ -20306,7 +17946,7 @@ c      WRITE(kout,105) colnew, colnew/2.687E16
 
 * mid-layer temperature:
 
-      REAL tlay(kz) 
+      REAL tlay(kz)
 
 ********
 * output:
@@ -20318,7 +17958,7 @@ c      WRITE(kout,105) colnew, colnew/2.687E16
 * local:
 ********
 
-* absorption cross sections 
+* absorption cross sections
 
       REAL xsso2(kw)
       REAL cz(kz)
@@ -20360,13 +18000,13 @@ c      write(kout,*) 'SO2:  1 ppb in lowest 1 km, 0 above'
       zd(3) = zd(2)* 1.000001
       so2(3) = 0.
 
-C     zd(4) = zd(3)*1.1 
+C     zd(4) = zd(3)*1.1
 C     so2(4) = 0.
 
 * compute column increments (alternatively, can specify these directly)
 
       DO 11, i = 1, nd - 1
-         cd(i) = (so2(i+1)+so2(i)) * 1.E5 * (zd(i+1)-zd(i)) / 2. 
+         cd(i) = (so2(i+1)+so2(i)) * 1.E5 * (zd(i+1)-zd(i)) / 2.
    11 CONTINUE
 
 * Include exponential tail integral from top level to infinity.
@@ -20379,11 +18019,11 @@ C     so2(4) = 0.
 ***********
 *********** end data input.
 
-* Compute column increments on standard z-grid.  
+* Compute column increments on standard z-grid.
 
       CALL inter3(nz,z,cz, nd,zd,cd, 1)
 
-* scale values of cz(i) 
+* scale values of cz(i)
 
       colold = fsum(nz-1,cz)
 c      WRITE(kout,100) colold, colold/2.687E16
@@ -20401,7 +18041,7 @@ c      WRITE(kout,100) colold, colold/2.687E16
       enddo
       DO i = 1, nzstem - 1
          cz(i) = (so2stem(i+1)+so2stem(i)) * 1.E5 *  ! load SO2 from STEM
-     1	 (z(i+1)-z(i)) / 2. 
+     1	 (z(i+1)-z(i)) / 2.
       enddo
 
       colnew = fsum(nz-1,cz)
@@ -20410,14 +18050,14 @@ c      WRITE(kout,105) colnew, colnew/2.687E16
      $     0pf8.2, '  Dobson Units ')
 
 ************************************
-* calculate sulfur optical depth for each layer, with temperature 
+* calculate sulfur optical depth for each layer, with temperature
 * correction.  Output, dtso2(kz,kw)
 
       DO 20, l = 1, nw-1
          sso2 = xsso2(l)
          DO 10, i = 1, nz - 1
 
-c Leaving this part in in case i want to interpolate between 
+c Leaving this part in in case i want to interpolate between
 c the 221K and 298K data.
 c
 c            IF ( wl(l) .GT. 240.5  .AND. wl(l+1) .LT. 350. ) THEN
@@ -20526,14 +18166,14 @@ c            ENDIF
      g 264.000,276.000,288.000,300.000,312.000,324.000,336.000,
      h 348.000,360.000/
 
-      
+
 *_______________________________________________________________________
 
 
 * read in temperature profile
 
 
-* use constant temperature to infinity:  
+* use constant temperature to infinity:
 
       zd(nd) = 1.E10
 
@@ -20553,7 +18193,7 @@ c            ENDIF
          tlay(i) = (tlev(i+1) + tlev(i))/2.
  20   CONTINUE
 *_______________________________________________________________________
-      
+
       RETURN
       END
 
@@ -20685,7 +18325,7 @@ c            ENDIF
       REAL  dr
       PARAMETER ( dr = pi/180.)
 
-* local 
+* local
 
       REAL zenrad, rpsinz, rj, rjp1, dsj, dhj, ga, gb, sm
       INTEGER i, j, k
@@ -20726,7 +18366,7 @@ c            ENDIF
       DO 100 i = 0, nlayer
 
         rpsinz = (re + zd(i)) * SIN(zenrad)
- 
+
         IF ( (zen .GT. 90.0) .AND. (rpsinz .LT. re) ) THEN
            nid(i) = -1
         ELSE
@@ -20734,30 +18374,30 @@ c            ENDIF
 *
 * Find index of layer in which the screening height lies
 *
-           id = i 
+           id = i
            IF( zen .GT. 90.0 ) THEN
               DO 10 j = 1, nlayer
                  IF( (rpsinz .LT. ( zd(j-1) + re ) ) .AND.
      $               (rpsinz .GE. ( zd(j) + re )) ) id = j
  10           CONTINUE
            END IF
- 
+
            DO 20 j = 1, id
 
              sm = 1.0
              IF(j .EQ. id .AND. id .EQ. i .AND. zen .GT. 90.0)
      $          sm = -1.0
- 
+
              rj = re + zd(j-1)
              rjp1 = re + zd(j)
- 
+
              dhj = zd(j-1) - zd(j)
- 
+
              ga = rj*rj - rpsinz*rpsinz
              gb = rjp1*rjp1 - rpsinz*rpsinz
              IF (ga .LT. 0.0) ga = 0.0
              IF (gb .LT. 0.0) gb = 0.0
- 
+
              IF(id.GT.i .AND. j.EQ.id) THEN
                 dsj = SQRT( ga )
              ELSE
@@ -20766,9 +18406,9 @@ c            ENDIF
              dsdh(i,j) = dsj / dhj
 
  20        CONTINUE
- 
+
            nid(i) = id
- 
+
         END IF
 
  100  CONTINUE
@@ -20829,7 +18469,7 @@ c            ENDIF
       PARAMETER(pi=3.1415926535898)
 *_______________________________________________________________________
 
-      DATA imn/31,28,31,30,31,30,31,31,30,31,30,31/             
+      DATA imn/31,28,31,30,31,30,31,31,30,31,30,31/
 *_______________________________________________________________________
 
 * parse date to find day number (Julian day)
@@ -20871,7 +18511,7 @@ cgy
 
       mday = 0
       DO 12, month = 1, imonth-1
-         mday = mday + imn(month)	  	   
+         mday = mday + imn(month)
    12 CONTINUE
       jday = mday + iday
       dayn = FLOAT(jday - 1) + 0.5
@@ -20890,8 +18530,8 @@ cgy
       costh = COS(thet0)
       sin2th = 2.*sinth*costh
       cos2th = costh*costh - sinth*sinth
-      esrm2  = 1.000110 + 
-     $         0.034221*costh  +  0.001280*sinth + 
+      esrm2  = 1.000110 +
+     $         0.034221*costh  +  0.001280*sinth +
      $         0.000719*cos2th +  0.000077*sin2th
 *_______________________________________________________________________
 
@@ -20954,7 +18594,7 @@ cgy
       REAL lbut,lzut
       REAL rlt
       REAL d, tz, rdecl, eqr, eqh, zpt
-      REAL csz, zr, caz, raz 
+      REAL csz, zr, caz, raz
       REAL sintz, costz, sin2tz, cos2tz, sin3tz, cos3tz
 
       INTEGER iiyear, imth, iday, ijd
@@ -20969,7 +18609,7 @@ cgy
       PARAMETER (dr=pi/180.D0)
 *_______________________________________________________________________
 
-      DATA imn/31,28,31,30,31,30,31,31,30,31,30,31/             
+      DATA imn/31,28,31,30,31,30,31,31,30,31,30,31/
 *_______________________________________________________________________
 
 * convert to radians
@@ -21006,10 +18646,10 @@ cgy
 
       tz = 2.*pi*d/365.
 
-* Calculate sine and cosine from addition theoremes for 
+* Calculate sine and cosine from addition theoremes for
 * better performance;  the computation of sin2tz,
 * sin3tz, cos2tz and cos3tz is about 5-6 times faster
-* than the evaluation of the intrinsic functions 
+* than the evaluation of the intrinsic functions
 *
 * It is SIN(x+y) = SIN(x)*COS(y)+COS(x)*SIN(y)
 * and   COS(x+y) = COS(x)*COS(y)-SIN(x)*SIN(y)
@@ -21027,8 +18667,8 @@ cgy
 
 * Equation 3.7 for declination in radians
 
-      rdecl = 0.006918 - 0.399912*costz  + 0.070257*sintz 
-     $                 - 0.006758*cos2tz + 0.000907*sin2tz    
+      rdecl = 0.006918 - 0.399912*costz  + 0.070257*sintz
+     $                 - 0.006758*cos2tz + 0.000907*sin2tz
      $                 - 0.002697*cos3tz + 0.001480*sin3tz
 
 * Equation 3.11 for Equation of time  in radians
@@ -21038,18 +18678,18 @@ cgy
 
 * convert equation of time to hours:
 
-      eqh = eqr*24./(2.*pi) 
+      eqh = eqr*24./(2.*pi)
 
 * calculate local hour angle (hours):
 
-      lbut = 12. - eqh - long*24./360 
+      lbut = 12. - eqh - long*24./360
 
 * convert to angle from UT
 
       lzut = 15.*(ut - lbut)
       zpt = lzut*dr
 
-* Equation 2.4 for cosine of zenith angle 
+* Equation 2.4 for cosine of zenith angle
 
       csz = SIN(rlt)*SIN(rdecl) + COS(rlt)*COS(rdecl)*COS(zpt)
       zr = ACOS(csz)

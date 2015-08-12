@@ -93,7 +93,7 @@ C     ---- Give the upper limit, to take advantage of lbfgs-b ------
                stop
             endif
             emi_unc(i,j,1:2,1) = unc_temp
-            if(emi_unc(i,j)>small) then
+            if(emi_unc(i,j,2,1)>small) then   !TWH - ifort change from emi_unc(i,j)
                lbfgs_n=lbfgs_n+1
                i_map(lbfgs_n)=i
                j_map(lbfgs_n)=j

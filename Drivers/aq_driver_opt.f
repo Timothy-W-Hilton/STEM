@@ -423,13 +423,14 @@ C     ---- Direct Access Files -----
       fname_emi_fac = 'TmpEmiFac'
       fname_emi_grd = 'TmpEmiGrd'
 
-C     ---- Write Initial Conc.
-      if( mode=='fwd' .or. mode=='fbw'.or.mode=='obs') then
-         open(unit_emi_fac,file=fname_emi_fac, access='direct',
+C     ---- write Initial Conc.
+      IF( mode=='fwd' .OR. mode=='fbw'.OR.mode=='obs') THEN
+         OPEN(UNIT=unit_emi_fac,FILE=fname_emi_fac, ACCESS='direct',
+     &        FORM="UNFORMATTED", !TWH make pgf90 default explicit
      &        recl=4*ix*iy*2*1)
-         write(unit_emi_fac) emi_fac
-         close( unit_emi_fac)
-      end if
+         WRITE(unit_emi_fac, rec=1) emi_fac
+         CLOSE( unit_emi_fac)
+      END IF
 
 
 C     ---- Call simulation by executing Adjoint stem in a new shell -------------

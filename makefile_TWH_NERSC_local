@@ -1,40 +1,33 @@
-# Timothy W. Hilton's attempt to compile STEM on carver.nersc.gov
+# Timothy W. Hilton's attempt to compile STEM on hopper.nersc.gov,
+# edison.nersc.gov.  Works using pgf90 on hopper.nersc.gov and using
+# ifort on edison.nersc.gov (verified 17 Aug 2015).  The linker must
+# be able to access libioapi.a compiled with the same compiler.
 
 SHELL=/bin/sh
 
-ifeq ($(NERSC_HOST), carver)
-	# The serial Portland Group compiler
-	FC=mpif90
-	LD=mpif90
-	# The parallel (mpi) Portland Group compiler
-	PFC=mpif90
-	PLD=mpif90
-else
-ifeq ($(NERSC_HOST), hopper)
-	# on hopper use the Cray wrapper "ftn" for compiling fortran.
-	# The default Fortran compiler on hopper Portland Group.  The
-	# wrappers are MPI-aware so mpif90 does not need to be called
-	# explicitly.  See
-	# https://www.nersc.gov/users/computational-systems/hopper/programming/compiling-codes-on-hopper/
-	# The serial Portland Group compiler
-	FC=ftn
-	LD=ftn
-	# The parallel (mpi) Portland Group compiler
-	PFC=ftn
-	PLD=ftn
-endif  # if hopper
-endif  # if carver
+# necessary modules to load on hopper or edison: netcdf, cray-libsci
+
+# on hopper or edison use the Cray wrapper "ftn" for compiling
+# fortran.  The default Fortran compiler on hopper is Portland Group
+# (pgf90).  The default compiler on edison is Intel (ifort).  wrappers
+# cc and ftn are are MPI-aware so mpif90 does not need to be called
+# explicitly.  The wrappers point toward the default compiler.
+# https://www.nersc.gov/users/computational-systems/hopper/programming/compiling-codes-on-hopper/
+FC=ftn
+LD=ftn
+# The parallel compiler (PG on hopper; Intel on hopper)
+PFC=ftn
+PLD=ftn
 
 # the "root" directory for stem, containing the src and run directories
 STEMROOTDIR=$(PWD)
 #the directory containing the stem sources
 STEMSRCDIR=$(STEMROOTDIR)/
-#the directory in which to place the stem executables
-STEMRUNDIR=$(STEMROOTDIR)/
-#STEMRUNDIR=$(HOME)
 #the directory containing all the local libraries, sources, etc.
 ROOTDIR=$(HOME)
 PROJDIR=/project/projectdirs/m2319
+#the directory in which to place the stem executables
+STEMRUNDIR=$(STEMROOTDIR)
 
 # The Vis5D home directory
 V5DHOME=/usr/local/vis5d-5.2
@@ -48,8 +41,8 @@ DIRINCL=$(STEMSRCDIR)/Include
 STEMINCL=-I$(DIRINCL) -I$(STEMSRCDIR)/Tuvsub
 FFLAGS   = -c -O $(APINCL) $(STEMINCL)
 PFFLAGS  = -c -O $(APINCL) $(STEMINCL)
-LDFLAGS  = -O -g77libs
-PLDFLAGS = -O -g77libs
+LDFLAGS  = -O  -openmp -lpthread
+PLDFLAGS = -O  -openmp -lpthread
 
 # use debugging compiler and linker flags if debug target specified
 debug:FFLAGS  += -g
@@ -57,7 +50,10 @@ debug:PFFLAGS  += -g
 debug:LDFLAGS  += -g
 debug:PLDFLAGS += -g
 
-MATHLIB= -llapack -lblas
+# at NERSC lapack and blas are included in the module cray-libsci, and
+# found automatically by the cray compiler wrappers ftn and cc.  If
+# the module cray-libsci is loaded no further action is necessary.
+MATHLIB= # -llapack -lblas
 
 CMDOPT = $(STEMRUNDIR)/saprcnov-LRU_paper_fwd_main.exe
 CMDFUN = $(STEMRUNDIR)/saprcnov-LRU_paper_fun.exe
@@ -245,4 +241,7 @@ setulb.o: $(DIROPT)/setulb.f
 	$(FC) $(FFLAGS) $<
 
 clean:
-	rm -f $(OBJ) $(OBJDRV) $(LIBS)
+	rm -fv $(OBJ) $(OBJDRV) $(OBJDRVFUN) $(OBJDRVOPT) $(LIBS)
+
+clobber: clean
+	rm -fv $(CMDOPT) $(CMDFUN) ./*.mod

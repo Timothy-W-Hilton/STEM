@@ -291,9 +291,10 @@ C ---- Read the initial concentration provided by the simulation subroutine ----
         emi_grd=0.0
 !	print*,'Test mode ',mode,ix,iy
         if (mode == 'fbw' .or. mode == 'fwd') then
-           open(unit_emi_fac,file='TmpEmiFac', access='direct',
+           open(UNIT=unit_emi_fac, FILE='TmpEmiFac', ACCESS='direct',
+     &          FORM='UNFORMATTED',  !TWH make pgf90 format  explicit
      &          recl=4*ix*iy*2*1)
-           read(unit_emi_fac) emi_fac
+           read(UNIT=unit_emi_fac, rec=1) emi_fac
            close(unit_emi_fac)
 
         !@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -658,19 +659,19 @@ c=================================================================
               i_sg1=obs_index(i_mea,i_spe)
               tri_linear=sg1(ix_obs,iy_obs,iz_obs,i_sg1)        !Point 000
      &                   *(1.-fx_obs)*(1.-fy_obs)*(1.-fz_obs)
-     &                 + sg1(ix_obs+1,iy_obs,iz_obs,i_sg1)      !Point 100 
+     &                 + sg1(ix_obs+1,iy_obs,iz_obs,i_sg1)      !Point 100
      &                   *fx_obs*(1.-fy_obs)*(1.-fz_obs)
      &                 + sg1(ix_obs,iy_obs+1,iz_obs,i_sg1)      !Point 010
      &                   *(1.-fx_obs)*fy_obs*(1.-fz_obs)
-     &                 + sg1(ix_obs,iy_obs,iz_obs+1,i_sg1)      !Point 001 
+     &                 + sg1(ix_obs,iy_obs,iz_obs+1,i_sg1)      !Point 001
      &                   *(1.-fx_obs)*(1.-fy_obs)*fz_obs
-     &                 + sg1(ix_obs+1,iy_obs,iz_obs+1,i_sg1)    !Point 101 
+     &                 + sg1(ix_obs+1,iy_obs,iz_obs+1,i_sg1)    !Point 101
      &                   *fx_obs*(1.-fy_obs)*fz_obs
-     &                 + sg1(ix_obs,iy_obs+1,iz_obs+1,i_sg1)    !Point 011  
+     &                 + sg1(ix_obs,iy_obs+1,iz_obs+1,i_sg1)    !Point 011
      &                   *(1.-fx_obs)*fy_obs*fz_obs
-     &                 + sg1(ix_obs+1,iy_obs+1,iz_obs,i_sg1)    !Point 110   
+     &                 + sg1(ix_obs+1,iy_obs+1,iz_obs,i_sg1)    !Point 110
      &                   *fx_obs*fy_obs*(1.-fz_obs)
-     &                 + sg1(ix_obs+1,iy_obs+1,iz_obs+1,i_sg1)  !Point 111 
+     &                 + sg1(ix_obs+1,iy_obs+1,iz_obs+1,i_sg1)  !Point 111
      &                   *fx_obs*fy_obs*fz_obs
                 f_obs_model(i_flt,i_mea)= f_obs_model(i_flt,i_mea)
      &                                  + ft_obs*tri_linear

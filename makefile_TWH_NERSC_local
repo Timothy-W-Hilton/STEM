@@ -39,10 +39,10 @@ APILIB= -L$(PROJDIR)/local/lib -lioapi -lnetcdf
 DIRINCL=$(STEMSRCDIR)/Include
 # The Stem Common Blocks and other Things to Include
 STEMINCL=-I$(DIRINCL) -I$(STEMSRCDIR)/Tuvsub
-FFLAGS   = -c -O $(APINCL) $(STEMINCL)
-PFFLAGS  = -c -O $(APINCL) $(STEMINCL)
-LDFLAGS  = -O  -openmp -lpthread
-PLDFLAGS = -O  -openmp -lpthread
+FFLAGS   = -c -O $(APINCL) $(STEMINCL) -dynamic
+PFFLAGS  = -c -O $(APINCL) $(STEMINCL) -dynamic
+LDFLAGS  = -O  -openmp -lpthread -dynamic
+PLDFLAGS = -O  -openmp -lpthread -dynamic
 
 # use debugging compiler and linker flags if debug target specified
 debug:FFLAGS  += -g

@@ -1,3 +1,5 @@
+### Summary ###
+
 This repository provides the source code for the The Sulfur Transport
 and dEposition Model (STEM).
 
@@ -16,9 +18,9 @@ employed it.
 
 This source code repository also contains an adjoint model developed
 to quantitatively estimate STEM parameter values as well as surface
-fluxes that optimally match atmospheric observations.  More
+fluxes that optimally match atmospheric observations.  For more
 information about the STEM adjoint please see: Daescu and Carmichael,
-2003; Hakami et al., 2005; Sandu et al., 2005; Chai et al., 2006
+2003; Hakami et al., 2005; Sandu et al., 2005; Chai et al., 2006.
 
 ### References ###
 

@@ -9,8 +9,8 @@ STEM has successfully simulated aerosol distribution and outflow over
 Asia as well as atmospheric trace gas concentrations over North
 America.
 
-Carmichael et al. (2001) provides a detailed conceptual description of
-the STEM modeling framework.  The other references below describe
+Song and Carmichael (2001) provides a detailed conceptual description
+of the STEM modeling framework.  The other references below describe
 subsequent enhancements to the model as well as modeling studies that
 employed it.
 

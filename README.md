@@ -23,6 +23,14 @@ information about the STEM adjoint please see: Daescu and Carmichael,
 ### References ###
 
 ```html
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+</head>
+<body>
 <div class="references">
 <p>Campbell, J. E., G. R. Carmichael, Y. Tang, T. Chai, S. A. Vay, Y.-H. Choi, G. W. Sachse, H. B. Singh, J. L. Schnoor, J. Woo, J. M. Vukovich, D. G. Streets, L. G. Huey, and C. O. Stanier (2007), Analysis of anthropogenic CO<span class="math"><em></em><sub>2</sub></span> signal in ICARTT using a regional chemical transport model and observed tracers, <em>Tellus B</em>, <em>59</em>(2), 199–210, doi:<a href="http://dx.doi.org/10.1111/j.1600-0889.2006.00239.x">10.1111/j.1600-0889.2006.00239.x</a>.</p>
 <p>Carmichael, G. R., Y. Tang, G. Kurata, I. Uno, D. Streets, J.-H. Woo, H. Huang, J. Yienger, B. Lefer, R. Shetter, D. Blake, E. Atlas, A. Fried, E. Apel, F. Eisele, C. Cantrell, M. Avery, J. Barrick, G. Sachse, W. Brune, S. Sandholm, Y. Kondo, H. Singh, R. Talbot, A. Bandy, D. Thorton, A. Clarke, and B. Heikes (2003), Regional-scale chemical transport modeling in support of the analysis of observations obtained during the TRACE-P experiment, <em>Journal of Geophysical Research: Atmospheres</em>, <em>108</em>(D21), n/a–n/a, doi:<a href="http://dx.doi.org/10.1029/2002JD003117">10.1029/2002JD003117</a>.</p>
@@ -35,4 +43,5 @@ information about the STEM adjoint please see: Daescu and Carmichael,
 <p>Tang, Y., G. R. Carmichael, I. Uno, J.-H. Woo, G. Kurata, B. Lefer, R. E. Shetter, H. Huang, B. E. Anderson, M. A. Avery, A. D. Clarke, and D. R. Blake (2003), Impacts of aerosols and clouds on photolysis frequencies and photochemistry during TRACE-P: 2. Three-dimensional study using a regional chemical transport model, <em>Journal of Geophysical Research: Atmospheres</em>, <em>108</em>(D21), n/a–n/a, doi:<a href="http://dx.doi.org/10.1029/2002JD003100">10.1029/2002JD003100</a>.</p>
 <p>Tang, Y., G. R. Carmichael, J. H. Seinfeld, D. Dabdub, R. J. Weber, B. Huebert, A. D. Clarke, S. A. Guazzotti, D. A. Sodeman, K. A. Prather, I. Uno, J.-H. Woo, J. J. Yienger, D. G. Streets, P. K. Quinn, J. E. Johnson, C.-H. Song, V. H. Grassian, A. Sandu, R. W. Talbot, and J. E. Dibb (2004), Three-dimensional simulations of inorganic aerosol distributions in east Asia during spring 2001, <em>Journal of Geophysical Research: Atmospheres</em>, <em>109</em>(D19), n/a–n/a, doi:<a href="http://dx.doi.org/10.1029/2003JD004201">10.1029/2003JD004201</a>.</p>
 </div>
+</body>
 ```

@@ -1,7 +1,0 @@
-#!/bin/csh
-mv Mod_files/* .
-mv Obj_files/* .
-make -f my_make_file
-mv *.o Obj_files/
-mv *.mod Mod_files/
-

@@ -1,21 +1,20 @@
-# Timothy W. Hilton's attempt to compile STEM on hopper.nersc.gov,
-# edison.nersc.gov.  Works using pgf90 on hopper.nersc.gov and using
-# ifort on edison.nersc.gov (verified 17 Aug 2015).  The linker must
-# be able to access libioapi.a compiled with the same compiler.
+# Timothy W. Hilton's attempt to compile STEM on edison.nersc.gov.
+# Works using ifort on edison.nersc.gov (verified 17 Aug 2015).  The
+# linker must be able to access libioapi.a compiled with the same
+# compiler.
 
 SHELL=/bin/sh
 
-# necessary modules to load on hopper or edison: netcdf, cray-libsci
+# necessary modules to load on edison: netcdf, cray-libsci
 
-# on hopper or edison use the Cray wrapper "ftn" for compiling
-# fortran.  The default Fortran compiler on hopper is Portland Group
-# (pgf90).  The default compiler on edison is Intel (ifort).  wrappers
-# cc and ftn are are MPI-aware so mpif90 does not need to be called
-# explicitly.  The wrappers point toward the default compiler.
-# https://www.nersc.gov/users/computational-systems/hopper/programming/compiling-codes-on-hopper/
+# on edison use the Cray wrapper "ftn" for compiling fortran.  The
+# default compiler on edison is Intel (ifort).  wrappers cc and ftn
+# are are MPI-aware so mpif90 does not need to be called explicitly.
+# The wrappers point toward the default compiler.
+# https://www.nersc.gov/users/computational-systems/edison/programming/
 FC=ftn
 LD=ftn
-# The parallel compiler (PG on hopper; Intel on hopper)
+# The parallel compiler (Intel on edison)
 PFC=ftn
 PLD=ftn
 
@@ -45,6 +44,7 @@ LDFLAGS  = -O  -openmp -lpthread -dynamic
 PLDFLAGS = -O  -openmp -lpthread -dynamic
 
 # use debugging compiler and linker flags if debug target specified
+# TODO: use explicit O0 flag to turn off compiler optimizations
 debug:FFLAGS  += -g
 debug:PFFLAGS  += -g
 debug:LDFLAGS  += -g

@@ -1,5 +1,5 @@
 # Timothy W. Hilton's attempt to compile STEM on edison.nersc.gov.
-# Works using ifort on edison.nersc.gov (verified 17 Aug 2015).  The
+# Works using ifort on edison.nersc.gov (verified 27 Apr 2017).  The
 # linker must be able to access libioapi.a compiled with the same
 # compiler.
 
@@ -40,8 +40,8 @@ DIRINCL=$(STEMSRCDIR)/Include
 STEMINCL=-I$(DIRINCL) -I$(STEMSRCDIR)/Tuvsub
 FFLAGS   = -c -O $(APINCL) $(STEMINCL) -dynamic
 PFFLAGS  = -c -O $(APINCL) $(STEMINCL) -dynamic
-LDFLAGS  = -O  -openmp -lpthread -dynamic
-PLDFLAGS = -O  -openmp -lpthread -dynamic
+LDFLAGS  = -O  -qopenmp -lpthread -dynamic
+PLDFLAGS = -O  -qopenmp -lpthread -dynamic
 
 # use debugging compiler and linker flags if debug target specified
 # use explicit O0 flag during debugging so that compiler does not
@@ -56,8 +56,8 @@ debug:PLDFLAGS += -g -O0
 # the module cray-libsci is loaded no further action is necessary.
 MATHLIB= # -llapack -lblas
 
-CMDOPT = $(STEMRUNDIR)/saprcnov-LRU_paper_fwd_main.exe
-CMDFUN = $(STEMRUNDIR)/saprcnov-LRU_paper_fun.exe
+CMDOPT = $(STEMRUNDIR)/test_fwd_main.exe
+CMDFUN = $(STEMRUNDIR)/test_fun.exe
 
 all:  $(CMDFUN) $(CMDOPT)
 debug: all

@@ -94,8 +94,7 @@ OBJPAR= paqmsg_util.o paqmsg_library.o paqmsg_communication.o \
 	paqmsg_stem.o
 
 # --------------Input/Output Files -----------------------------------
-DIRIO=$(STEMSRCDIR)/IO1
-DIRIO2=$(STEMSRCDIR)/IO2
+DIRIO=$(STEMSRCDIR)/IO
 SRCIO=input_ioapi.f output_ioapi.f checkpoints.f
 OBJIO=input_ioapi.o output_ioapi.o checkpoints.o
 
@@ -229,7 +228,7 @@ tuvsub.o: $(DIRTUV)/tuvsub.f $(DIRTUV)/tuv.params
 checkpoints.o: $(DIRIO)/checkpoints.f
 	$(FC) $(FFLAGS) $<
 
-input_ioapi.o: $(DIRIO2)/input_ioapi.f
+input_ioapi.o: $(DIRIO)/input_ioapi.f
 	$(FC) $(FFLAGS) $<
 
 output_ioapi.o: $(DIRIO)/output_ioapi.f

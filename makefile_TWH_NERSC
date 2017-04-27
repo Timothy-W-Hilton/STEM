@@ -44,11 +44,12 @@ LDFLAGS  = -O  -openmp -lpthread -dynamic
 PLDFLAGS = -O  -openmp -lpthread -dynamic
 
 # use debugging compiler and linker flags if debug target specified
-# TODO: use explicit O0 flag to turn off compiler optimizations
-debug:FFLAGS  += -g
-debug:PFFLAGS  += -g
-debug:LDFLAGS  += -g
-debug:PLDFLAGS += -g
+# use explicit O0 flag during debugging so that compiler does not
+# optimize any variables away
+debug:FFLAGS  += -g -O0
+debug:PFFLAGS  += -g -O0
+debug:LDFLAGS  += -g -O0
+debug:PLDFLAGS += -g -O0
 
 # at NERSC lapack and blas are included in the module cray-libsci, and
 # found automatically by the cray compiler wrappers ftn and cc.  If

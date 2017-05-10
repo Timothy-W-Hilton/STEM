@@ -10,6 +10,14 @@ import send_TWH_txt
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description=("""script to start STEM, sending stdout to a dated log file and, optionally, sending a text to Tim when the run finishes."""))
+    parser.add_argument('-e',
+                        '--executable',
+    					nargs='?',
+    					type=str,
+    					dest='fname_exe',
+    					default='',
+    					const='',
+    					help=('full path to the STEM main executable.'))
     parser.add_argument('-r',
                         '--run_file',
     					nargs='?',
@@ -40,14 +48,18 @@ if __name__ == "__main__":
 
     logfile = t0.strftime('TWH_opt_%Y-%m-%dT%H%M%S.log')
     run_dir = os.getcwd()
-    cmd_str = "./saprcnov-LRU_paper_fwd_main.exe ./{runfile} > {logfile} 2>&1\n".format(logfile=logfile, runfile=args.fname_run_file)
+    cmd_str = "./{executable} ./{runfile} > {logfile} 2>&1\n".format(executable=args.fname_exe,
+                                                                     logfile=logfile,
+                                                                     runfile=args.fname_run_file)
     sys.stdout.write("====================\n"
                      "starting STEM\n"
                      "run directory: {pwd}\n"
+                     "executable: {executable}\n"
                      "run file: {run_file}\n"
                      "log file: {logfile_fname}\n"
                      "cmd: {cmd}"
                      "====================\n".format(pwd=os.getcwd(),
+                                                     executable=args.fname_exe,
                                                      run_file = args.fname_run_file,
                                                      logfile_fname=logfile,
                                                      cmd=cmd_str))

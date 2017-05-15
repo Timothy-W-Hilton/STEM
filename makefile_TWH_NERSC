@@ -26,7 +26,8 @@ STEMSRCDIR=$(STEMROOTDIR)/
 ROOTDIR=$(HOME)
 PROJDIR=/project/projectdirs/m2319
 #the directory in which to place the stem executables
-STEMRUNDIR=$(STEMROOTDIR)
+#STEMRUNDIR=$(STEMROOTDIR)
+STEMRUNDIR=/global/cscratch1/sd/twhilton/STEM_tests/STEM_adjCOS
 
 # The Vis5D home directory
 V5DHOME=/usr/local/vis5d-5.2
@@ -56,8 +57,8 @@ debug:PLDFLAGS += -g -O0
 # the module cray-libsci is loaded no further action is necessary.
 MATHLIB= # -llapack -lblas
 
-CMDOPT = $(STEMRUNDIR)/test_fwd_main.exe
-CMDFUN = $(STEMRUNDIR)/test_fun.exe
+CMDOPT = $(STEMRUNDIR)/adj_COS_main.exe
+CMDFUN = $(STEMRUNDIR)/adj_COS_fun.exe
 
 all:  $(CMDFUN) $(CMDOPT)
 debug: all

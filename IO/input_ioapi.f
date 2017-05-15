@@ -1057,22 +1057,12 @@ c------------------------------------------------------------------------------
       character*18 subname
       character*80 msg3d
 
-      logical aqout_exists
-      CHARACTER(len=255) :: AQOUT_val
-
       data subname /'read_ioapi'/
 
       iflag=0
       jul3d = JULIAN (year, month, day)
       date3d = 1000 * year + jul3d ! current date YYYYDDD
       time3d = 10000 * hour     ! current time HHMMSS
-
-      CALL get_environment_variable("AQOUT", AQOUT_val)
-      print *, 'read_IOAPI_find_previous thinks AQOUT is: ',
-     &     AQOUT_val
-      INQUIRE( FILE=AQOUT_val, EXIST=aqout_exists)
-      print *, 'read_IOAPI_find_previous thinks AQOUT exists: ',
-     &     aqout_exists
 
       if(.not. OPEN3(lname, FSREAD3, 'read_IOAPI_find_previous')) then
         print*, 'failed to open ', lname, ' in read_IOAPI_find_previous'
@@ -2004,35 +1994,26 @@ c     error code
 c     COS concentration from previous timestep
       real, dimension(:, :, :), allocatable :: cos_conc_prev
       real cos_assumed
-      logical aqout_exists
-      CHARACTER(len=255) :: AQOUT_val
 
-      print *, 'inside adjust_cos_plantflux'
       cos_assumed = 450    ! TODO: units
       allocate(cos_conc_prev(ix, iy, iz), stat=ierr)
-      print *, 'inside adjust_cos_plantflux: memory allocated'
-c$$$TODO: figure out what include needed for AllocErrorCheck
-c$$$      call AllocErrorCheck(ierr,'cos_conc_prev')
-c     put year, month, day into YYYYDDD format
+
+c$$$  TODO: figure out what include needed for AllocErrorCheck
+c$$$  call AllocErrorCheck(ierr,'cos_conc_prev')
+c$$$  put year, month, day into YYYYDDD format
       jdate = (1000 * year) + JULIAN(year, month, day)
-c     put hour in to HHMMSS (setting both MM and SS to 00)
+c$$$  put hour in to HHMMSS (setting both MM and SS to 00)
       jtime = hour*10000
       one_hour = 10000
-      print *, 'inside adjust_cos_plantflux: calculating time step'
+
+c$$$  calculate previous time step by subtracting one hour from current
+c$$$  timestep
       call NEXTIME(jdate, jtime, (one_hour * -1))
       call DAYMON(jdate, MM_prev, DD_prev)
       YYYY_prev = FLOOR(jdate / 1000.0)
       HH_prev = FLOOR(jtime / 10000.0)
-      print *, 'inside adjust_cos_plantflux: time step calculated;'
-      print *, 'now calling read_ioapi_find_previous'
 
-c     check that AQOUT exists
-      INQUIRE( FILE='./output/AQOUT.adjcos.nc', EXIST=aqout_exists)
-      print *, 'adjust_cos_plantflux thinks AQOUT exists: ',
-     &     aqout_exists
-      CALL get_environment_variable("AQOUT", AQOUT_val)
-      print *, 'adjust_cos_plantflux thinks AQOUT is: ',
-     &     AQOUT_val
+c$$$      read previous timestep [COS] from AQOUT
       call READ_IOAPI_FIND_PREVIOUS('AQOUT', 'CO2_TRACER1',
      &     YYYY_prev, MM_prev, DD_prev, HH_prev, cos_conc_prev, ierr)
       print *, 'cos_flux_t', shape(cos_flux_t)

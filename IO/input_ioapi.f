@@ -2014,9 +2014,9 @@ c$$$      read previous timestep [COS] from AQOUT
       print *, 'cos_flux_t', shape(cos_flux_t)
       print *, 'cos_conc_prev', shape(cos_conc_prev)
       print *, 'cos_conc_prev', shape(cos_conc_prev(:, :, 1))
-c      cos_flux_t = cos_flux_t * (cos_conc_prev(:, :, 1)) ! / cos_assumed)
+      cos_flux_t(:, :, 1) = cos_flux_t(:, :, 1) *
+     &     (cos_conc_prev(:, :, 1) / cos_assumed)
       deallocate(cos_conc_prev)
-      print *, 'stopping now'
-      stop
+      print *, '[COS] adjustment sucessful ', jdate, jtime
       RETURN
       END

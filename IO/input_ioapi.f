@@ -47,14 +47,14 @@ c     open all the data file
 c-------------------------------------------------------------------------
 c        read geological data: longitude, latitude, terrain base ht
 
-      if(.not.open3('HEIGHT3D',FSREAD3,'aq_open')) then  ! for MM5 output
-        print*, 'failed to open HEIGHT3D in input1'
-        stop
+      if(.not.open3('HEIGHT3D',FSREAD3,'aq_open')) then ! for MM5 output
+         print*, 'failed to open HEIGHT3D in input1'
+         stop
       endif
       call READ_IOAPI('HEIGHT3D','AGL',1000, 1, 1, 0, hdz,iflag)
       if(iflag.ne.0) then
-       print*,'failed to get height information from HEIGHT3D'
-       stop
+         print*,'failed to get height information from HEIGHT3D'
+         stop
       endif
       nflag=close3('HEIGHT3D')
 
@@ -62,95 +62,92 @@ c        read geological data: longitude, latitude, terrain base ht
       call READ_IOAPI('DOMAIN','LAT',1000, 1, 1, 0, tlat,iflag)
       call READ_IOAPI('DOMAIN','TOPO',1000, 1, 1, 0, h,iflag)
 
-
       if(iz.gt.2) then
          do 10 i=1,ix
-          do 10 j=1,iy
-           do k=1,iz
-            hdz(i,j,k)=hdz(i,j,k)+h(i,j)   ! altitude above sea level
-           enddo
-          do 10 k=2,iz
-           dz(i,j,k-1)=hdz(i,j,k)-hdz(i,j,k-1)
-10       continue
-      endif
+            do 10 j=1,iy
+               do k=1,iz
+                  hdz(i,j,k)=hdz(i,j,k)+h(i,j) ! altitude above sea level
+               enddo
+               do 10 k=2,iz
+                  dz(i,j,k-1)=hdz(i,j,k)-hdz(i,j,k-1)
+ 10            continue
+            endif
 
 c-------------------------------------------------------------------------
 c                                 initial condition
-c     call aq_readhd(iunit(3),1)
-c     call aq_read_conc(iunit(3),ix*iy*iz,numl(1,3),numl(1,3),
-c    1                 sname(1,1),sg1,
-c    2 '** error in reading gas initial concentrations **')
 
+            call INTERP_IOAPI('METEO3D','T', ! K
+     &           istday(1),istday(2),istday(3),isthr,
+     &           t(1,1,1),ix*iy*iz,idum)
+c     c
+            call INTERP_IOAPI('METEO3D','P',istday(1), ! Pa
+     &           istday(2),istday(3),isthr,sg1(1,1,1,iair),
+     &           ix*iy*iz,iflag)
+            print*,' READ initial condition file in input1'
 
-      call INTERP_IOAPI('METEO3D','T',                      ! K
-     1  istday(1),istday(2),istday(3),isthr,t(1,1,1),ix*iy*iz,idum)
-cc
-      call INTERP_IOAPI('METEO3D','P',istday(1),             ! Pa
-     1 istday(2),istday(3),isthr,sg1(1,1,1,iair),ix*iy*iz,iflag)
-c      print*,sg1(10,10,1,iair),sg1(50,50,1,iair)
-      print*,' READ initial condition file in input1'
+!**************************************************************
+! 	Changed from numl(1,3) to numl(1,2)
+!                     Chai, Tianfeng 3/17/2005
+!**************************************************************
+            do l=1,numl(1,2)
+               write(6,*), l, sname(l,1)
+               if(sname(L,1).eq.'H2SO4') then
+                  call READ_IOAPI('INITF','H2SO4',
+     &                 istday(1),istday(2),istday(3),isthr,sg1(1,1,1,L),
+     &                 iflag)
 
-      !**************************************************************
-      ! 	Changed from numl(1,3) to numl(1,2)
-      !                     Chai, Tianfeng 3/17/2005
-      !**************************************************************
-      do l=1,numl(1,2)
-       write(6,*), l, sname(l,1)
-       if(sname(L,1).eq.'H2SO4') then
-        call READ_IOAPI('INITF','H2SO4',
-     1  istday(1),istday(2),istday(3),isthr,sg1(1,1,1,L),iflag)
-
-        call READ_IOAPI('INITF','SO41',
-     1  istday(1),istday(2),istday(3),isthr,work,iflag)
-        sg1(1:ix,1:iy,1:iz,L)=sg1(1:ix,1:iy,1:iz,L)+work(1:ix,1:iy,1:iz)
+                  call READ_IOAPI('INITF','SO41',
+     &                 istday(1),istday(2),istday(3),isthr,work,iflag)
+                  sg1(1:ix,1:iy,1:iz,L) = sg1(1:ix,1:iy,1:iz,L) +
+     &                 work(1:ix,1:iy,1:iz)
 
         call READ_IOAPI('INITF','SO42',
-     1  istday(1),istday(2),istday(3),isthr,work,iflag)
+     &  istday(1),istday(2),istday(3),isthr,work,iflag)
         sg1(1:ix,1:iy,1:iz,L)=sg1(1:ix,1:iy,1:iz,L)+work(1:ix,1:iy,1:iz)
 
         call READ_IOAPI('INITF','SO43',
-     1  istday(1),istday(2),istday(3),isthr,work,iflag)
+     &  istday(1),istday(2),istday(3),isthr,work,iflag)
         sg1(1:ix,1:iy,1:iz,L)=sg1(1:ix,1:iy,1:iz,L)+work(1:ix,1:iy,1:iz)
 
        else if(sname(L,1).eq.'BC') then
        call READ_IOAPI('INITF','BC1',
-     1  istday(1),istday(2),istday(3),isthr,sg1(1,1,1,L),iflag)
+     &  istday(1),istday(2),istday(3),isthr,sg1(1,1,1,L),iflag)
 
         call READ_IOAPI('INITF','BC2',
-     1  istday(1),istday(2),istday(3),isthr,work,iflag)
+     &  istday(1),istday(2),istday(3),isthr,work,iflag)
         sg1(1:ix,1:iy,1:iz,L)=sg1(1:ix,1:iy,1:iz,L)+work(1:ix,1:iy,1:iz)
 
        else if(sname(L,1).eq.'OC') then
 
         call READ_IOAPI('INITF','OC1',
-     1  istday(1),istday(2),istday(3),isthr,sg1(1,1,1,L),iflag)
+     &  istday(1),istday(2),istday(3),isthr,sg1(1,1,1,L),iflag)
 
         call READ_IOAPI('INITF','OC2',
-     1  istday(1),istday(2),istday(3),isthr,work,iflag)
+     &  istday(1),istday(2),istday(3),isthr,work,iflag)
         sg1(1:ix,1:iy,1:iz,L)=sg1(1:ix,1:iy,1:iz,L)+work(1:ix,1:iy,1:iz)
 
        else if(sname(L,1).eq.'SSF') then
 
         call READ_IOAPI('INITF','SS1',
-     1  istday(1),istday(2),istday(3),isthr,sg1(1,1,1,L),iflag)
+     &  istday(1),istday(2),istday(3),isthr,sg1(1,1,1,L),iflag)
 
         call READ_IOAPI('INITF','SS2',
-     1  istday(1),istday(2),istday(3),isthr,work,iflag)
+     &  istday(1),istday(2),istday(3),isthr,work,iflag)
         sg1(1:ix,1:iy,1:iz,L)=sg1(1:ix,1:iy,1:iz,L)+work(1:ix,1:iy,1:iz)
 
        else if(sname(L,1).eq.'SSC') then
 
         call READ_IOAPI('INITF','SS3',
-     1  istday(1),istday(2),istday(3),isthr,sg1(1,1,1,L),iflag)
+     &  istday(1),istday(2),istday(3),isthr,sg1(1,1,1,L),iflag)
 
         call READ_IOAPI('INITF','SS4',
-     1  istday(1),istday(2),istday(3),isthr,work,iflag)
+     &  istday(1),istday(2),istday(3),isthr,work,iflag)
         sg1(1:ix,1:iy,1:iz,L)=sg1(1:ix,1:iy,1:iz,L)+work(1:ix,1:iy,1:iz)
 
       else    ! other than these three species
       write(*,*) istday(1),istday(2),istday(3),isthr,sname(l,1)
       call READ_IOAPI("INITF",sname(l,1),
-     1  istday(1),istday(2),istday(3),isthr,sg1(1,1,1,l),iflag)
+     &  istday(1),istday(2),istday(3),isthr,sg1(1,1,1,l),iflag)
       endif
 
        if(iflag.eq.1) then
@@ -160,7 +157,7 @@ c      print*,sg1(10,10,1,iair),sg1(50,50,1,iair)
 	 do j=1,iy
 	  do k=1,iz
 c           sg1(i,j,k,l)=sg1(i,j,k,l)*2.687e+19*
-c     &                  sg1(i,j,k,iair)/101300.*273/t(i,j,k)  ! Take out 1e9 because IC in mole fraction, short runs
+c     &                  sg1(i,j,k,iair)/101300.*273/t(i,j,k)  ! Take out     &e9 because IC in mole fraction, short runs
            sg1(i,j,k,l)=sg1(i,j,k,l)*2.687e+19/1.e9*
      &                  sg1(i,j,k,iair)/101300.*273/t(i,j,k)  ! Leave in 1e9 because IC in ppb, long runs
           enddo
@@ -180,7 +177,7 @@ c---------------------------------------------------------------------
 
 c**********************************************************************
       subroutine input2(ix,iy,iz,numsp,it,idate,sg1,u,v,w,kh,kv,t,
-     1  wc,wr,rvel,q,em,vg,fz,sprc,sx,sy,sz,dx,dy,hdz,h,cldod,ccover,
+     &  wc,wr,rvel,q,em,vg,fz,sprc,sx,sy,sz,dx,dy,hdz,h,cldod,ccover,
      2  kctop,dobson,iunit)
 c**********************************************************************
       include 'aqmax.param'
@@ -196,20 +193,20 @@ c**********************************************************************
       dimension rvel(ix,iy,1),idate(3),hdz(ix,iy,1),land(ix,iy)
               ! rvel is rain fall down speed
       dimension vg(ix,iy,1),fz(ix,iy,1),sprc(ix,iy),dx(1),dy(1),
-     1  PBL(ix,iy),pv(ix,iy,iz)
+     &  PBL(ix,iy),pv(ix,iy,iz)
       dimension sx(iy,iz,2,1),sy(ix,iz,2,1),sz(ix,iy,1)
       dimension iunit(25),scrat(mxgr*4*30)
       real   dobson(ix,iy),h(ix,iy),cldod(ix,iy,iz),ccover(ix,iy,iz) ! cloud coverage
       integer  ikctop(ix,iy)                 ! Cloud top K index
       real     kctop(ix,iy)
       real hdzzz(iz),jz(iz),pz(iz),tz(iz),vapor(iz),cwater(iz),
-     1 rwater(iz),wetk(iz,4),biomelev(nelev),dustelev(nelev),cld1d(iz),
+     & rwater(iz),wetk(iz,4),biomelev(nelev),dustelev(nelev),cld1d(iz),
      2 cc1d(iz),fixemfac
 
       data biomelev/0.12,0.12,0.11,0.101,0.101,0.096,0.083,0.082,
-     1 0.082,0.074,0.018,0.013/
+     & 0.082,0.074,0.018,0.013/
       data dustelev/0.2,0.2,0.2,0.2,0.13,0.01,0.01,0.01,
-     1 0.1,0.1,0.01,0.01/
+     & 0.1,0.1,0.01,0.01/
 
       real kh,kv, concdummy, vcosco2(ix,iy)
       integer weekday, wkday, iv, ij,e1
@@ -228,7 +225,7 @@ c
        weekday=3
       else
        print*,'Error in iweekday ',iweekday,jday,idate(1),idate(2),
-     1  idate(3)
+     &  idate(3)
        stop
       endif
       !read emissions
@@ -244,20 +241,20 @@ c
 
       do L=1,emnum
 !       if(emname(L).eq.'DUST'.or.emname(L).eq.'SSF'.or.
-!     1  emname(L).eq.'SSC') then
+!     &  emname(L).eq.'SSC') then
 !         call INTERP_IOAPI('METEO2D',emname(L),                  ! Load dust and sea salt emissions
-!     1    idate(1),idate(2),idate(3),ihr,q(1,1,L) ,ix*iy,iflag)  !from METEO2D          
+!     &    idate(1),idate(2),idate(3),ihr,q(1,1,L) ,ix*iy,iflag)  !from METEO2D          
 
 !       else if(index(emname(L),'BIOG').gt.0) then
 
 !         call INTERP_IOAPI('BIOGENIC',emname(L),                  ! Load biogenic isoprene and monoterpene
-!     1    idate(1),idate(2),idate(3),ihr,q(1,1,L),ix*iy,iflag)
+!     &    idate(1),idate(2),idate(3),ihr,q(1,1,L),ix*iy,iflag)
 !         if(iflag.ne.0) print*,'failed to read ',emname(L),' at ',
-!     1	  ihr,idate
+!     &	  ihr,idate
 
 !       else if(emname(L).eq.'LNOX') then
 !          call INTERP_IOAPI('LIGHTNING',emname(L),                 ! Load lightning emissions from METEO3D
-!     1    idate(1),idate(2),idate(3),ihr,em(1,1,1,L) ,ix*iy*iz,iflag)          
+!     &    idate(1),idate(2),idate(3),ihr,em(1,1,1,L) ,ix*iy*iz,iflag)          
 !        do i=1,ix
 !	 do j=1,iy
 !	  em(i,j,1,L)=em(i,j,1,L)*(hdz(i,j,1)-h(i,j))*2    ! multiplying with the thickness           
@@ -269,14 +266,14 @@ c
 
 !       else
 !        call READ_IOAPI('EMDAILY',emname(L),       ! read in diurnal-cycle emission
-!     1    idate(1),idate(2),idate(3), 0, q(1,1,L),iflag)   ! our emission already in molecular/cm2
+!     &    idate(1),idate(2),idate(3), 0, q(1,1,L),iflag)   ! our emission already in molecular/cm2
 
 c        call READ_IOAPI('EMISSION',emname(L),       ! read in diurnal-cycle emission
-c     1     2001,1,weekday,ihr, em(1,1,1,L),iflag2)   ! our emission already in molecular/cm2
+c     &     2001,1,weekday,ihr, em(1,1,1,L),iflag2)   ! our emission already in molecular/cm2
 !        if(iflag.eq.1) then
 !	call aq_zero_r4(ix*iy*iz,em(1,1,1,L))
 !        call READ_IOAPI('EMDAILY',emname(L),       ! read in diurnal-cycle emission
-!     1    idate(1),idate(2),idate(3), 0, q(1,1,L),iflag)   ! our emission already in molecular/cm2
+!     &    idate(1),idate(2),idate(3), 0, q(1,1,L),iflag)   ! our emission already in molecular/cm2
 !        if(iflag.eq.1) call aq_zero_r4(ix*iy,q(1,1,L))
 
 !     read in diurnal-cycle emission
@@ -305,8 +302,8 @@ c$$$  now adjust surface COS flux to use [COS] from previous timestep
 c	if (emname(L).eq.'gpp') then
 c
 c       open(27, file='fixedfac.dat',status='old',IOSTAT = e1)
-c        do iv = 1, ix
-c          do jv = 1,iy
+c        do iv =     &, ix
+c          do jv =     &,iy
 c               read(27,*) vcosco2(iv,jv)
 c         enddo
 c        enddo
@@ -328,7 +325,7 @@ c	    em(i,j,k,L)=em(i,j,k,L)+q(i,j,L)*biomelev(K)
 c	   endif
 c	  enddo
 c	  if(emname(L).eq.'SSF'.or.emname(L).eq.'SSC')
-c     1	   em(i,j,1,L)=em(i,j,1,L)+q(i,j,L)      ! sea salt only in lowest layer
+c     &	   em(i,j,1,L)=em(i,j,1,L)+q(i,j,L)      ! sea salt only in lowest layer
 c
 c          q(i,j,L)=em(i,j,1,L)!/100.
 c 	  em(i,j,1,L)=0.
@@ -354,7 +351,7 @@ c       endif
 c-------------------------------------------------------------------
 !      do l=1,vgnum
 !      call INTERP_IOAPI('DEPVEL',vgname(l),
-!     1        idate(1),idate(2),idate(3),ihr,vg(1,1,l),ix*iy,iflag)
+!     &        idate(1),idate(2),idate(3),ihr,vg(1,1,l),ix*iy,iflag)
 !      enddo
 
 c      call READ_IOAPI('DOMAIN','LANDUSE',1000, 1, 1, 0, land,iflag)
@@ -374,59 +371,59 @@ c29     continue
 !      endif
 
 !      call INTERP_IOAPI('DOBSON','O3-dobson',
-!     1     idate(1),idate(2),idate(3),ihr,dobson,ix*iy,idum)
+!     &     idate(1),idate(2),idate(3),ihr,dobson,ix*iy,idum)
 
       print*,' Read 2D meteorological data in input2 for date',idate(1),
-     1 idate(2),idate(3), ihr
+     & idate(2),idate(3), ihr
       call INTERP_IOAPI('METEO2D','PBLHT',        ! PBL Height in meter above surface
-     1     idate(1),idate(2),idate(3),ihr,pbl,ix*iy,idum)
+     &     idate(1),idate(2),idate(3),ihr,pbl,ix*iy,idum)
       call INTERP_IOAPI('METEO2D','PRATE',        ! Precipitation rate in mm/hr
-     1     idate(1),idate(2),idate(3),ihr,sprc,ix*iy,idum)
+     &     idate(1),idate(2),idate(3),ihr,sprc,ix*iy,idum)
 c-------------------------------------------------------------------
 cc                                        ! read 3D meteorological fields
       print*, 'Read meteorological data in input2 for date',idate(1),
-     1 idate(2),idate(3), ihr
+     & idate(2),idate(3), ihr
       print*,'ix, iy, iz=',ix,iy,iz
       call INTERP_IOAPI('METEO3D','U',
-     1     idate(1),idate(2),idate(3),ihr,u,ix*iy*iz,idum)
+     &     idate(1),idate(2),idate(3),ihr,u,ix*iy*iz,idum)
 cc
       call INTERP_IOAPI('METEO3D','V',
-     1     idate(1),idate(2),idate(3),ihr,v,ix*iy*iz,idum)
+     &     idate(1),idate(2),idate(3),ihr,v,ix*iy*iz,idum)
 cc
       call INTERP_IOAPI('METEO3D','W',
-     1     idate(1),idate(2),idate(3),ihr,w,ix*iy*iz,idum)
+     &     idate(1),idate(2),idate(3),ihr,w,ix*iy*iz,idum)
 cc
       call INTERP_IOAPI('METEO3D','KV',                     ! m/s2
-     1     idate(1),idate(2),idate(3),ihr,kv,ix*iy*iz,idum)
+     &     idate(1),idate(2),idate(3),ihr,kv,ix*iy*iz,idum)
 cc
       call INTERP_IOAPI('METEO3D','KH',                     ! m/s2
-     1     idate(1),idate(2),idate(3),ihr,kh,ix*iy*iz,idum)
+     &     idate(1),idate(2),idate(3),ihr,kh,ix*iy*iz,idum)
 cc
       call INTERP_IOAPI('METEO3D','T',                      ! K
-     1    idate(1),idate(2),idate(3),ihr,t,ix*iy*iz,idum)
+     &    idate(1),idate(2),idate(3),ihr,t,ix*iy*iz,idum)
 cc
       call INTERP_IOAPI('METEO3D','P',                       ! Pa
-     1  idate(1),idate(2),idate(3),ihr,sg1(1,1,1,iair),ix*iy*iz,iflag)
+     &  idate(1),idate(2),idate(3),ihr,sg1(1,1,1,iair),ix*iy*iz,iflag)
 cc
       call INTERP_IOAPI('METEO3D','VAPOR',           ! water vapor mixing ratio kg/kg
-     1  idate(1),idate(2),idate(3),ihr,sg1(1,1,1,ih2o),ix*iy*iz,iflag)
+     &  idate(1),idate(2),idate(3),ihr,sg1(1,1,1,ih2o),ix*iy*iz,iflag)
 
       call INTERP_IOAPI('METEO3D','CWATER',    ! Cloud water Content kg/kg
-     1  idate(1),idate(2),idate(3),ihr,wc,ix*iy*iz,iflag)
+     &  idate(1),idate(2),idate(3),ihr,wc,ix*iy*iz,iflag)
 
       call INTERP_IOAPI('METEO3D','RWATER',    ! Rain water Content kg/kg
-     1  idate(1),idate(2),idate(3),ihr,wr,ix*iy*iz,iflag)
+     &  idate(1),idate(2),idate(3),ihr,wr,ix*iy*iz,iflag)
 
 !      call INTERP_IOAPI('METEO3D','PV',    ! Potential Vortex
-!     1  idate(1),idate(2),idate(3),ihr,pv,ix*iy*iz,iflag)
+!     &  idate(1),idate(2),idate(3),ihr,pv,ix*iy*iz,iflag)
 
 c----------------------------------------------------------------------
 cc                               !  convert pressure to molecules/cme
       print *,'io3, ico, ich4, ih2, iair, io2, ih2o, ico2, itrace =',
-     1  io3, ico, ich4, ih2, iair, io2, ih2o, ico2, itrace
+     &  io3, ico, ich4, ih2, iair, io2, ih2o, ico2, itrace
       if(iflag.eq.0) then  ! unit tests
-      do 10 i=1,ix
-      do 10 j=1,iy
+      do     10 i=1,ix
+      do     10 j=1,iy
         hdzzz(1:iz)=hdz(i,j,1:iz)
 	pz(1:iz)=sg1(i,j,1:iz,iair)
 	tz(1:iz)=t(i,j,1:iz)
@@ -434,7 +431,7 @@ cc                               !  convert pressure to molecules/cme
         cwater(1:iz)=wc(i,j,1:iz)
         rwater(1:iz)=wr(i,j,1:iz)
        call tuvclouds(iz,hdzzz,h(i,j)+pbl(i,j),pz,
-     1  sprc(i,j),tz,vapor,cwater,rwater,cld1d,cc1d,ikctop(i,j),wetk)   ! computing Cloud optical depth et al
+     &  sprc(i,j),tz,vapor,cwater,rwater,cld1d,cc1d,ikctop(i,j),wetk)   ! computing Cloud optical depth et al
 
        cldod(i,j,1:iz)=cld1d(1:iz)
        ccover(i,j,1:iz)=cc1d(1:iz)
@@ -447,12 +444,12 @@ cc                               !  convert pressure to molecules/cme
        do k=1,iz
        if(cldod(i,j,k).lt.0.or.ccover(i,j,k).lt.0) then
         print*,'CLDOD or CCOVER is negative, stop!',i,j,k,iz,
-     1   sprc(i,j),kctop(i,j),wc(i,j,1:iz),cldod(i,j,k),ccover(i,j,k)
+     &   sprc(i,j),kctop(i,j),wc(i,j,1:iz),cldod(i,j,k),ccover(i,j,k)
         stop
        endif
       enddo
 	!print *,'test'
-      do 10 k=1,iz
+      do     10 k=1,iz
       sg1(i,j,k,iair)=2.687e+19*sg1(i,j,k,iair)/101300.*273/t(i,j,k)
 		 ! 2.687e+19=avo/22400=6.02e+23/22400 molecules/cm3
       sg1(i,j,k,ih2o)=sg1(i,j,k,ih2o)*28.9/18.0*sg1(i,j,k,iair)
@@ -467,23 +464,23 @@ c      sg1(i,j,k,itrace)=1e-6                   ! trace
 c-------------------------------------------------------
 C---- READ Boundary Condition in PPb and convert it molecular/cm3
        print*, 'Read boundary condition in input2 for date',idate(1),
-     1 idate(2),idate(3), ihr
+     & idate(2),idate(3), ihr
 
 	print*,'Test ',numsp,iz,ix
       do L=1,numsp
       call READ_IOAPI_BND(sname(l,1),idate(1),idate(2),idate(3),
-     1     ihr,ix,iy,iz,sy(1,1,1,l),sx(1,1,2,l),sy(1,1,2,l),
+     &     ihr,ix,iy,iz,sy(1,1,1,l),sx(1,1,2,l),sy(1,1,2,l),
      2     sx(1,1,1,l),scrat)
       do k=1,iz
        do i=1,ix
 
 c       sy(i,k,1,L) = 0.467 -
-c     c     0.0009*(julian(idate(1),idate(2),idate(3)) - 187) !
+c     c     0.0009*(julian(idate(1),idate(2),idate(3)) -     &87) !
 
         sy(i,k,1,L)=sy(i,k,1,L)*sg1(i,1,k,iair)/1e9   ! South boundary
 
 c       sy(i,k,2,L) = 0.467 -
-c     c     0.0009*(julian(idate(1),idate(2),idate(3)) - 187) !
+c     c     0.0009*(julian(idate(1),idate(2),idate(3)) -     &87) !
 
 c	if (k.lt.11) then
 c		sy(i,k,2,L)=sy(i,k,2,L)*0.884 ! add drawdown to north boundary PBL to 398 ppt
@@ -509,9 +506,9 @@ c     c     0.0009*(julian(idate(1),idate(2),idate(3)) - 187) !
        enddo
       enddo
 c        print*,'DEBUG bc',jday,
-c     c     0.007*(julian(idate(1),idate(2),idate(3)) - 187), sx(j,k,1,L)
+c     c     0.007*(julian(idate(1),idate(2),idate(3)) -     &87), sx(j,k,1,L)
 
-      do K=1,iz              ! trace boundary concentration , 1ppm
+      do K=1,iz              ! trace boundary concentration, 1 ppm
         do i=1,ix
 	 sy(i,k,1,itrace)=1000*sg1(i,1,k,iair)/1e9
 	 sy(i,k,2,itrace)=1000*sg1(i,iy,k,iair)/1e9
@@ -526,7 +523,7 @@ c      do i=1,ix
 c       do j=1,iy
 c         sz(i,j,io3)=amax1(30.,pv(i,j,iz)*1e6*pvo3)*sg1(i,j,iz,iair)/1e9      ! set pv ozone boundary condition
 c	 sz(i,j,io3+numsp)=amax1(30.,pv(i,j,iz-1)*1e6*pvo3)*
-c     1	   sg1(i,j,iz-1,iair)/1e9                            !second top boundary
+c     &	   sg1(i,j,iz-1,iair)/1e9                            !second top boundary
 c        enddo
 c      enddo
 
@@ -560,10 +557,10 @@ c      enddo
         enddo
        enddo
        call INTERP_IOAPI('TOPBND',sname(L,1),                ! Load top boundary condition 
-     1    idate(1),idate(2),idate(3),ihr,sz(1,1,L),ix*iy,iflag)
+     &    idate(1),idate(2),idate(3),ihr,sz(1,1,L),ix*iy,iflag)
        if(iflag.eq.0) then
 		print*,'load top boundary condition for ',
-     1   sname(L,1)
+     &   sname(L,1)
         sz(1:ix,1:iy,L)=sz(1:ix,1:iy,L)*sg1(1:ix,1:iy,iz,iair)/1e9   ! PPb to molecular/cm3
 	endif
       enddo
@@ -587,16 +584,16 @@ c***********************************************************************
       include 'aqrxn.cmm'
       dimension numl(3,4),sigmaz(1)
       character*16 ouname(mxspg),blank,sunit(mxspg),outjname(mxspg),
-     1  outaeronam(mxspg)
+     &  outaeronam(mxspg)
       character*80 aqrst,aqout
       integer aqspout,year,month,day,hour,julb,aeroindex
       common /aqodx/aqspout(mxspg),noutsp,izout,joutindex(mxspg),
-     1 joutsp,jzout,aeroindex(mxspg),nout_aero,izaero,outaeronam
+     & joutsp,jzout,aeroindex(mxspg),nout_aero,izaero,outaeronam
 
       include 'aqsymb.cmm'
 
       namelist /aqopenf/ouname,AQRST,AQOUT,izout,iscrat,outjname,
-     1 jzout,jprnt,                     ! J-value output filename, Zlevel and timestep
+     & jzout,jprnt,                     ! J-value output filename, Zlevel and timestep
      2 outaeronam,izaero, iaeroprnt     ! Aerosol output filename, Zlevel and timestep
 
 c
@@ -732,12 +729,12 @@ c       fdesc3d(1) = 'Generated by program AQMS'
 c       ... set variables, units and descriptions
 
 c       nvars3d = numl(1,2)
-c       do iv = 1,nvars3d
+c       do iv = 1, nvars3d
 c         vname3d(iv) = sname(iv)
 c         units3d(iv) = sunit(iv)
 c       enddo
 
-c       do iv = 1,nvars3d
+c       do iv = 1, nvars3d
 c         vdesc3d(iv) = 'Species Concentration'	! text-descriptions
 c         vtype3d(iv) = M3REAL	! basic data types
 c       enddo
@@ -752,13 +749,13 @@ c 	stop
 c       endif
 
       call create_out_ioapi('AQRST','GRIDSYS',iz,2,sigmaz,dht,
-     1     year,month,day,hour,iscrat,numl(1,2),sname,sunit)      ! scratch file
+     &     year,month,day,hour,iscrat,numl(1,2),sname,sunit)      ! scratch file
 c      write(0,*)   'successful generate restart file'
 cc
 
 C------Output file
 c       nvars3d = noutsp
-c       do iv = 1,nvars3d
+c       do iv = 1, nvars3d
 c        vname3d(iv) = ouname(iv)
 c       enddo
 c       nlays3d=izout
@@ -769,19 +766,19 @@ c	stop
 c       endif
       print *, "now creating AQOUT"
        call create_out_ioapi_nest('AQOUT','GRIDSYS',izout,2,sigmaz,dht,
-     1     year,month,day,hour,iprnt,noutsp,ouname,sunit)      ! output gas concentration files
+     &     year,month,day,hour,iprnt,noutsp,ouname,sunit)      ! output gas concentration files
 
 
        ! Checkpoint level 1 file
        call create_out_ioapi('AQCHKP1','GRIDSYS',iz,2,sigmaz,dht,
-     1     year,month,day,hour,1,numl(1,3),sname,sunit)
+     &     year,month,day,hour,1,numl(1,3),sname,sunit)
 
 
        do i=1,joutsp
 	 sunit(i)='1/s'
        enddo
        call create_out_ioapi('JOUT','GRIDSYS',jzout,2,sigmaz,dht,
-     1     year,month,day,hour,jprnt,joutsp,outjname,sunit)    ! J-value and extinction file
+     &     year,month,day,hour,jprnt,joutsp,outjname,sunit)    ! J-value and extinction file
 c       write(0,*)   'successful generate JVOUT'
 
       if(unit_aero.eq.0) then             ! determine aerosol output unit
@@ -807,11 +804,11 @@ c       write(0,*)   'successful generate JVOUT'
 c      print*,'outaeronam=',outaeronam
 c      print*,'sigmaz=',sigmaz
 c      print*,'dht, izaero,iaeroprnt, nout_aero=',dht, izaero,iaeroprnt,
-c     1 nout_aero
+c     & nout_aero
 c       print*,' aeroindex =',aeroindex(1:nout_aero)
 
       call create_out_ioapi('AEROOUT','GRIDSYS',izaero,2,sigmaz,dht,
-     1     year,month,day,hour,iaeroprnt,nout_aero,outaeronam,sunit)    ! aerosol file
+     &     year,month,day,hour,iaeroprnt,nout_aero,outaeronam,sunit)    ! aerosol file
 
 c      write(0,*)   'successful generate AEROOUT'
       call close_ioap
@@ -1193,12 +1190,12 @@ c------------------------------------------------------------------------------
 
       if (.not. DESC3(TRIM(lname))) stop
       do L=1,nvars3d
-       if(vname3d(L).eq.trim(varname)) goto 10   ! find this variable
+         if(vname3d(L).eq.trim(varname)) goto 10 ! find this variable
       enddo
       iflag=1
       return               ! if there is no such a variable, return
 
- 10   if(imother.eq.ncols3d.and.jmother.eq.nrows3d) then         ! mother domain
+ 10   if(imother.eq.ncols3d.and.jmother.eq.nrows3d) then ! mother domain
        if(.not.interp3(trim(lname),trim(varname),subname,date3d,time3d,
      +   ncols3d*nrows3d*nlays3d,field)) then
         write(6,*) 'Error interping var ' //TRIM(varname)//
@@ -1231,7 +1228,7 @@ c       endif
       endif
 
       if (.not. INTERP3(TRIM(lname),
-     1	TRIM(varname), subname,
+     &	TRIM(varname), subname,
      2  date3d, time3d,nsize, field)) then
          print*, 'Error interping var '//TRIM(varname) //
      +      ' from file ' //trim(lname)
@@ -1267,7 +1264,7 @@ c loutname		C  logical name of file to be created
 c loutgrid		C  logical name of grid system adopted by output file
 c nz			I  actual # of vertical grid points
 c vertype		I  vertical coordinates system:
-c                          1 = terrain-following; 2 = sigma-z
+c     1 = terrain-following; 2 = sigma-z
 c zvect			R  vector of vertical coordinates
 c			   (m above ground, if terrain-following;
 c			   0-1 numbers, if sigma-z)
@@ -1326,12 +1323,12 @@ c       ...set time step structure
 
       julb = JULIAN (yearb, monthb, dayb)
       sdate3d = 1000 * yearb + julb     ! file start date YYYYDDD
-      stime3d = 10000 * hourb           ! file start time HHMMSS
-      tstep3d = 10000 * dt              ! file time step HHMMSS
+      stime3d =10000 * hourb           ! file start time HHMMSS
+      tstep3d =10000 * dt              ! file time step HHMMSS
 
 c       ...file description and history
 
-      do l = 1,MXDESC3
+      do l = 1, MXDESC3
         fdesc3d(l) = ' '
       enddo
       fdesc3d(1) = 'Generated by program AQMS'
@@ -1434,8 +1431,8 @@ c      include 'netcdf.inc'
 c	convert to i/o api time
 
       jul3d = JULIAN (year, month, day)
-      date3d = 1000 * year + jul3d    ! file current date YYYYDDD
-      time3d = 10000 * hour           ! file current time HHMMSS
+      date3d =1000 * year + jul3d    ! file current date YYYYDDD
+      time3d =10000 * hour           ! file current time HHMMSS
 
       if(time3d.eq.240000) then
 	time3d = 0
@@ -1516,12 +1513,12 @@ c      include 'netcdf.inc'
       data subname /'read_ioapi_bnd'/
 
       jul3d = JULIAN (year, month, day)
-      date3d = 1000 * year + jul3d		! current date YYYYDDD
-      time3d = 10000 * hour			! current time HHMMSS
+      date3d =1000 * year + jul3d		! current date YYYYDDD
+      time3d =10000 * hour			! current time HHMMSS
 
       if (.not. DESC3('BDFV') ) goto 20    ! no time-varied boundary condition
       if (nx.ne.ncols3d.or.ny.ne.nrows3d.or.nz.lt.nlays3d.or.
-     1  ftype3d.ne.bndary3) then  ! allow nz.ge.nlay3d in case 20 layer input for 21 layer stem
+     &  ftype3d.ne.bndary3) then  ! allow nz.ge.nlay3d in case 20 layer input for 21 layer stem
        print*,'Time-varied Boundary file Wrong !',nx,ncols3d,ny,nrows3d,
      &  nz,nlays3d,ftype3d,bndary3
        print*,'Checking your BDFV setting'
@@ -1538,12 +1535,12 @@ c      include 'netcdf.inc'
 
 
       do L=1,nvars3d
-       if(vname3d(L).eq.varname) goto 10   ! find this variable
+         if(vname3d(L).eq.varname) goto 10 ! find this variable
       enddo
       layer20=.false.
       goto 20
 
- 10   ibtime=sdate3d*100+stime3d/10000        ! begin time of the file in YYMMDDHH
+ 10   ibtime=sdate3d*100+stime3d/10000 ! begin time of the file in YYMMDDHH
       ietime=(mxrec3d*tstep3d+stime3d)/10000
       ietime=(sdate3d+ietime/24)*100+mod(ietime,24) ! end time of the file in YYMMDDHH
       inowtime=date3d*100+time3d/10000              ! nowtime in YYMMDDHH
@@ -1598,7 +1595,7 @@ c      include 'netcdf.inc'
 
 
       subroutine tuvclouds(iz,z,pbl,p,prate,t,vapor,cw,rw,cldod,ccover,
-     1 ktop,wetk)
+     & ktop,wetk)
 C-----------------------------------------------------------------
 C     compute the Jcorrecot value due to cloud
 C     Input:
@@ -1624,7 +1621,7 @@ C-----------------------------------------------------------------
      2  prmin=0.01, nwet=4 )          ! define if there is precipitation
       integer iz,ktop
       real z(iz),pbl,p(iz),prate,t(iz),vapor(iz),cw(iz),rw(iz),
-     1 cldod(iz),ccover(iz), wetk(iz,nwet), iradius
+     & cldod(iz),ccover(iz), wetk(iz,nwet), iradius
 
       data rdry,cradius,iradius, rradius/287.04, 1.e-5, 9.e-5, 1.e-3/
       ! air constant, cloud water drop, ice drop and rain drop radius in meter
@@ -1660,7 +1657,7 @@ C-----------------------------------------------------------------
 
        do k=1, ktop
         rh=vapor(k)/QSAT(ESAT(         ! computing relative humudity
-     1		t(k)),p(k)/1000)         !convert to KPa
+     &		t(k)),p(k)/1000)         !convert to KPa
         if(z(k).lt. pbl) then        ! within Convective Boundary
 	 RHC=0.98                           ! Cloud relative humididty
 	 if(rh.gt.rhc) then
@@ -1691,7 +1688,7 @@ c
 c where
 c L = mean condensed water content, kg m-3, L= cw*airdensity+rw*airdensity
 c dz = mean depth of cloudy layer, m
-c rho = density of water  1000 kg m-3
+c rho = density of water1000 kg m-3
 c r = drop radius, 10 microns (1e-5 meters) is a good average.
 c
 C  ice cloud: o.d.= L (ai+bi/re) dz/ rho   (Ebert JGR 97(D4) 3831)
@@ -1705,10 +1702,10 @@ c  re: effective ice radius
         airdensity=(p(k)/t(k)+p(k+1)/t(k+1))/rdry/2            ! kg/m3 air density
 	if((t(k)+t(k+1))/2.ge.273.15) then ! water cloud
          cldod(k)=1.5*((rw(k)+rw(k+1))/rradius+(cw(k)+cw(k+1))/cradius)
-     1	 *airdensity*(z(k+1)-z(k))/1e3/2
+     &	 *airdensity*(z(k+1)-z(k))/1e3/2
         else
 	 cldod(k)= (rw(k)+cw(k)+rw(k+1)+cw(k+1))/2*airdensity
-     1	  *(3.448+2.431e-3/iradius)*(z(k+1)-z(k))/850
+     &	  *(3.448+2.431e-3/iradius)*(z(k+1)-z(k))/850
         endif
        enddo
 
@@ -1762,7 +1759,7 @@ c loutname		C  logical name of file to be created
 c loutgrid		C  logical name of grid system adopted by output file
 c nz			I  actual # of vertical grid points
 c vertype		I  vertical coordinates system:
-c                          1 = terrain-following; 2 = sigma-z
+c     1 = terrain-following; 2 = sigma-z
 c zvect			R  vector of vertical coordinates
 c			   (m above ground, if terrain-following;
 c			   0-1 numbers, if sigma-z)
@@ -1823,9 +1820,9 @@ c       get filename, coordinates system and grid name from environment
 c       ...set time step structure
 
       julb = JULIAN (yearb, monthb, dayb)
-      sdate3d = 1000 * yearb + julb     ! file start date YYYYDDD
-      stime3d = 10000 * hourb           ! file start time HHMMSS
-      tstep3d = 10000 * dt              ! file time step HHMMSS
+      sdate3d =1000 * yearb + julb     ! file start date YYYYDDD
+      stime3d =10000 * hourb           ! file start time HHMMSS
+      tstep3d =10000 * dt              ! file time step HHMMSS
 
 c       ...file description and history
 
@@ -1932,8 +1929,8 @@ c      include 'netcdf.inc'
 c	convert to i/o api time
 
       jul3d = JULIAN (year, month, day)
-      date3d = 1000 * year + jul3d    ! file current date YYYYDDD
-      time3d = 10000 * hour           ! file current time HHMMSS
+      date3d =1000 * year + jul3d    ! file current date YYYYDDD
+      time3d =10000 * hour           ! file current time HHMMSS
 
       if(time3d.eq.240000) then
 	time3d = 0
@@ -1998,20 +1995,18 @@ c     COS concentration from previous timestep
       cos_assumed = 450    ! TODO: units
       allocate(cos_conc_prev(ix, iy, iz), stat=ierr)
 
-c$$$  TODO: figure out what include needed for AllocErrorCheck
-c$$$  call AllocErrorCheck(ierr,'cos_conc_prev')
 c$$$  put year, month, day into YYYYDDD format
       jdate = (1000 * year) + JULIAN(year, month, day)
 c$$$  put hour in to HHMMSS (setting both MM and SS to 00)
       jtime = hour*10000
-      one_hour = 10000
+      one_hour =10000
 
 c$$$  calculate previous time step by subtracting one hour from current
 c$$$  timestep
       call NEXTIME(jdate, jtime, (one_hour * -1))
       call DAYMON(jdate, MM_prev, DD_prev)
-      YYYY_prev = FLOOR(jdate / 1000.0)
-      HH_prev = FLOOR(jtime / 10000.0)
+      YYYY_prev = FLOOR(jdate /1000.0)
+      HH_prev = FLOOR(jtime /10000.0)
 
 c$$$      read previous timestep [COS] from AQOUT
       call READ_IOAPI_FIND_PREVIOUS('AQOUT', 'CO2_TRACER1',
@@ -2021,6 +2016,7 @@ c$$$      read previous timestep [COS] from AQOUT
       print *, 'cos_conc_prev', shape(cos_conc_prev(:, :, 1))
 c      cos_flux_t = cos_flux_t * (cos_conc_prev(:, :, 1)) ! / cos_assumed)
       deallocate(cos_conc_prev)
+      print *, 'stopping now'
       stop
       RETURN
       END

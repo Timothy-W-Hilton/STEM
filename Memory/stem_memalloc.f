@@ -1,9 +1,9 @@
       module StemMemAlloc
-      
+
       contains
 
 c********************************************************************
-      subroutine MemAlloc( N_x, N_y, N_z, 
+      subroutine MemAlloc( N_x, N_y, N_z,
      &                   N_gas, N_liquid, N_particle,
      &                   sg1, sl1, sp1,
      &                   u, v, w,
@@ -11,19 +11,19 @@ c********************************************************************
      &                   wc, wr, sprc, rvel,
      &                   sx, sy, sz, q, em,
      &                   vg, fz, hdz,
-     &                   h, deltah, tlon, tlat, cldod, 
+     &                   h, deltah, tlon, tlat, cldod,
      &                   kctop, ccover, dobson)
 c-----------------------------------------------------------------------c
 c
-c                  A. Sandu, Dec. 2000  
+c                  A. Sandu, Dec. 2000
 c
 c-----------------------------------------------------------------------c
 c Allocates memory for the following arrays:
 c
-c Nx, Ny, Nz = dimension of the grid   
+c Nx, Ny, Nz = dimension of the grid
 c N_gas      = no. of gas species
 c N_liquid   = no. of liquid species
-c N_particle = no of particulate species  
+c N_particle = no of particulate species
 c sg1        = gas concentrations field
 c sl1        = liquid concentrations field
 c sp1        = particulate matter concentration field
@@ -35,14 +35,14 @@ c wc, wr     = photolysis rate data
 c sprc       = unknown
 c rvel       = removal velocity
 c sx, sy, sz = boundary concentrations
-c q          = surface emission rates 
-c em         = elevated emission rates 
-c vg         = deposition velocity 
+c q          = surface emission rates
+c em         = elevated emission rates
+c vg         = deposition velocity
 c fz         = unknown
-c hdz        = height of each layer 
+c hdz        = height of each layer
 c h          = ground level height
 c deltah     = computational domain height
-c tlon, tlat = latitude and longitude 
+c tlon, tlat = latitude and longitude
 c
 c********************************************************************
       implicit none
@@ -123,15 +123,15 @@ c-----dimension rvel(ixm*iym*izm)
       allocate( rvel(N_x, N_y, N_z), STAT=ierr)
       call AllocErrorCheck(ierr,"rvel")
 c
-c-----dimension sx(iym*izm*2*iLm)          
+c-----dimension sx(iym*izm*2*iLm)
       allocate( sx(N_y, N_z, 2, N_gas), STAT=ierr)
       call AllocErrorCheck(ierr,"sx")
 c
-c-----dimension sy(ixm*izm*2*iLm)          
+c-----dimension sy(ixm*izm*2*iLm)
       allocate( sy(N_x, N_z, 2, N_gas), STAT=ierr)
       call AllocErrorCheck(ierr,"sy")
 c
-c-----dimension sz(ixm*iym*iLm)            
+c-----dimension sz(ixm*iym*iLm)
       allocate( sz(N_x, N_y, N_gas), STAT=ierr)
       call AllocErrorCheck(ierr,"sz")
 c
@@ -192,18 +192,15 @@ c
 c
       contains
 c
-        subroutine AllocErrorCheck(ierr,s)
-	  integer :: ierr
-	  character(LEN=*) :: s
-          if (ierr .NE. 0) then
-            print*,"Error in MemAlloc: allocation for ",s," failed"
-	    stop
-          end if 
-	end subroutine AllocErrorCheck
+      subroutine AllocErrorCheck(ierr,s)
+      integer :: ierr
+      character(LEN=*) :: s
+      if (ierr .NE. 0) then
+         print*,"Error in MemAlloc: allocation for ",s," failed"
+         stop
+      end if
+      end subroutine AllocErrorCheck
 c
       end subroutine MemAlloc
 
-
       end module StemMemAlloc
-
-

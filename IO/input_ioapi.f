@@ -1048,7 +1048,7 @@ c------------------------------------------------------------------------------
       integer trimlen, julian
 
       integer date3d, time3d, jul3d
-      integer reqdate3d, reqtime3d  !timestep requested by caller
+      integer reqdate3d, reqtime3d !timestep requested by caller
       integer result,iflag,i,j,k
       character*256 filename
       character*18 subname
@@ -1056,15 +1056,19 @@ c------------------------------------------------------------------------------
 
       data subname /'read_ioapi'/
 
+      print *, 'begin read_IOAPI_find_previous'
       iflag=0
       jul3d = JULIAN (year, month, day)
       date3d = 1000 * year + jul3d ! current date YYYYDDD
       time3d = 10000 * hour     ! current time HHMMSS
 
+      print *, "opening ", lname, 'read_IOAPI_find_previous'
       if(.not. OPEN3(lname, FSREAD3, 'read_IOAPI_find_previous')) then
-        print*, 'failed to open ', lname, ' in read_IOAPI_find_previous'
-        stop
+         print*, 'failed to open ', lname,
+     &        ' in read_IOAPI_find_previous'
+         stop
       endif
+      print *, "DESC3 ", lname, 'read_IOAPI_find_previous'
       if (.not. DESC3(trim(lname)) ) then
          print*,'No information for',lname
          stop
@@ -1072,32 +1076,32 @@ c------------------------------------------------------------------------------
 
 !     find the timestep in lname that is relevant to the requested
 !     timestep and place it in date3d, time3d.  If the requested
-!      timestep precedes all timesteps in lname issue a warning.
+!     timestep precedes all timesteps in lname issue a warning.
       reqdate3d = date3d
       reqtime3d = time3d
       if (.not. CHECK3(
      &     TRIM(lname), TRIM(varname), reqdate3d, reqtime3d)
      &     ) then
 !     the I/O API documentation says that CURRSTEP is a Fortran function
-!      that returns type logical.  I cannot get it to compile that way
-!      (see commented out call below).  Calling it as a subroutine
-!      compiles and runs and relates timesteps to one another as
-!      expected, but I do not know what would happen if no appropriate
-!      timestamp is present in the file.  The function should return
-!      false in that case but there is no equivalent argument for the
-!       "subroutine".   -TWH
+!     that returns type logical.  I cannot get it to compile that way
+!     (see commented out call below).  Calling it as a subroutine
+!     compiles and runs and relates timesteps to one another as
+!     expected, but I do not know what would happen if no appropriate
+!     timestamp is present in the file.  The function should return
+!     false in that case but there is no equivalent argument for the
+!     "subroutine".   -TWH
          call CURRSTEP(reqdate3d, reqtime3d,
      &        SDATE3D, STIME3D, TSTEP3D,
      &        date3d, time3d)
          write(6,*)'using ', date3d, time3d, 'for', reqdate3d, reqtime3d
-c$$$         if (.not. CURRSTEP(reqdate3d, reqtime3d,
-c$$$     &        SDATE3D, STIME3D, TSTEP3D,
-c$$$     &        date3d, time3d)) then
-c$$$         iflag=1
-c$$$         write(6,*)'Warning: Can not Read the variable ',
-c$$$     &        varname,lname
-c$$$         write(6,*)'time =', date3d, time3d
-c$$$         return
+c$$$  if (.not. CURRSTEP(reqdate3d, reqtime3d,
+c$$$  &        SDATE3D, STIME3D, TSTEP3D,
+c$$$  &        date3d, time3d)) then
+c$$$  iflag=1
+c$$$  write(6,*)'Warning: Can not Read the variable ',
+c$$$  &        varname,lname
+c$$$  write(6,*)'time =', date3d, time3d
+c$$$  return
       endif
 
       if(imother.eq.ncols3d.and.jmother.eq.nrows3d) then ! mother domain
@@ -1108,7 +1112,15 @@ c$$$         return
      &           date3d,time3d
             stop
          endif
-         return
+
+         IF ( CLOSE3( lname ) ) THEN
+            print *, lname, "0closed (READ_IOAPI_FIND_PREVIOUS)"
+         ELSE
+            print *, lname, "0unable to close",
+     &           lname, "(READ_IOAPI_FIND_PREVIOUS)"
+         ENDIF
+      print *, "0done READ_IOAPI_FIND_PREVIOUS", lname, date3d, time3d
+      return
       endif
 
       if(ixm.ne.ncols3d.or.iym.ne.nrows3d) then ! check dimension
@@ -1117,6 +1129,7 @@ c$$$         return
          stop
       endif
 
+      print *, "reading ", lname, "(READ_IOAPI_FIND_PREVIOUS)"
       if (.not.
      &     READ3 (TRIM(lname),
      &     TRIM(varname),
@@ -1128,6 +1141,13 @@ c$$$         return
          stop
       endif
 
+      print *, "about to close file (READ_IOAPI_FIND_PREVIOUS)"
+      IF ( CLOSE3( lname ) ) THEN
+         print *, lname, " closed (READ_IOAPI_FIND_PREVIOUS)"
+      ELSE
+         print *, lname, " unable to close (READ_IOAPI_FIND_PREVIOUS)"
+      ENDIF
+      print *, "done READ_IOAPI_FIND_PREVIOUS", lname, date3d, time3d
       return
       end subroutine READ_IOAPI_FIND_PREVIOUS
 
@@ -1567,7 +1587,7 @@ c      include 'netcdf.inc'
       endif
 
  30   if(layer20) then                 ! apply 20 layers' lowest layer data to current 1&2 layers
-                                                                                                      
+
         do k=nz,2,-1
         scratch(1:(2*nx+2*ny+4),k)=scratch(1:(2*nx+2*ny+4),k-1)
         enddo
@@ -1629,7 +1649,7 @@ C-----------------------------------------------------------------
       real c303,c302
       parameter(C303=19.83,C302=5417.4)
 
-      ESAT(TEMK)=.611*EXP(C303-C302/TEMK)       ! for calculating saturated water vapor pressure  
+      ESAT(TEMK)=.611*EXP(C303-C302/TEMK)       ! for calculating saturated water vapor pressure
       QSAT(ESAT1,PCB)=ESAT1*.622/(PCB-ESAT1)    ! TEMK is ambient temperature in K, PCB is the pressue in KPa
                                                 ! QSAT is the saturated humidity in kg/kg
 
@@ -2001,6 +2021,7 @@ c$$$  put hour in to HHMMSS (setting both MM and SS to 00)
       jtime = hour*10000
       one_hour =10000
 
+      print *, 'adjusting [COS] for ', jdate, jtime
 c$$$  calculate previous time step by subtracting one hour from current
 c$$$  timestep
       call NEXTIME(jdate, jtime, (one_hour * -1))
@@ -2008,7 +2029,8 @@ c$$$  timestep
       YYYY_prev = FLOOR(jdate /1000.0)
       HH_prev = FLOOR(jtime /10000.0)
 
-c$$$      read previous timestep [COS] from AQOUT
+c$$$  read previous timestep [COS] from AQOUT
+      print *, "enter READ_IOAPI_FIND_PREVIOUS (adjust_cos_plantflux)"
       call READ_IOAPI_FIND_PREVIOUS('AQOUT', 'CO2_TRACER1',
      &     YYYY_prev, MM_prev, DD_prev, HH_prev, cos_conc_prev, ierr)
       print *, 'cos_flux_t', shape(cos_flux_t)

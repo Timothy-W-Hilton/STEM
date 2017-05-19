@@ -5,6 +5,8 @@ c**********************************************************************
 c****************************************************************************
 c---+----1----+----2----+----3----+----4----+----5----+----6----+----7-----
 
+c$$$  TODO: implicit none, resolve declaration errors
+
       include 'PARMS3.EXT'      ! i/o API
       include 'FDESC3.EXT'      ! i/o API
       include 'IODECL3.EXT'     ! i/o API
@@ -180,6 +182,8 @@ c**********************************************************************
      &  wc,wr,rvel,q,em,vg,fz,sprc,sx,sy,sz,dx,dy,hdz,h,cldod,ccover,
      2  kctop,dobson,iunit)
 c**********************************************************************
+
+c$$$  TODO: implicit none, resolve declaration errors
 
       include 'aqmax.param'
       include 'aqindx.cmm'
@@ -576,6 +580,9 @@ c-------------------------------------------------------------------
 c***********************************************************************
       subroutine aq_open(numl,year,month,day,hour,sigmaz,dht,iz)
 c***********************************************************************
+
+c$$$  TODO: implicit none, resolve declaration errors
+
       include 'PARMS3.EXT'      ! i/o API
       include 'FDESC3.EXT'      ! i/o API
       include 'IODECL3.EXT'     ! i/o API
@@ -1632,6 +1639,9 @@ C      wetk     liquid removing factor for SO2, SO4, H2O2 and HNO3
 C
 C   Author: Youhua Tang
 C-----------------------------------------------------------------
+
+c$$$  TODO: implicit none, resolve declaration errors
+
       parameter(CWMIN=1e-6,   ! define if there is cloud
      2  prmin=0.01, nwet=4 )          ! define if there is precipitation
       integer iz,ktop
@@ -1794,7 +1804,7 @@ c CALLS: I/O API library
 c------------------------------------------------------------------------------
       implicit none
 
-	include 'aqms.param'
+      include 'aqms.param'
       include 'PARMS3.EXT'	! i/o API
       include 'FDESC3.EXT'	! i/o API
       include 'IODECL3.EXT'	! i/o API
@@ -1996,6 +2006,8 @@ c adjusted values in cos_flux_t
 c
 c     CALLS: I/O API library
 c     **************************************************
+      use M3UTILIO
+
       implicit none
 
       dimension cos_flux_t(ix,iy,1)

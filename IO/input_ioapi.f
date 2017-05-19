@@ -1056,19 +1056,16 @@ c------------------------------------------------------------------------------
 
       data subname /'read_ioapi'/
 
-      print *, 'begin read_IOAPI_find_previous'
       iflag=0
       jul3d = JULIAN (year, month, day)
       date3d = 1000 * year + jul3d ! current date YYYYDDD
       time3d = 10000 * hour     ! current time HHMMSS
 
-      print *, "opening ", lname, 'read_IOAPI_find_previous'
       if(.not. OPEN3(lname, FSREAD3, 'read_IOAPI_find_previous')) then
          print*, 'failed to open ', lname,
      &        ' in read_IOAPI_find_previous'
          stop
       endif
-      print *, "DESC3 ", lname, 'read_IOAPI_find_previous'
       if (.not. DESC3(trim(lname)) ) then
          print*,'No information for',lname
          stop
@@ -1114,12 +1111,11 @@ c$$$  return
          endif
 
          IF ( CLOSE3( lname ) ) THEN
-            print *, lname, "0closed (READ_IOAPI_FIND_PREVIOUS)"
+            print *, lname, " closed (READ_IOAPI_FIND_PREVIOUS)"
          ELSE
-            print *, lname, "0unable to close",
-     &           lname, "(READ_IOAPI_FIND_PREVIOUS)"
+            print *, lname, "unable to close",
+     &           lname, " (READ_IOAPI_FIND_PREVIOUS)"
          ENDIF
-      print *, "0done READ_IOAPI_FIND_PREVIOUS", lname, date3d, time3d
       return
       endif
 
@@ -1129,7 +1125,6 @@ c$$$  return
          stop
       endif
 
-      print *, "reading ", lname, "(READ_IOAPI_FIND_PREVIOUS)"
       if (.not.
      &     READ3 (TRIM(lname),
      &     TRIM(varname),
@@ -1141,13 +1136,11 @@ c$$$  return
          stop
       endif
 
-      print *, "about to close file (READ_IOAPI_FIND_PREVIOUS)"
       IF ( CLOSE3( lname ) ) THEN
          print *, lname, " closed (READ_IOAPI_FIND_PREVIOUS)"
       ELSE
          print *, lname, " unable to close (READ_IOAPI_FIND_PREVIOUS)"
       ENDIF
-      print *, "done READ_IOAPI_FIND_PREVIOUS", lname, date3d, time3d
       return
       end subroutine READ_IOAPI_FIND_PREVIOUS
 
@@ -2021,7 +2014,7 @@ c$$$  put hour in to HHMMSS (setting both MM and SS to 00)
       jtime = hour*10000
       one_hour =10000
 
-      print *, 'adjusting [COS] for ', jdate, jtime
+      print *, 'adjusting [COS] for ', year, month, day, hour
 c$$$  calculate previous time step by subtracting one hour from current
 c$$$  timestep
       call NEXTIME(jdate, jtime, (one_hour * -1))
@@ -2030,7 +2023,6 @@ c$$$  timestep
       HH_prev = FLOOR(jtime /10000.0)
 
 c$$$  read previous timestep [COS] from AQOUT
-      print *, "enter READ_IOAPI_FIND_PREVIOUS (adjust_cos_plantflux)"
       call READ_IOAPI_FIND_PREVIOUS('AQOUT', 'CO2_TRACER1',
      &     YYYY_prev, MM_prev, DD_prev, HH_prev, cos_conc_prev, ierr)
       print *, 'cos_flux_t', shape(cos_flux_t)

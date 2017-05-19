@@ -180,6 +180,7 @@ c**********************************************************************
      &  wc,wr,rvel,q,em,vg,fz,sprc,sx,sy,sz,dx,dy,hdz,h,cldod,ccover,
      2  kctop,dobson,iunit)
 c**********************************************************************
+
       include 'aqmax.param'
       include 'aqindx.cmm'
       include 'aqspec.cmm'
@@ -284,7 +285,8 @@ c     &     2001,1,weekday,ihr, em(1,1,1,L),iflag2)   ! our emission already in 
          print*, 'iflag = ',iflag
          print*, '*********************************'
 c$$$  now adjust surface COS flux to use [COS] from previous timestep
-         print *, jday
+         print *, 'current timestep: ', jday, ihr
+         print *, 'current idate: ', idate
          print *, "(jday .GT. 2008183) .and. (ihr .GT. 0)",
      &        ((jday .GT. 2008183) .OR. (ihr .GT. 0))
          if ((jday .GT. 2008183) .OR. (ihr .GT. 0))  then
@@ -1994,9 +1996,12 @@ c adjusted values in cos_flux_t
 c
 c     CALLS: I/O API library
 c     **************************************************
+      implicit none
 
       dimension cos_flux_t(ix,iy,1)
 c     timesteps
+      integer, intent(in) :: ix, iy, iz, year, month, day, hour
+      real, intent(inout) :: cos_flux_t
       integer jdate, jtime, t_prev, one_hour
       integer YYYY_prev, MM_prev, DD_prev, HH_prev
 c     error code

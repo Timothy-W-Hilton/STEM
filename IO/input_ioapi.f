@@ -291,9 +291,9 @@ c     &     2001,1,weekday,ihr, em(1,1,1,L),iflag2)   ! our emission already in 
 c$$$  now adjust surface COS flux to use [COS] from previous timestep
          print *, 'current timestep: ', jday, ihr
          print *, 'current idate: ', idate
-         print *, "(jday .GT. 2008183) .and. (ihr .GT. 0)",
-     &        ((jday .GT. 2008183) .OR. (ihr .GT. 0))
-         if ((jday .GT. 2008183) .OR. (ihr .GT. 0))  then
+         print *, "(jday .GT. 2015064) .and. (ihr .GT. 0)",
+     &        ((jday .GT. 2015064) .OR. (ihr .GT. 0))
+         if ((jday .GT. 2015064) .OR. (ihr .GT. 0)) then
             print*, 'calling adjust_cos_plantflux'
             call adjust_cos_plantflux(ix, iy, iz,
      &           idate(1),idate(2),idate(3),ihr, q(1, 1, L))
@@ -347,7 +347,7 @@ c        enddo
 c       endif
       enddo ! end emission loop
 
-! after whole emissions done, mappping  them to transport species sequence 
+! after whole emissions done, mappping  them to transport species sequence
 	print*, '*************************************************'
 	print*,'DEBUG',minval(q(:,:,1)),minval(em(:,:,:,1))
 	print*,'DEBUG',maxval(q(:,:,1)),maxval(em(:,:,:,1))
@@ -562,7 +562,7 @@ c      enddo
          sz(i,j,l)=sg1(i,j,iz,L)  ! set initial as top boundary  condition
         enddo
        enddo
-       call INTERP_IOAPI('TOPBND',sname(L,1),                ! Load top boundary condition 
+       call INTERP_IOAPI('TOPBND',sname(L,1),                ! Load top boundary condition
      &    idate(1),idate(2),idate(3),ihr,sz(1,1,L),ix*iy,iflag)
        if(iflag.eq.0) then
 		print*,'load top boundary condition for ',

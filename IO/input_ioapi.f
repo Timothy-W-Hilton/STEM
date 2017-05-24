@@ -288,16 +288,15 @@ c     &     2001,1,weekday,ihr, em(1,1,1,L),iflag2)   ! our emission already in 
          print*, '*********************************'
          print*, 'iflag = ',iflag
          print*, '*********************************'
-c$$$  now adjust surface COS flux to use [COS] from previous timestep
-         print *, 'current timestep: ', jday, ihr
-         print *, 'current idate: ', idate
-         print *, "(jday .GT. 2015064) .and. (ihr .GT. 0)",
-     &        ((jday .GT. 2015064) .OR. (ihr .GT. 0))
-         if ((jday .GT. 2015064) .OR. (ihr .GT. 0)) then
-            print*, 'calling adjust_cos_plantflux'
+c$$$  TWH: now adjust surface COS flux to use [COS] from previous
+c$$$  timestep.  Don't adjust for first timestep (it == 0) because there
+c$$$  is no previous timestep to use.
+         if (it > 0) then
             call adjust_cos_plantflux(ix, iy, iz,
      &           idate(1),idate(2),idate(3),ihr, q(1, 1, L))
-         endif
+         ELSE
+            print*, 'first time step; skipping [COS] adjustment'
+         ENDIF
          if(iflag.eq.1) call aq_zero_r4(ix*iy,q(1,1,L))
 !	endif
 
@@ -2042,12 +2041,9 @@ c$$$  timestep
 c$$$  read previous timestep [COS] from AQOUT
       call READ_IOAPI_FIND_PREVIOUS('AQOUT', 'CO2_TRACER1',
      &     YYYY_prev, MM_prev, DD_prev, HH_prev, cos_conc_prev, ierr)
-      print *, 'cos_flux_t', shape(cos_flux_t)
-      print *, 'cos_conc_prev', shape(cos_conc_prev)
-      print *, 'cos_conc_prev', shape(cos_conc_prev(:, :, 1))
       cos_flux_t(:, :, 1) = cos_flux_t(:, :, 1) *
      &     (cos_conc_prev(:, :, 1) / cos_assumed)
       deallocate(cos_conc_prev)
-      print *, '[COS] adjustment sucessful ', jdate, jtime
+      print *, '[COS] adjustment sucessful '
       RETURN
       END

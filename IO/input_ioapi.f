@@ -1,7 +1,7 @@
 c**********************************************************************
       subroutine input1(istday2,ut,iperiod2,ix,iy,iz,t,sg1,sl1,sp1,
-     &    tlon,tlat,h,deltah,hdz,dx,dy,dz,
-     &    dht,sigmaz,baseh,dt2,iunit,iout)
+     &     tlon,tlat,h,deltah,hdz,dx,dy,dz,
+     &     dht,sigmaz,baseh,dt2,iunit,iout)
 c****************************************************************************
 c---+----1----+----2----+----3----+----4----+----5----+----6----+----7-----
 
@@ -17,9 +17,9 @@ c$$$  TODO: implicit none, resolve declaration errors
       include 'aqsymb.cmm'
       include 'aqcont.cmm'
 
-cc
+c
       dimension sg1(ix,iy,iz,1),sl1(ix,iy,iz,1),sp1(ix,iy,iz,1)
-!      dimension work(ix,iy,iz,mxspg) ! Changed by sarika
+c     dimension work(ix,iy,iz,mxspg) ! Changed by sarika
       dimension work(ix,iy,iz)
       dimension tlon(ix,iy),tlat(ix,iy),h(ix,iy),t(ix,iy,iz)
       dimension hdz(ix,iy,1),dz(ix,iy,1),sigmaz(1),istday(3)
@@ -27,16 +27,16 @@ cc
       dimension istday2(3)
       dimension iunit(25),iout(25),idum1(3),dx(1),dy(1)
       logical nflag
-cc
+c
       namelist /aqtime/istday,isthr,iperiod,iprnt,dt
 c------------------------------------------------------------------------
 c     read namelist input file
       open(11,file='aqms.mif',status='old')
       read(11,aqtime)
       dt2=dt
-      iperiod2=iperiod
-      do i=1,3
-       istday2(i)=istday(i)
+      iperiod2 = iperiod
+      do i=1, 3
+         istday2(i)=istday(i)
       enddo
       close(11)
       ut=isthr
@@ -45,7 +45,7 @@ c     call headline
 c-------------------------------------------------------------------------
 c     open all the data file
       call aq_open(numl,istday(1),istday(2),istday(3),isthr,
-     1              sigmaz,dht,iz)
+     &     sigmaz,dht,iz)
 c-------------------------------------------------------------------------
 c        read geological data: longitude, latitude, terrain base ht
 
@@ -103,73 +103,87 @@ c     c
                   sg1(1:ix,1:iy,1:iz,L) = sg1(1:ix,1:iy,1:iz,L) +
      &                 work(1:ix,1:iy,1:iz)
 
-        call READ_IOAPI('INITF','SO42',
-     &  istday(1),istday(2),istday(3),isthr,work,iflag)
-        sg1(1:ix,1:iy,1:iz,L)=sg1(1:ix,1:iy,1:iz,L)+work(1:ix,1:iy,1:iz)
+                  call READ_IOAPI('INITF','SO42',
+     &                 istday(1),istday(2),istday(3),isthr,work,iflag)
+                  sg1(1:ix,1:iy,1:iz,L) = sg1(1:ix,1:iy,1:iz,L) +
+     &                 work(1:ix,1:iy,1:iz)
 
-        call READ_IOAPI('INITF','SO43',
-     &  istday(1),istday(2),istday(3),isthr,work,iflag)
-        sg1(1:ix,1:iy,1:iz,L)=sg1(1:ix,1:iy,1:iz,L)+work(1:ix,1:iy,1:iz)
+                  call READ_IOAPI('INITF','SO43',
+     &                 istday(1),istday(2),istday(3),isthr,work,iflag)
+                  sg1(1:ix,1:iy,1:iz,L) = sg1(1:ix,1:iy,1:iz,L) +
+     &                 work(1:ix,1:iy,1:iz)
 
-       else if(sname(L,1).eq.'BC') then
-       call READ_IOAPI('INITF','BC1',
-     &  istday(1),istday(2),istday(3),isthr,sg1(1,1,1,L),iflag)
+               else if(sname(L,1).eq.'BC') then
+                  call READ_IOAPI('INITF','BC1',
+     &                 istday(1),istday(2),istday(3),isthr,sg1(1,1,1,L),
+     &                 iflag)
 
-        call READ_IOAPI('INITF','BC2',
-     &  istday(1),istday(2),istday(3),isthr,work,iflag)
-        sg1(1:ix,1:iy,1:iz,L)=sg1(1:ix,1:iy,1:iz,L)+work(1:ix,1:iy,1:iz)
+                  call READ_IOAPI('INITF','BC2',
+     &                 istday(1),istday(2),istday(3),isthr,work,iflag)
+                  sg1(1:ix,1:iy,1:iz,L) = sg1(1:ix,1:iy,1:iz,L) +
+     &                 work(1:ix,1:iy,1:iz)
 
-       else if(sname(L,1).eq.'OC') then
+               else if(sname(L,1).eq.'OC') then
 
-        call READ_IOAPI('INITF','OC1',
-     &  istday(1),istday(2),istday(3),isthr,sg1(1,1,1,L),iflag)
+                  call READ_IOAPI('INITF','OC1',
+     &                 istday(1),istday(2),istday(3),isthr,sg1(1,1,1,L),
+     &                 iflag)
 
-        call READ_IOAPI('INITF','OC2',
-     &  istday(1),istday(2),istday(3),isthr,work,iflag)
-        sg1(1:ix,1:iy,1:iz,L)=sg1(1:ix,1:iy,1:iz,L)+work(1:ix,1:iy,1:iz)
+                  call READ_IOAPI('INITF','OC2',
+     &                 istday(1),istday(2),istday(3),isthr,work,iflag)
+                  sg1(1:ix,1:iy,1:iz,L) = sg1(1:ix,1:iy,1:iz,L) +
+     &                 work(1:ix,1:iy,1:iz)
 
-       else if(sname(L,1).eq.'SSF') then
+               else if(sname(L,1).eq.'SSF') then
 
-        call READ_IOAPI('INITF','SS1',
-     &  istday(1),istday(2),istday(3),isthr,sg1(1,1,1,L),iflag)
+                  call READ_IOAPI('INITF','SS1',
+     &                 istday(1),istday(2),istday(3),isthr,sg1(1,1,1,L),
+     &                 iflag)
 
-        call READ_IOAPI('INITF','SS2',
-     &  istday(1),istday(2),istday(3),isthr,work,iflag)
-        sg1(1:ix,1:iy,1:iz,L)=sg1(1:ix,1:iy,1:iz,L)+work(1:ix,1:iy,1:iz)
+                  call READ_IOAPI('INITF','SS2',
+     &                 istday(1),istday(2),istday(3),isthr,work,iflag)
+                  sg1(1:ix,1:iy,1:iz,L) = sg1(1:ix,1:iy,1:iz,L) +
+     &                 work(1:ix,1:iy,1:iz)
 
-       else if(sname(L,1).eq.'SSC') then
+               else if(sname(L,1).eq.'SSC') then
 
-        call READ_IOAPI('INITF','SS3',
-     &  istday(1),istday(2),istday(3),isthr,sg1(1,1,1,L),iflag)
+                  call READ_IOAPI('INITF','SS3',
+     &                 istday(1),istday(2),istday(3),isthr,sg1(1,1,1,L),
+     &                 iflag)
 
-        call READ_IOAPI('INITF','SS4',
-     &  istday(1),istday(2),istday(3),isthr,work,iflag)
-        sg1(1:ix,1:iy,1:iz,L)=sg1(1:ix,1:iy,1:iz,L)+work(1:ix,1:iy,1:iz)
+                  call READ_IOAPI('INITF','SS4',
+     &                 istday(1),istday(2),istday(3),isthr,work,iflag)
+                  sg1(1:ix,1:iy,1:iz,L) = sg1(1:ix,1:iy,1:iz,L) +
+     &                 work(1:ix,1:iy,1:iz)
 
-      else    ! other than these three species
-      write(*,*) istday(1),istday(2),istday(3),isthr,sname(l,1)
-      call READ_IOAPI("INITF",sname(l,1),
-     &  istday(1),istday(2),istday(3),isthr,sg1(1,1,1,l),iflag)
-      endif
+               else             ! other than these three species
+                  write(*,*) istday(1),istday(2),istday(3),
+     &                 isthr,sname(l,1)
+                  call READ_IOAPI("INITF",sname(l,1),
+     &                 istday(1),istday(2),istday(3),isthr,sg1(1,1,1,l),
+     &                 iflag)
+               endif
 
-       if(iflag.eq.1) then
-        write(6,*) '** can not find**', sname(l,1)
-       else             !  convert ppbv to molecular/cm3
-        do i=1,ix
-	 do j=1,iy
-	  do k=1,iz
-c           sg1(i,j,k,l)=sg1(i,j,k,l)*2.687e+19*
-c     &                  sg1(i,j,k,iair)/101300.*273/t(i,j,k)  ! Take out     &e9 because IC in mole fraction, short runs
-           sg1(i,j,k,l)=sg1(i,j,k,l)*2.687e+19/1.e9*
-     &                  sg1(i,j,k,iair)/101300.*273/t(i,j,k)  ! Leave in 1e9 because IC in ppb, long runs
-          enddo
-	 enddo
-	enddo
-       endif
-      enddo
+               if(iflag.eq.1) then
+                  write(6,*) '** can not find**', sname(l,1)
+               else             !  convert ppbv to molecular/cm3
+                  do i=1,ix
+                     do j=1,iy
+                        do k=1,iz
+c$$$  Take out 1e9 because IC in mole fraction, short runs
+c$$$                           sg1(i,j,k,l) = sg1(i,j,k,l)*2.687e+19*
+c$$$     &                          sg1(i,j,k,iair)/101300.*273/t(i,j,k)
+c$$$  Leave in 1e9 because IC in ppb, long runs
+                           sg1(i,j,k,l) = sg1(i,j,k,l)*2.687e+19/1.e9*
+     &                          sg1(i,j,k,iair)/101300.*273/t(i,j,k)
+                        enddo
+                     enddo
+                  enddo
+               endif
+            enddo
 
 c---------------------------------------------------------------------
-      if(ih2o.le.0) then
+            if(ih2o.le.0) then
 	 write(6,*) '** critical error: no water species**'
 	 stop
       endif
@@ -179,8 +193,8 @@ c---------------------------------------------------------------------
 
 c**********************************************************************
       subroutine input2(ix,iy,iz,numsp,it,idate,sg1,u,v,w,kh,kv,t,
-     &  wc,wr,rvel,q,em,vg,fz,sprc,sx,sy,sz,dx,dy,hdz,h,cldod,ccover,
-     2  kctop,dobson,iunit)
+     &     wc,wr,rvel,q,em,vg,fz,sprc,sx,sy,sz,dx,dy,hdz,h,cldod,ccover,
+     &     kctop,dobson,iunit)
 c**********************************************************************
 
 c$$$  TODO: implicit none, resolve declaration errors
@@ -189,7 +203,7 @@ c$$$  TODO: implicit none, resolve declaration errors
       include 'aqindx.cmm'
       include 'aqspec.cmm'
       include 'aqsymb.cmm'
-      parameter (n_var3=11,nelev=12)  ! biomass and dust elevation levels
+      parameter (n_var3=11,nelev=12) ! biomass and dust elevation levels
       parameter (pvo3=33.0)           ! convert factor of PV to ozone
 
       dimension u(ix,iy,1),v(ix,iy,1),w(ix,iy,1),kh(ix,iy,1)
@@ -198,20 +212,20 @@ c$$$  TODO: implicit none, resolve declaration errors
       dimension rvel(ix,iy,1),idate(3),hdz(ix,iy,1),land(ix,iy)
               ! rvel is rain fall down speed
       dimension vg(ix,iy,1),fz(ix,iy,1),sprc(ix,iy),dx(1),dy(1),
-     &  PBL(ix,iy),pv(ix,iy,iz)
+     &     PBL(ix,iy),pv(ix,iy,iz)
       dimension sx(iy,iz,2,1),sy(ix,iz,2,1),sz(ix,iy,1)
       dimension iunit(25),scrat(mxgr*4*30)
       real   dobson(ix,iy),h(ix,iy),cldod(ix,iy,iz),ccover(ix,iy,iz) ! cloud coverage
       integer  ikctop(ix,iy)                 ! Cloud top K index
       real     kctop(ix,iy)
       real hdzzz(iz),jz(iz),pz(iz),tz(iz),vapor(iz),cwater(iz),
-     & rwater(iz),wetk(iz,4),biomelev(nelev),dustelev(nelev),cld1d(iz),
-     2 cc1d(iz),fixemfac
+     &     rwater(iz),wetk(iz,4),biomelev(nelev),dustelev(nelev),
+     &     cld1d(iz), cc1d(iz),fixemfac
 
       data biomelev/0.12,0.12,0.11,0.101,0.101,0.096,0.083,0.082,
-     & 0.082,0.074,0.018,0.013/
+     &     0.082,0.074,0.018,0.013/
       data dustelev/0.2,0.2,0.2,0.2,0.13,0.01,0.01,0.01,
-     & 0.1,0.1,0.01,0.01/
+     &     0.1,0.1,0.01,0.01/
 
       real kh,kv, concdummy, vcosco2(ix,iy)
       integer weekday, wkday, iv, ij,e1
@@ -223,29 +237,28 @@ c
 
       iweekday=wkday(jday)
       if(iweekday.ge.1.and.iweekday.le.5) then
-       weekday=1
+         weekday=1
       else if(iweekday.eq.6) then        ! Saturday
-       weekday=2
+         weekday=2
       else if(iweekday.eq.7) then        ! Sunday
-       weekday=3
+         weekday=3
       else
-       print*,'Error in iweekday ',iweekday,jday,idate(1),idate(2),
-     &  idate(3)
-       stop
+         print*,'Error in iweekday ',iweekday,jday,idate(1),idate(2),
+     &        idate(3)
+         stop
       endif
-      !read emissions
+c     read emissions
       print *, idate(1),idate(2),idate(3),ihr
 
       call aq_zero_r4(ix*iy*iz*numsp,em)
       call aq_zero_r4(ix*iy*numsp,q)
 
-	 print*, ''
-	 print*, emnum
-	 print*, ''
-
+      print*, ''
+      print*, emnum
+      print*, ''
 
       do L=1,emnum
-!       if(emname(L).eq.'DUST'.or.emname(L).eq.'SSF'.or.
+!     if(emname(L).eq.'DUST'.or.emname(L).eq.'SSF'.or.
 !     &  emname(L).eq.'SSC') then
 !         call INTERP_IOAPI('METEO2D',emname(L),                  ! Load dust and sea salt emissions
 !     &    idate(1),idate(2),idate(3),ihr,q(1,1,L) ,ix*iy,iflag)  !from METEO2D          
@@ -298,10 +311,10 @@ c$$$  is no previous timestep to use.
             print*, 'first time step; skipping [COS] adjustment'
          ENDIF
          if(iflag.eq.1) call aq_zero_r4(ix*iy,q(1,1,L))
-!	endif
+!     endif
 
-!	iflag=iflag*iflag2
-!       endif
+!     iflag=iflag*iflag2
+!     endif
 
 
 c	if (emname(L).eq.'gpp') then
@@ -344,31 +357,31 @@ c	  enddo
 c 	 enddo
 c        enddo
 c       endif
-      enddo ! end emission loop
+      enddo                     ! end emission loop
 
-! after whole emissions done, mappping  them to transport species sequence
-	print*, '*************************************************'
-	print*,'DEBUG',minval(q(:,:,1)),minval(em(:,:,:,1))
-	print*,'DEBUG',maxval(q(:,:,1)),maxval(em(:,:,:,1))
-      call aq_speci(ix*iy,numsp,emnum,emal,q)          ! area emissions
-      call aq_speci(ix*iy*iz,numsp,emnum,emal,em)      ! elevated emissions
+!     after whole emissions done, mappping  them to transport species sequence
+      print*, '*************************************************'
+      print*,'DEBUG',minval(q(:,:,1)),minval(em(:,:,:,1))
+      print*,'DEBUG',maxval(q(:,:,1)),maxval(em(:,:,:,1))
+      call aq_speci(ix*iy,numsp,emnum,emal,q) ! area emissions
+      call aq_speci(ix*iy*iz,numsp,emnum,emal,em) ! elevated emissions
 
 c-------------------------------------------------------------------
-!      do l=1,vgnum
-!      call INTERP_IOAPI('DEPVEL',vgname(l),
+!     do l=1,vgnum
+!     call INTERP_IOAPI('DEPVEL',vgname(l),
 !     &        idate(1),idate(2),idate(3),ihr,vg(1,1,l),ix*iy,iflag)
-!      enddo
+!     enddo
 
-c      call READ_IOAPI('DOMAIN','LANDUSE',1000, 1, 1, 0, land,iflag)
+c     call READ_IOAPI('DOMAIN','LANDUSE',1000, 1, 1, 0, land,iflag)
 
-c      print *, vgnum
+c     print *, vgnum
 
-c       do 29 i=1,ix
-c       do 29 j=1,iy
-c       do 29 k=1,vgnum
-c	   if (land(i,j).eq.16) vg(i,j,2) = 0.0       ! case water body
-c           if (land(i,j).eq.16) vg(i,j,14) = 0.0
-c29     continue
+c     do 29 i=1,ix
+c     do 29 j=1,iy
+c     do 29 k=1,vgnum
+c     if (land(i,j).eq.16) vg(i,j,2) = 0.0       ! case water body
+c     if (land(i,j).eq.16) vg(i,j,14) = 0.0
+c     29     continue
 
 
 !      if(iflag.eq.0) then
@@ -379,111 +392,117 @@ c29     continue
 !     &     idate(1),idate(2),idate(3),ihr,dobson,ix*iy,idum)
 
       print*,' Read 2D meteorological data in input2 for date',idate(1),
-     & idate(2),idate(3), ihr
-      call INTERP_IOAPI('METEO2D','PBLHT',        ! PBL Height in meter above surface
+     &     idate(2),idate(3), ihr
+      call INTERP_IOAPI('METEO2D','PBLHT', ! PBL Height in meter above surface
      &     idate(1),idate(2),idate(3),ihr,pbl,ix*iy,idum)
-      call INTERP_IOAPI('METEO2D','PRATE',        ! Precipitation rate in mm/hr
+      call INTERP_IOAPI('METEO2D','PRATE', ! Precipitation rate in mm/hr
      &     idate(1),idate(2),idate(3),ihr,sprc,ix*iy,idum)
 c-------------------------------------------------------------------
-cc                                        ! read 3D meteorological fields
+c     read 3D meteorological fields
       print*, 'Read meteorological data in input2 for date',idate(1),
-     & idate(2),idate(3), ihr
+     &     idate(2),idate(3), ihr
       print*,'ix, iy, iz=',ix,iy,iz
       call INTERP_IOAPI('METEO3D','U',
      &     idate(1),idate(2),idate(3),ihr,u,ix*iy*iz,idum)
-cc
+c
       call INTERP_IOAPI('METEO3D','V',
      &     idate(1),idate(2),idate(3),ihr,v,ix*iy*iz,idum)
-cc
+c
       call INTERP_IOAPI('METEO3D','W',
      &     idate(1),idate(2),idate(3),ihr,w,ix*iy*iz,idum)
-cc
-      call INTERP_IOAPI('METEO3D','KV',                     ! m/s2
+c
+      call INTERP_IOAPI('METEO3D','KV', ! m/s2
      &     idate(1),idate(2),idate(3),ihr,kv,ix*iy*iz,idum)
-cc
-      call INTERP_IOAPI('METEO3D','KH',                     ! m/s2
+c
+      call INTERP_IOAPI('METEO3D','KH', ! m/s2
      &     idate(1),idate(2),idate(3),ihr,kh,ix*iy*iz,idum)
-cc
-      call INTERP_IOAPI('METEO3D','T',                      ! K
-     &    idate(1),idate(2),idate(3),ihr,t,ix*iy*iz,idum)
-cc
-      call INTERP_IOAPI('METEO3D','P',                       ! Pa
-     &  idate(1),idate(2),idate(3),ihr,sg1(1,1,1,iair),ix*iy*iz,iflag)
-cc
-      call INTERP_IOAPI('METEO3D','VAPOR',           ! water vapor mixing ratio kg/kg
-     &  idate(1),idate(2),idate(3),ihr,sg1(1,1,1,ih2o),ix*iy*iz,iflag)
+c
+      call INTERP_IOAPI('METEO3D','T', ! K
+     &     idate(1),idate(2),idate(3),ihr,t,ix*iy*iz,idum)
+c
+      call INTERP_IOAPI('METEO3D','P', ! Pa
+     &     idate(1),idate(2),idate(3),ihr,sg1(1,1,1,iair),ix*iy*iz,
+     &     iflag)
+c
+      call INTERP_IOAPI('METEO3D','VAPOR', ! water vapor mixing ratio kg/kg
+     &     idate(1),idate(2),idate(3),ihr,sg1(1,1,1,ih2o),ix*iy*iz,
+     &     iflag)
 
-      call INTERP_IOAPI('METEO3D','CWATER',    ! Cloud water Content kg/kg
-     &  idate(1),idate(2),idate(3),ihr,wc,ix*iy*iz,iflag)
+      call INTERP_IOAPI('METEO3D','CWATER', ! Cloud water Content kg/kg
+     &     idate(1),idate(2),idate(3),ihr,wc,ix*iy*iz,iflag)
 
-      call INTERP_IOAPI('METEO3D','RWATER',    ! Rain water Content kg/kg
-     &  idate(1),idate(2),idate(3),ihr,wr,ix*iy*iz,iflag)
+      call INTERP_IOAPI('METEO3D','RWATER', ! Rain water Content kg/kg
+     &     idate(1),idate(2),idate(3),ihr,wr,ix*iy*iz,iflag)
 
-!      call INTERP_IOAPI('METEO3D','PV',    ! Potential Vortex
+!     call INTERP_IOAPI('METEO3D','PV',    ! Potential Vortex
 !     &  idate(1),idate(2),idate(3),ihr,pv,ix*iy*iz,iflag)
 
 c----------------------------------------------------------------------
-cc                               !  convert pressure to molecules/cme
+c     convert pressure to molecules/cme
       print *,'io3, ico, ich4, ih2, iair, io2, ih2o, ico2, itrace =',
-     &  io3, ico, ich4, ih2, iair, io2, ih2o, ico2, itrace
-      if(iflag.eq.0) then  ! unit tests
-      do     10 i=1,ix
-      do     10 j=1,iy
-        hdzzz(1:iz)=hdz(i,j,1:iz)
-	pz(1:iz)=sg1(i,j,1:iz,iair)
-	tz(1:iz)=t(i,j,1:iz)
-	vapor(1:iz)=sg1(i,j,1:iz,ih2o)
-        cwater(1:iz)=wc(i,j,1:iz)
-        rwater(1:iz)=wr(i,j,1:iz)
-       call tuvclouds(iz,hdzzz,h(i,j)+pbl(i,j),pz,
-     &  sprc(i,j),tz,vapor,cwater,rwater,cld1d,cc1d,ikctop(i,j),wetk)   ! computing Cloud optical depth et al
+     &     io3, ico, ich4, ih2, iair, io2, ih2o, ico2, itrace
+      if (iflag .eq. 0) then       ! unit tests
+         do     10 i=1,ix
+            do     10 j=1,iy
+               hdzzz(1:iz)=hdz(i,j,1:iz)
+               pz(1:iz)=sg1(i,j,1:iz,iair)
+               tz(1:iz)=t(i,j,1:iz)
+               vapor(1:iz)=sg1(i,j,1:iz,ih2o)
+               cwater(1:iz)=wc(i,j,1:iz)
+               rwater(1:iz)=wr(i,j,1:iz)
+               call tuvclouds(iz,hdzzz,h(i,j)+pbl(i,j),pz,
+     &              sprc(i,j),tz,vapor,cwater,rwater,cld1d,cc1d,
+     &              ikctop(i,j),wetk) ! computing Cloud optical depth et al
 
-       cldod(i,j,1:iz)=cld1d(1:iz)
-       ccover(i,j,1:iz)=cc1d(1:iz)
-!       sg1(i,j,1:iz,nwetso2)=wetk(1:iz,1)
-!       sg1(i,j,1:iz,nwetso4)=wetk(1:iz,2)
-!       sg1(i,j,1:iz,nweth2o2)=wetk(1:iz,3)
-!       sg1(i,j,1:iz,nwethno3)=wetk(1:iz,4)
-       kctop(1:ix,1:iy) = ikctop(1:ix,1:iy)
+               cldod(i,j,1:iz)=cld1d(1:iz)
+               ccover(i,j,1:iz)=cc1d(1:iz)
+!     sg1(i,j,1:iz,nwetso2)=wetk(1:iz,1)
+!     sg1(i,j,1:iz,nwetso4)=wetk(1:iz,2)
+!     sg1(i,j,1:iz,nweth2o2)=wetk(1:iz,3)
+!     sg1(i,j,1:iz,nwethno3)=wetk(1:iz,4)
+               kctop(1:ix,1:iy) = ikctop(1:ix,1:iy)
 
-       do k=1,iz
-       if(cldod(i,j,k).lt.0.or.ccover(i,j,k).lt.0) then
-        print*,'CLDOD or CCOVER is negative, stop!',i,j,k,iz,
-     &   sprc(i,j),kctop(i,j),wc(i,j,1:iz),cldod(i,j,k),ccover(i,j,k)
-        stop
-       endif
-      enddo
+               do k=1,iz
+                  if(cldod(i,j,k).lt.0.or.ccover(i,j,k).lt.0) then
+                     print*,'CLDOD or CCOVER is negative, stop!',
+     &                    i,j,k,iz,
+     &                    sprc(i,j),kctop(i,j),wc(i,j,1:iz),
+     &                    cldod(i,j,k),ccover(i,j,k)
+                     stop
+                  endif
+               enddo
 	!print *,'test'
-      do     10 k=1,iz
-      sg1(i,j,k,iair)=2.687e+19*sg1(i,j,k,iair)/101300.*273/t(i,j,k)
-		 ! 2.687e+19=avo/22400=6.02e+23/22400 molecules/cm3
-      sg1(i,j,k,ih2o)=sg1(i,j,k,ih2o)*28.9/18.0*sg1(i,j,k,iair)
-c      sg1(i,j,k,ich4)=1740.*sg1(i,j,k,iair)/1.e9   ! ch4
+               do     10 k=1,iz
+                  sg1(i,j,k,iair)=2.687e+19*
+     &                 sg1(i,j,k,iair)/101300.*273/t(i,j,k)
+c     2.687e+19=avo/22400=6.02e+23/22400 molecules/cm3
+                  sg1(i,j,k,ih2o) = sg1(i,j,k,ih2o)*28.9/18.0*
+     &                 sg1(i,j,k,iair)
+c     sg1(i,j,k,ich4)=1740.*sg1(i,j,k,iair)/1.e9   ! ch4
 c     sg1(i,j,k,ico2)=0.00032*sg1(i,j,k,iair)
-c      sg1(i,j,k,ih2)=540.*sg1(i,j,k,iair)/1.e9
-c      sg1(i,j,k,io2)=0.21*sg1(i,j,k,iair)
-c      sg1(i,j,k,in2)=0.78*sg1(i,j,k,iair)
-c      sg1(i,j,k,itrace)=1e-6                   ! trace
-10    continue
+c     sg1(i,j,k,ih2)=540.*sg1(i,j,k,iair)/1.e9
+c     sg1(i,j,k,io2)=0.21*sg1(i,j,k,iair)
+c     sg1(i,j,k,in2)=0.78*sg1(i,j,k,iair)
+c     sg1(i,j,k,itrace)=1e-6                   ! trace
+ 10            continue
 
 c-------------------------------------------------------
 C---- READ Boundary Condition in PPb and convert it molecular/cm3
-       print*, 'Read boundary condition in input2 for date',idate(1),
-     & idate(2),idate(3), ihr
+               print*, 'Read boundary condition in input2 for date',
+     &              idate(1), idate(2),idate(3), ihr
+               print*,'Test ',numsp,iz,ix
+               do L=1,numsp
+                  call READ_IOAPI_BND(sname(l,1),
+     &                 idate(1),idate(2),idate(3),
+     &                 ihr,ix,iy,iz,sy(1,1,1,l),sx(1,1,2,l),sy(1,1,2,l),
+     &                 sx(1,1,1,l),scrat)
+                  do k=1,iz
+                     do i=1,ix
 
-	print*,'Test ',numsp,iz,ix
-      do L=1,numsp
-      call READ_IOAPI_BND(sname(l,1),idate(1),idate(2),idate(3),
-     &     ihr,ix,iy,iz,sy(1,1,1,l),sx(1,1,2,l),sy(1,1,2,l),
-     2     sx(1,1,1,l),scrat)
-      do k=1,iz
-       do i=1,ix
-
-c       sy(i,k,1,L) = 0.467 -
-c     c     0.0009*(julian(idate(1),idate(2),idate(3)) -     &87) !
-
-        sy(i,k,1,L)=sy(i,k,1,L)*sg1(i,1,k,iair)/1e9   ! South boundary
-
+c     sy(i,k,1,L) = 0.467 -
+c     0.0009*(julian(idate(1),idate(2),idate(3)) -     &87) !
+c     South boundary
+                        sy(i,k,1,L) = sy(i,k,1,L) * sg1(i,1,k,iair)/1e9
 c       sy(i,k,2,L) = 0.467 -
 c     c     0.0009*(julian(idate(1),idate(2),idate(3)) -     &87) !
 
@@ -494,9 +513,9 @@ c      if (k.lt.11 .and. i.gt.20) then
 c               sy(i,k,2,L)=sy(i,k,2,L) - 0.053 ! add drawdown to north boundary PBL to 398 ppt
 c       endif
 
-	sy(i,k,2,L)=sy(i,k,2,L)*sg1(i,iy,k,iair)/1e9  ! north
-       enddo
-       do j=1,iy
+                        sy(i,k,2,L)=sy(i,k,2,L)*sg1(i,iy,k,iair)/1e9 ! north
+                     enddo
+                     do j=1,iy
 c	sx(j,k,1,L)=sx(j,k,1,L) - 0.0107 ! decrease west boundary by one stdev of pacific flight observation
 c       sx(j,k,1,L)=sx(j,k,1,L) -
 c     c     0.0007*(julian(idate(1),idate(2),idate(3)) - 187) ! decrease west boundary by 0.7 ppt every day following temporal trend in INTEX-NA and NOAA/ESRL data, where 187 is the first day of observations where we set the 480 ppt boundary condition from
@@ -505,24 +524,24 @@ c       sx(j,k,1,5) = 0.467 -
 c     c     0.0009*(julian(idate(1),idate(2),idate(3)) - 187) !
 c       sx(j,k,2,L) = 0.467 -
 c     c     0.0009*(julian(idate(1),idate(2),idate(3)) - 187) !
-        sx(j,k,1,L)=sx(j,k,1,L)*sg1(1,j,k,iair)/1e9   !west
-	sx(j,k,2,L)=sx(j,k,2,L)*sg1(ix,j,k,iair)/1e9  !east
-	enddo
-       enddo
-      enddo
-c        print*,'DEBUG bc',jday,
-c     c     0.007*(julian(idate(1),idate(2),idate(3)) -     &87), sx(j,k,1,L)
+                        sx(j,k,1,L)=sx(j,k,1,L)*sg1(1,j,k,iair)/1e9 !west
+                        sx(j,k,2,L)=sx(j,k,2,L)*sg1(ix,j,k,iair)/1e9 !east
+                     enddo
+                  enddo
+               enddo
+c     print*,'DEBUG bc',jday,
+c     0.007*(julian(idate(1),idate(2),idate(3)) -     &87), sx(j,k,1,L)
 
-      do K=1,iz              ! trace boundary concentration, 1 ppm
-        do i=1,ix
-	 sy(i,k,1,itrace)=1000*sg1(i,1,k,iair)/1e9
-	 sy(i,k,2,itrace)=1000*sg1(i,iy,k,iair)/1e9
-	enddo
-	do j=1,iy
-	 sx(j,k,1,itrace)=1000*sg1(1,j,k,iair)/1e9
-	 sx(j,k,2,itrace)=1000*sg1(ix,j,k,iair)/1e9
-	enddo
-      enddo
+               do K=1,iz        ! trace boundary concentration, 1 ppm
+                  do i=1,ix
+                     sy(i,k,1,itrace)=1000*sg1(i,1,k,iair)/1e9
+                     sy(i,k,2,itrace)=1000*sg1(i,iy,k,iair)/1e9
+                  enddo
+                  do j=1,iy
+                     sx(j,k,1,itrace)=1000*sg1(1,j,k,iair)/1e9
+                     sx(j,k,2,itrace)=1000*sg1(ix,j,k,iair)/1e9
+                  enddo
+               enddo
 
 c      do i=1,ix
 c       do j=1,iy
@@ -549,31 +568,35 @@ c       sy(i,iz-1,2,io3)=sz(i,iy,io3+numsp)
 c      enddo
 
 
-      do i=1,ix
-       do j=1,iy
-        sz(i,j,itrace)=1000*sg1(i,j,iz,iair)/1e9
-       enddo
-      enddo
+               do i=1,ix
+                  do j=1,iy
+                     sz(i,j,itrace)=1000*sg1(i,j,iz,iair)/1e9
+                  enddo
+               enddo
 
-      do L=1,numsp
-       do i=1,ix
-        do j=1,iy
-         sz(i,j,l)=sg1(i,j,iz,L)  ! set initial as top boundary  condition
-        enddo
-       enddo
-       call INTERP_IOAPI('TOPBND',sname(L,1),                ! Load top boundary condition
-     &    idate(1),idate(2),idate(3),ihr,sz(1,1,L),ix*iy,iflag)
-       if(iflag.eq.0) then
-		print*,'load top boundary condition for ',
-     &   sname(L,1)
-        sz(1:ix,1:iy,L)=sz(1:ix,1:iy,L)*sg1(1:ix,1:iy,iz,iair)/1e9   ! PPb to molecular/cm3
-	endif
-      enddo
-      print *, 'TOPBND is done'
+               do L=1,numsp
+                  do i=1,ix
+                     do j=1,iy
+c     set initial as top boundary  condition
+                        sz(i,j,l)=sg1(i,j,iz,L)
+                     enddo
+                  enddo
+c     Load top boundary condition
+                  call INTERP_IOAPI('TOPBND',sname(L,1),
+     &                 idate(1),idate(2),idate(3),ihr,sz(1,1,L),ix*iy,
+     &                 iflag)
+                  if (iflag .eq. 0) then
+                     print*,'load top boundary condition for ',
+     &                    sname(L,1)
+                     sz(1:ix,1:iy,L) = sz(1:ix,1:iy,L)*
+     &                    sg1(1:ix,1:iy,iz,iair)/1e9 ! PPb to molecular/cm3
+                  endif
+               enddo
+               print *, 'TOPBND is done'
 c-------------------------------------------------------------------
-      endif
-      return
-      end
+            endif
+            return
+            end
 
 
 c***********************************************************************
@@ -592,17 +615,17 @@ c$$$  TODO: implicit none, resolve declaration errors
       include 'aqrxn.cmm'
       dimension numl(3,4),sigmaz(1)
       character*16 ouname(mxspg),blank,sunit(mxspg),outjname(mxspg),
-     &  outaeronam(mxspg)
+     &     outaeronam(mxspg)
       character*80 aqrst,aqout
       integer aqspout,year,month,day,hour,julb,aeroindex
       common /aqodx/aqspout(mxspg),noutsp,izout,joutindex(mxspg),
-     & joutsp,jzout,aeroindex(mxspg),nout_aero,izaero,outaeronam
+     &     joutsp,jzout,aeroindex(mxspg),nout_aero,izaero,outaeronam
 
       include 'aqsymb.cmm'
 
       namelist /aqopenf/ouname,AQRST,AQOUT,izout,iscrat,outjname,
-     & jzout,jprnt,                     ! J-value output filename, Zlevel and timestep
-     2 outaeronam,izaero, iaeroprnt     ! Aerosol output filename, Zlevel and timestep
+     &     jzout,jprnt,         ! J-value output filename, Zlevel and timestep
+     &     outaeronam,izaero, iaeroprnt ! Aerosol output filename, Zlevel and timestep
 
 c
       call aq_blank(16*mxspg,ouname)
@@ -614,65 +637,65 @@ c
       read(11,aqopenf)
       close(11)
 c
-      call aq_find(mxspg,blank,ouname,lpsec,iflag)    ! find output gas-phase species
+      call aq_find(mxspg,blank,ouname,lpsec,iflag) ! find output gas-phase species
       noutsp=lpsec-1
       do i=1,noutsp
-      call aq_find(numl(1,3),ouname(i),sname(1,1),lpsec,iflag)
-      if(iflag.eq.1) then
-	 write(6,*) '** critical error in aqodx in aqms.mif **'
-	 write(6,*) '** can not find :',ouname(i)
-	 stop
-      else
-	 aqspout(i)=lpsec   ! output species index
-      endif
+         call aq_find(numl(1,3),ouname(i),sname(1,1),lpsec,iflag)
+         if (iflag .eq. 1) then
+            write(6,*) '** critical error in aqodx in aqms.mif **'
+            write(6,*) '** can not find :',ouname(i)
+            stop
+         else
+            aqspout(i)=lpsec    ! output species index
+         endif
       enddo
 
-      call aq_find(mxspg,blank,outjname,jpsec,iflag)   !  Jvalue output
+      call aq_find(mxspg,blank,outjname,jpsec,iflag) !  Jvalue output
       joutsp=jpsec-1
       do i=1,joutsp
-      call aq_find(npht+6,outjname(i),jvname,jpsec,iflag)
-      if(iflag.eq.1) then
-	 write(6,*) '** critical error in aqodx in aqms.mif **'
-	 write(6,*) '** can not find :',outjname(i)
-	 stop
-      else
-	 joutindex(i)=jpsec   ! output species index
-      endif
+         call aq_find(npht+6,outjname(i),jvname,jpsec,iflag)
+         if(iflag.eq.1) then
+            write(6,*) '** critical error in aqodx in aqms.mif **'
+            write(6,*) '** can not find :',outjname(i)
+            stop
+         else
+            joutindex(i)=jpsec  ! output species index
+         endif
       enddo
 
-      call aq_find(mxspg,blank,outaeronam,lpsec,iflag)   ! aerosol
+      call aq_find(mxspg,blank,outaeronam,lpsec,iflag) ! aerosol
       nout_aero=lpsec-1
       do i=1,nout_aero
-      call aq_find(numl(1,3),outaeronam(i),sname(1,1),lpsec,iflag)
-      if(iflag.eq.1) then
-        call aq_find(6,outaeronam(i),extname,lpsec,iflag)    ! search extinction fact
-	if(iflage.eq.1) then
-	 write(6,*) '** critical error in aqodx in aqms.mif **'
-	 write(6,*) '** can not find :',outaeronam(i)
-	 stop
-	else
-	 aeroindex(i)=lpsec+jaoedust-1
-	endif
-      else
-	 aeroindex(i)=lpsec   ! output species index
-      endif
+         call aq_find(numl(1,3),outaeronam(i),sname(1,1),lpsec,iflag)
+         if(iflag.eq.1) then
+c     search extinction fact
+            call aq_find(6,outaeronam(i),extname,lpsec,iflag)
+            if(iflage.eq.1) then
+               write(6,*) '** critical error in aqodx in aqms.mif **'
+               write(6,*) '** can not find :',outaeronam(i)
+               stop
+            else
+               aeroindex(i)=lpsec+jaoedust-1
+            endif
+         else
+            aeroindex(i)=lpsec  ! output species index
+         endif
       enddo
 
-c
       io_log=init3()
       call open_ioapi('DOMAIN')
       call open_ioapi('METEO3D')
       call open_ioapi('METEO2D')
       call open_ioapi('INITF')
       call open_ioapi('BDF')
-      call open_ioapi('BDFV')  ! time-varied boundary condition
+      call open_ioapi('BDFV')   ! time-varied boundary condition
       call open_ioapi('TOPBND')
       call open_ioapi('EMHOURLY')
-!      call open_ioapi('DOBSON') ! ozone dobson
-!      call open_ioapi('EMISSION')
-!      call open_ioapi('EMDAILY')
-!      call open_ioapi('BIOGENIC') ! biogenic emissions
-!      call open_ioapi('DEPVEL')
+c     call open_ioapi('DOBSON') ! ozone dobson
+c     call open_ioapi('EMISSION')
+c     call open_ioapi('EMDAILY')
+c     call open_ioapi('BIOGENIC') ! biogenic emissions
+c     call open_ioapi('DEPVEL')
 
 c      if(.not.open3('DOMAIN',FSREAD3,'aq_open')) then
 c        print*, 'failed to open TOPO'
@@ -707,15 +730,15 @@ c-------------------------------------------------------------------------------
 cc                                Create Out Put File
       if(unit_out.eq.0) then
 	 do i=1,numl(1,3)
-         sunit(i)='molecules/cm3'
+            sunit(i)='molecules/cm3'
 	 enddo
       else if(unit_out.eq.4) then
 	 do i=1,numl(1,3)
-	 sunit(i)='ppbv'
+            sunit(i)='ppbv'
 	 enddo
       else if(unit_out.eq.2) then
 	 do i=1,numl(1,3)
-	 sunit(i)='microgram/m3'
+            sunit(i)='microgram/m3'
 	 enddo
       else
 	 write(6,*) '** wrong unit_out **'
@@ -757,8 +780,8 @@ c 	stop
 c       endif
 
       call create_out_ioapi('AQRST','GRIDSYS',iz,2,sigmaz,dht,
-     &     year,month,day,hour,iscrat,numl(1,2),sname,sunit)      ! scratch file
-c      write(0,*)   'successful generate restart file'
+     &     year,month,day,hour,iscrat,numl(1,2),sname,sunit) ! scratch file
+c     write(0,*)   'successful generate restart file'
 cc
 
 C------Output file
@@ -773,41 +796,43 @@ c        print*,' Error Open AQOUT'
 c	stop
 c       endif
       print *, "now creating AQOUT"
-       call create_out_ioapi_nest('AQOUT','GRIDSYS',izout,2,sigmaz,dht,
-     &     year,month,day,hour,iprnt,noutsp,ouname,sunit)      ! output gas concentration files
+c     output gas concentration files
+      call create_out_ioapi_nest('AQOUT','GRIDSYS',izout,2,sigmaz,dht,
+     &     year,month,day,hour,iprnt,noutsp,ouname,sunit)
 
 
-       ! Checkpoint level 1 file
-       call create_out_ioapi('AQCHKP1','GRIDSYS',iz,2,sigmaz,dht,
+c     Checkpoint level 1 file
+      call create_out_ioapi('AQCHKP1','GRIDSYS',iz,2,sigmaz,dht,
      &     year,month,day,hour,1,numl(1,3),sname,sunit)
 
 
        do i=1,joutsp
-	 sunit(i)='1/s'
+          sunit(i)='1/s'
        enddo
+c     J-value and extinction file
        call create_out_ioapi('JOUT','GRIDSYS',jzout,2,sigmaz,dht,
-     &     year,month,day,hour,jprnt,joutsp,outjname,sunit)    ! J-value and extinction file
-c       write(0,*)   'successful generate JVOUT'
+     &      year,month,day,hour,jprnt,joutsp,outjname,sunit)
+c     write(0,*)   'successful generate JVOUT'
 
-      if(unit_aero.eq.0) then             ! determine aerosol output unit
-	 do i=1,nout_aero
-         sunit(i)='molecules/cm3'
-	 enddo
-      else if(unit_aero.eq.4) then
-	 do i=1,nout_aero
-	 sunit(i)='ppbv'
-	 enddo
-      else if(unit_aero.eq.2) then
-	 do i=1,nout_aero
-	 sunit(i)='microgram/m3'
-	 enddo
-      else
-	 write(6,*) '** wrong unit_out **'
-	 stop
-      endif
-      do i=1,nout_aero
-       if(index(outaeronam(i),'AOE').gt.0) sunit(i)=' 1/km '  ! extinction coefficient
-      enddo
+       if(unit_aero.eq.0) then  ! determine aerosol output unit
+          do i=1,nout_aero
+             sunit(i)='molecules/cm3'
+          enddo
+       else if(unit_aero.eq.4) then
+          do i=1,nout_aero
+             sunit(i)='ppbv'
+          enddo
+       else if(unit_aero.eq.2) then
+          do i=1,nout_aero
+             sunit(i)='microgram/m3'
+          enddo
+       else
+          write(6,*) '** wrong unit_out **'
+          stop
+       endif
+       do i=1,nout_aero
+          if(index(outaeronam(i),'AOE').gt.0) sunit(i)=' 1/km ' ! extinction coefficient
+       enddo
 
 c      print*,'outaeronam=',outaeronam
 c      print*,'sigmaz=',sigmaz
@@ -815,14 +840,16 @@ c      print*,'dht, izaero,iaeroprnt, nout_aero=',dht, izaero,iaeroprnt,
 c     & nout_aero
 c       print*,' aeroindex =',aeroindex(1:nout_aero)
 
-      call create_out_ioapi('AEROOUT','GRIDSYS',izaero,2,sigmaz,dht,
-     &     year,month,day,hour,iaeroprnt,nout_aero,outaeronam,sunit)    ! aerosol file
+c     aerosol file
+       call create_out_ioapi('AEROOUT','GRIDSYS',izaero,2,sigmaz,dht,
+     &      year,month,day,hour,iaeroprnt,nout_aero,outaeronam,sunit)
 
 c      write(0,*)   'successful generate AEROOUT'
-      call close_ioap
+       call close_ioap
 c      write(0,*)   'end of aq_open'
-      return
-      end
+       return
+       end
+
 c==============================================================================
 c AQMS I/O API module
 c==============================================================================
@@ -844,11 +871,12 @@ c      io_log = INIT3()           ! start up I/O API
 
 
       if (.not. OPEN3(lname, FSREAD3, progname) ) then
-	  msg3d = 'Error opening ' // domainfile
-          call M3EXIT (progname, date3d, time3d, msg3d, 1)
+         msg3d = 'Error opening ' // domainfile
+         call M3EXIT (progname, date3d, time3d, msg3d, 1)
       endif
       return
       end
+
 c==============================================================================
       subroutine OPEN_IOAPW(lname)
 c------------------------------------------------------------------------------
@@ -864,44 +892,44 @@ c------------------------------------------------------------------------------
       integer io_log
 
 
-      io_log = INIT3()           ! start up I/O API
+      io_log = INIT3()          ! start up I/O API
 
 
       if (.not. OPEN3(lname, FSRDWR3, progname) ) then
-	  msg3d = 'Error opening ' // domainfile
-          call M3EXIT (progname, date3d, time3d, msg3d, 1)
+         msg3d = 'Error opening ' // domainfile
+         call M3EXIT (progname, date3d, time3d, msg3d, 1)
       endif
       return
       end
 
 c*****************************************************************************
       subroutine READ_IOAPI
-     +  (lname, varname, year, month, day, hour, field, iflag)
+     +     (lname, varname, year, month, day, hour, field, iflag)
 c------------------------------------------------------------------------------
-c G. Calori, 1.11.99
+c     G. Calori, 1.11.99
 c
-c LAST REV:
+c     LAST REV:
 c
-c PURPOSE: Read a field from an AQMS input file
-c          (EDSS/Models-3 I/O API format)
+c     PURPOSE: Read a field from an AQMS input file
+c     (EDSS/Models-3 I/O API format)
 c
-c PRECONDITIONS:
-c Following env vars need to be set:
-c <lname>	logical name of input file
+c     PRECONDITIONS:
+c     Following env vars need to be set:
+c     <lname>	logical name of input file
 c
-c INPUT:
-c <lname>		C  logical name of output file
-c varname	     C*16  name of variable to be read
-c year, month, day	I  year (yyyy), month, day
-c hour			I  hour
+c     INPUT:
+c     <lname>		C  logical name of output file
+c     varname	     C*16  name of variable to be read
+c     year, month, day	I  year (yyyy), month, day
+c     hour			I  hour
 c
-c OUTPUT:
-c field			R  field just read
+c     OUTPUT:
+c     field			R  field just read
 c
-c CALLS: I/O API library
+c     CALLS: I/O API library
 c
-c NOTES: If 'varname' does not exists at specified time,
-c        'field' is returned unchanged
+c     NOTES: If 'varname' does not exists at specified time,
+c     'field' is returned unchanged
 c------------------------------------------------------------------------------
       implicit none
 
@@ -931,31 +959,30 @@ c------------------------------------------------------------------------------
       date3d = 1000 * year + jul3d		! current date YYYYDDD
       time3d = 10000 * hour			! current time HHMMSS
 
-
-c      write(0,*) 'read variable ',varname,date3d,time3d,' from ',lname
+c     write(0,*) 'read variable ',varname,date3d,time3d,' from ',lname
       if (.not.
-     +    CHECK3 (TRIM(lname), TRIM(varname),
-     +            date3d, time3d)
-     +   ) then
-	iflag=1
-	write(6,*)'Warning: Can not Read the variable ',varname,lname
-	write(6,*)'time =', date3d, time3d
-        return
+     &     CHECK3 (TRIM(lname), TRIM(varname),
+     &     date3d, time3d)
+     &     ) then
+         iflag=1
+         write(6,*)'Warning: Can not Read the variable ',varname,lname
+         write(6,*)'time =', date3d, time3d
+         return
       endif
 
       if (.not. DESC3(trim(lname)) ) then
-       print*,'No information for',lname
-       stop
+         print*,'No information for',lname
+         stop
       endif
 
-      if(imother.eq.ncols3d.and.jmother.eq.nrows3d) then         ! mother domain
-       if(.not.read3(trim(lname),trim(varname),ALLAYS3,date3d,time3d,
-     +   field)) then
-        write(6,*) 'Error reading var ' //TRIM(varname)//
-     +    ' from file ' // TRIM(lname) // 'at time ',
-     +    date3d,time3d
-	stop
-       endif
+      if(imother.eq.ncols3d.and.jmother.eq.nrows3d) then ! mother domain
+         if(.not.read3(trim(lname),trim(varname),ALLAYS3,date3d,time3d,
+     &        field)) then
+            write(6,*) 'Error reading var ' //TRIM(varname)//
+     &           ' from file ' // TRIM(lname) // 'at time ',
+     &           date3d,time3d
+            stop
+         endif
 c       if(nlays3d.eq.1) then
 c	do j=1,iym
 c         do i=1,ixm
@@ -971,37 +998,37 @@ c	  enddo
 c	 enddo
 c	enddo
 c       endif
-       return
+         return
       endif
 
-      if(ixm.ne.ncols3d.or.iym.ne.nrows3d) then   ! check dimension
-       print*,'dimension does not match ',lname
-       print*,ixm,iym,ncols3d,nrows3d
-       stop
+      if(ixm.ne.ncols3d.or.iym.ne.nrows3d) then ! check dimension
+         print*,'dimension does not match ',lname
+         print*,ixm,iym,ncols3d,nrows3d
+         stop
       endif
 
       if (.not.
-     +      READ3 (TRIM(lname),
-     +             TRIM(varname),
-     +             ALLAYS3, date3d, time3d, field)
-     +     ) then
+     &     READ3 (TRIM(lname),
+     &     TRIM(varname),
+     &     ALLAYS3, date3d, time3d, field)
+     &     ) then
 
-        write(6,*) 'Error reading var ' // TRIM(varname)//
-     +    ' from file ' // TRIM(lname) // 'at time ',
-     +    date3d,time3d
-c          call ENVSTR (lname(:TRIMLEN(lname)),
+         write(6,*) 'Error reading var ' // TRIM(varname)//
+     &        ' from file ' // TRIM(lname) // 'at time ',
+     &        date3d,time3d
+c     call ENVSTR (lname(:TRIMLEN(lname)),
 c     +                 'AQMS input file', 'dummy_in.nc', filename, ios)
-c          msg3d = 'Error reading var ' // varname(:TRIMLEN(varname)) //
+c     msg3d = 'Error reading var ' // varname(:TRIMLEN(varname)) //
 c     +      ' from file ' // filename(:TRIMLEN(filename))
-c          call M3EXIT (subname, date3d, time3d, msg3d, 1)
-          stop
-        endif
+c     call M3EXIT (subname, date3d, time3d, msg3d, 1)
+         stop
+      endif
 
       return
       end
 
       subroutine READ_IOAPI_FIND_PREVIOUS
-     +     (lname, varname, year, month, day, hour, field, iflag)
+     &     (lname, varname, year, month, day, hour, field, iflag)
 c------------------------------------------------------------------------------
 c     T.W. Hilton, 6.17.2014
 c
@@ -1124,7 +1151,7 @@ c$$$  return
             print *, lname, "unable to close",
      &           lname, " (READ_IOAPI_FIND_PREVIOUS)"
          ENDIF
-      return
+         return
       endif
 
       if(ixm.ne.ncols3d.or.iym.ne.nrows3d) then ! check dimension
@@ -1152,35 +1179,36 @@ c$$$  return
       return
       end subroutine READ_IOAPI_FIND_PREVIOUS
 
-
-      subroutine INTERP_IOAPI
-     +  (lname, varname, year, month, day, hour, field,  nsize, iflag)
 c------------------------------------------------------------------------------
-c Y. Tang, 1.11.99
+      subroutine INTERP_IOAPI
+     &     (lname, varname, year, month, day, hour,
+     &     field,  nsize, iflag)
+c------------------------------------------------------------------------------
+c     Y. Tang, 1.11.99
 c
-c LAST REV:
+c     LAST REV:
 c
-c PURPOSE: Read a field from an AQMS input file
-c          (EDSS/Models-3 I/O API format)
+c     PURPOSE: Read a field from an AQMS input file
+c     (EDSS/Models-3 I/O API format)
 c
-c PRECONDITIONS:
-c Following env vars need to be set:
-c <lname>	logical name of input file
+c     PRECONDITIONS:
+c     Following env vars need to be set:
+c     <lname>	logical name of input file
 c
-c INPUT:
-c <lname>		C  logical name of output file
-c varname	     C*16  name of variable to be read
-c year, month, day	I  year (yyyy), month, day
-c hour			I  hour
-C nsize                 I  buffer size for storing data
+c     INPUT:
+c     <lname>		C  logical name of output file
+c     varname	     C*16  name of variable to be read
+c     year, month, day	I  year (yyyy), month, day
+c     hour			I  hour
+C     nsize                 I  buffer size for storing data
 c
-c OUTPUT:
-c field			R  field just read
+c     OUTPUT:
+c     field			R  field just read
 c
-c CALLS: I/O API library
+c     CALLS: I/O API library
 c
-c NOTES: If 'varname' does not exists at specified time,
-c        'field' is returned unchanged
+c     NOTES: If 'varname' does not exists at specified time,
+c     'field' is returned unchanged
 c------------------------------------------------------------------------------
       implicit none
 
@@ -1214,94 +1242,93 @@ c------------------------------------------------------------------------------
          if(vname3d(L).eq.trim(varname)) goto 10 ! find this variable
       enddo
       iflag=1
-      return               ! if there is no such a variable, return
+      return                    ! if there is no such a variable, return
 
  10   if(imother.eq.ncols3d.and.jmother.eq.nrows3d) then ! mother domain
-       if(.not.interp3(trim(lname),trim(varname),subname,date3d,time3d,
-     +   ncols3d*nrows3d*nlays3d,field)) then
-        write(6,*) 'Error interping var ' //TRIM(varname)//
-     +    ' from file ' // TRIM(filename) // 'at time ',
-     +    date3d,time3d
-	stop
-       endif
-c       if(nlays3d.eq.1) then
-c	do j=1,iym
-c         do i=1,ixm
-c	 field(i+(j-1)*ixm)=work(i+ioff,j+joff,1)
-c	 enddo
-c	enddo
-c       else
-c        do k=1,nlays3d
-c 	 do j=1,iym
-c          do i=1,ixm
-c	  field(i+((j-1)+(k-1)*iym)*ixm)=work(i+ioff,j+joff,k)
-c	  enddo
-c	 enddo
-c	enddo
-c       endif
-       return
+         if (.not.interp3(trim(lname),trim(varname),subname,
+     &        date3d,time3d,
+     &        ncols3d*nrows3d*nlays3d,field)) then
+            write(6,*) 'Error interping var ' //TRIM(varname)//
+     &           ' from file ' // TRIM(filename) // 'at time ',
+     &           date3d,time3d
+            stop
+         endif
+c     if(nlays3d.eq.1) then
+c     do j=1,iym
+c     do i=1,ixm
+c     field(i+(j-1)*ixm)=work(i+ioff,j+joff,1)
+c     enddo
+c     enddo
+c     else
+c     do k=1,nlays3d
+c     do j=1,iym
+c     do i=1,ixm
+c     field(i+((j-1)+(k-1)*iym)*ixm)=work(i+ioff,j+joff,k)
+c     enddo
+c     enddo
+c     enddo
+c     endif
+         return
       endif
 
-      if(ixm.ne.ncols3d.or.iym.ne.nrows3d) then   ! check dimension
-       print*,'dimension does not match ',lname
-       print*,ixm,iym,ncols3d,nrows3d
-       stop
+      if(ixm.ne.ncols3d.or.iym.ne.nrows3d) then ! check dimension
+         print*,'dimension does not match ',lname
+         print*,ixm,iym,ncols3d,nrows3d
+         stop
       endif
 
       if (.not. INTERP3(TRIM(lname),
-     &	TRIM(varname), subname,
-     2  date3d, time3d,nsize, field)) then
+     &     TRIM(varname), subname,
+     2     date3d, time3d,nsize, field)) then
          print*, 'Error interping var '//TRIM(varname) //
-     +      ' from file ' //trim(lname)
+     +        ' from file ' //trim(lname)
          print*,'date3d,time3d=',date3d,time3d
-        stop
+         stop
       endif
 
       return
       end
 
-
-
-
-      subroutine CREATE_OUT_IOAPI
-     +  (loutname, loutgrid, nz, vertype, zvect, ztop,
-     +   yearb, monthb, dayb, hourb, dt,
-     +   nvar, varnames, varunits)
 c------------------------------------------------------------------------------
-c G. Calori, 1.11.99
+      subroutine CREATE_OUT_IOAPI
+     &  (loutname, loutgrid, nz, vertype, zvect, ztop,
+     &   yearb, monthb, dayb, hourb, dt,
+     &   nvar, varnames, varunits)
+c------------------------------------------------------------------------------
+c     G. Calori, 1.11.99
 c
-c LAST REV:
+c     LAST REV:
 c
-c PURPOSE: Create/open AQMS 3D output files (EDSS/Models-3 I/O API format)
+c     PURPOSE: Create/open AQMS 3D output files (EDSS/Models-3 I/O API format)
 c
-c PRECONDITIONS:
-c Following env vars need to be set:
-c <loutname>	logical name of output file to be created
-c COORDSYS	name of coordinate system
-c <loutgrid>	logical name of grid system adopted by output file
+c     PRECONDITIONS:
+c     Following env vars need to be set:
+c     <loutname>	logical name of output file to be created
+c     COORDSYS	name of coordinate system
+c     <loutgrid>	logical name of grid system adopted by output file
 c
-c INPUT:
-c loutname		C  logical name of file to be created
-c loutgrid		C  logical name of grid system adopted by output file
-c nz			I  actual # of vertical grid points
-c vertype		I  vertical coordinates system:
+c     INPUT:
+c     loutname		C  logical name of file to be created
+c     loutgrid		C  logical name of grid system adopted by output file
+c     nz			I  actual # of vertical grid points
+c     vertype		I  vertical coordinates system:
 c     1 = terrain-following; 2 = sigma-z
-c zvect			R  vector of vertical coordinates
-c			   (m above ground, if terrain-following;
-c			   0-1 numbers, if sigma-z)
-c ztop			R  top of model domain (m above m.s.l.)
-c                          (used just in case of terrain-following)
-c yearb, month, dayb 	I  starting year (yyyy), month, day
-c hourb			I  starting hour
-c dt			I  time step (hr)
-c nvar			I  # of variables that the file will contain
-c varnames	     C*16  list of variables names
-c varunits	     C*16  list of variables units
+c     zvect			R  vector of vertical coordinates
+c     (m above ground, if terrain-following;
+c     0-1 numbers, if sigma-z)
+c     ztop			R  top of model domain (m above m.s.l.)
+c     (used just in case of terrain-following)
+c     yearb, month, dayb 	I  starting year (yyyy), month, day
+c     hourb			I  starting hour
+c     dt			I  time step (hr)
+c     nvar			I  # of variables that the file will contain
+c     varnames	     C*16  list of variables names
+c     varunits	     C*16  list of variables units
 c
-c OUTPUT:
-c <loutname> file is created/opened
+c     OUTPUT:
+c     <loutname> file is created/opened
 c
-c CALLS: I/O API library
+c     CALLS: I/O API library
 c------------------------------------------------------------------------------
       implicit none
 
@@ -1328,107 +1355,94 @@ c------------------------------------------------------------------------------
 
       data io_msg /6/
       data subname /'create_out_ioapi'/
+c     io_log = INIT3()           ! start up I/O API
 
-
-
-c      io_log = INIT3()           ! start up I/O API
-
-c       get filename, coordinates system and grid name from environment
-
-      if (.not. DESC3('METEO3D') ) then   ! get grid information from meteorological 3d file to fill the description of 3d chemical output
-        print*, 'Error getting info from METEO3D in create_out_ioapi'
-        stop
+c     get filename, coordinates system and grid name from environment
+c     get grid information from meteorological 3d file to fill the
+c     description of 3d chemical output
+      if (.not. DESC3('METEO3D') ) then
+         print*, 'Error getting info from METEO3D in create_out_ioapi'
+         stop
       endif
-
-c       ...set time step structure
-
+c     ...set time step structure
       julb = JULIAN (yearb, monthb, dayb)
       sdate3d = 1000 * yearb + julb     ! file start date YYYYDDD
-      stime3d =10000 * hourb           ! file start time HHMMSS
-      tstep3d =10000 * dt              ! file time step HHMMSS
+      stime3d = 10000 * hourb           ! file start time HHMMSS
+      tstep3d = 10000 * dt              ! file time step HHMMSS
 
-c       ...file description and history
-
+c     ...file description and history
       do l = 1, MXDESC3
-        fdesc3d(l) = ' '
+         fdesc3d(l) = ' '
       enddo
       fdesc3d(1) = 'Generated by program AQMS'
 
-c       ... vertical structure
-
+c     ... vertical structure
       nlays3d = nz
-
-c       ... set variables, units and descriptions
+c     ... set variables, units and descriptions
 
       nvars3d = nvar
       do iv = 1,nvar
-        vname3d(iv) = varnames(iv)
-        units3d(iv) = varunits(iv)
+         vname3d(iv) = varnames(iv)
+         units3d(iv) = varunits(iv)
       enddo
 
       do iv = 1,nvars3d
-        vdesc3d(iv) = 'Species Concentration'	! text-descriptions
-        vtype3d(iv) = M3REAL	! basic data types
+         vdesc3d(iv) = 'Species Concentration' ! text-descriptions
+         vtype3d(iv) = M3REAL	! basic data types
       enddo
 
-c       open file as "unknown": if it does not exist, create it;
-c       else check header against description supplied in FDESC3.EXT
-c       open for output in any case
-
-
+c     open file as "unknown": if it does not exist, create it;
+c     else check header against description supplied in FDESC3.EXT
+c     open for output in any case
       write(io_msg,'(/,a,a)')
-     +  'Opening/creating file : ' , loutname(:TRIMLEN(loutname))
+     &     'Opening/creating file : ' , loutname(:TRIMLEN(loutname))
       write(io_msg,'(a,a)')
-     +  'Coordinates system: ' , coordname(:TRIMLEN(coordname))
+     &     'Coordinates system: ' , coordname(:TRIMLEN(coordname))
       write(io_msg,'(a,a)')
-     +  'Grid system       : ' , gridname(:TRIMLEN(gridname))
+     &     'Grid system       : ' , gridname(:TRIMLEN(gridname))
 
       if (.not.
-     +    OPEN3(loutname(:TRIMLEN(loutname)), FSUNKN3, subname)
-     +   ) then
-       write(*,*)'Error opening ' // loutname(:TRIMLEN(loutname))
-c        msg3d = 'Error opening ' // loutname(:TRIMLEN(loutname))
-c        call M3EXIT (subname, date3d, time3d, msg3d, 1)
-	stop
+     &     OPEN3(loutname(:TRIMLEN(loutname)), FSUNKN3, subname)
+     &     ) then
+         write(*,*)'Error opening ' // loutname(:TRIMLEN(loutname))
+c     msg3d = 'Error opening ' // loutname(:TRIMLEN(loutname))
+c     call M3EXIT (subname, date3d, time3d, msg3d, 1)
+         stop
       endif
       write(io_msg,*)'opened IOAPI file: '//loutname(:TRIMLEN(loutname))
 
       return
       end
 
-
-
-
-
-
-      subroutine WRITE_OUT_IOAPI
-     +  (loutname, year, month, day, hour, varname, field)
 c------------------------------------------------------------------------------
-c G. Calori, 1.11.99
+      subroutine WRITE_OUT_IOAPI
+     &     (loutname, year, month, day, hour, varname, field)
+c------------------------------------------------------------------------------
+c     G. Calori, 1.11.99
 c
-c LAST REV:
+c     LAST REV:
 c
-c PURPOSE: Write a field to an AQMS output file
-c          (EDSS/Models-3 I/O API format)
+c     PURPOSE: Write a field to an AQMS output file
+c     (EDSS/Models-3 I/O API format)
 c
-c PRECONDITIONS:
-c 'create_out_ioapi' must has been previously called
+c     PRECONDITIONS:
+c     'create_out_ioapi' must has been previously called
 c
-c INPUT:
-c <loutname>		C  logical name of output file
-c year, month, day	I  current year (yyyy), month, day
-c hour			I  current hour
-c varname	     C*16  name of variable to be written
-c field(nwords)		R  field to be written
+c     INPUT:
+c     <loutname>		C  logical name of output file
+c     year, month, day	I  current year (yyyy), month, day
+c     hour			I  current hour
+c     varname	     C*16  name of variable to be written
+c     field(nwords)		R  field to be written
 c
-c OUTPUT:
-c on <loutname> file
+c     OUTPUT:
+c     on <loutname> file
 c
-c CALLS: I/O API library
+c     CALLS: I/O API library
 c------------------------------------------------------------------------------
       implicit none
 
-c      include 'netcdf.inc'
+c     include 'netcdf.inc'
       include 'PARMS3.EXT'	! i/o API
       include 'FDESC3.EXT'	! i/o API
       include 'IODECL3.EXT'	! i/o API
@@ -1449,68 +1463,68 @@ c      include 'netcdf.inc'
       data io_msg /6/
       data subname /'write_out_ioapi'/
 
-c	convert to i/o api time
-
+c     convert to i/o api time
       jul3d = JULIAN (year, month, day)
-      date3d =1000 * year + jul3d    ! file current date YYYYDDD
-      time3d =10000 * hour           ! file current time HHMMSS
+      date3d = 1000 * year + jul3d    ! file current date YYYYDDD
+      time3d = 10000 * hour           ! file current time HHMMSS
 
       if(time3d.eq.240000) then
-	time3d = 0
-	date3d = date3d + 1
+         time3d = 0
+         date3d = date3d + 1
       end if
 
-c	write field
+c     write field
       if (.not.
-     +    WRITE3(loutname(:TRIMLEN(loutname)),
-     +           varname, date3d, time3d, field)
-     +   ) then
-        call ENVSTR (loutname(:TRIMLEN(loutname)),
-     +               'AQMS output file', 'dummy_out.nc',
-     +               outfile, ios)
-        msg3d = 'Error writing var ' // varname
+     &     WRITE3(loutname(:TRIMLEN(loutname)),
+     &     varname, date3d, time3d, field)
+     &     ) then
+         call ENVSTR (loutname(:TRIMLEN(loutname)),
+     &        'AQMS output file', 'dummy_out.nc',
+     &        outfile, ios)
+         msg3d = 'Error writing var ' // varname
 c     +     //  ' at date&time ', date3d, time3d,
 c     +    ' on AQMS output file ' // outfile
-        call M3EXIT (subname, date3d, time3d, msg3d, 1)
-        stop
+         call M3EXIT (subname, date3d, time3d, msg3d, 1)
+         stop
       endif
 
       return
       end
+
 c*************************************************************************
       subroutine READ_IOAPI_BND
-     +  (varname, year, month, day, hour,
-     +   nx, ny, nz, south, east, north, west, scratch)
+     &  (varname, year, month, day, hour,
+     &   nx, ny, nz, south, east, north, west, scratch)
 c------------------------------------------------------------------------------
-c G. Calori, 8.11.99
+c     G. Calori, 8.11.99
 c
-c LAST REV:
+c     LAST REV:
 c
-c PURPOSE: Read a set of lateral b.c. at a given time and for a given species
-c          from an AQMS lateral b.c. file (EDSS/Models-3 I/O API format)
+c     PURPOSE: Read a set of lateral b.c. at a given time and for a given species
+c     from an AQMS lateral b.c. file (EDSS/Models-3 I/O API format)
 c
-c PRECONDITIONS:
-c lateral b.c. file (logical name 'BDF') file must has been already opened
+c     PRECONDITIONS:
+c     lateral b.c. file (logical name 'BDF') file must has been already opened
 c
-c INPUT:
-c varname	   	     C*16  name of variable to be read
-c year, month, day		I  desired year (yyyy), month, day
-c hour				I  desired hour
-c nx, ny, nz			I  actual dimension of 3D grid
-c scratch(2*nx+2*ny+4,nz)	R  scratch area
+c     INPUT:
+c     varname	   	     C*16  name of variable to be read
+c     year, month, day		I  desired year (yyyy), month, day
+c     hour				I  desired hour
+c     nx, ny, nz			I  actual dimension of 3D grid
+c     scratch(2*nx+2*ny+4,nz)	R  scratch area
 c
-c OUTPUT:
-c south(nx,nz), north(nx,nz)	R  S and N boundary conditions
-c east(ny,nz), west(ny,nz)	R  E and W boundary conditions
+c     OUTPUT:
+c     south(nx,nz), north(nx,nz)	R  S and N boundary conditions
+c     east(ny,nz), west(ny,nz)	R  E and W boundary conditions
 c
-c CALLS: I/O API library
+c     CALLS: I/O API library
 c
-c NOTES: If 'varname' does not exists at specified time,
-c        'south, east, north, west' are returned unchanged
+c     NOTES: If 'varname' does not exists at specified time,
+c     'south, east, north, west' are returned unchanged
 c------------------------------------------------------------------------------
       implicit none
 
-c      include 'netcdf.inc'
+c     include 'netcdf.inc'
       include 'PARMS3.EXT'	! i/o API
       include 'FDESC3.EXT'	! i/o API
       include 'IODECL3.EXT'	! i/o API
@@ -1519,7 +1533,7 @@ c      include 'netcdf.inc'
       integer day, month, year, hour
       integer nx, ny, nz
       real south(nx,nz), east(ny,nz), north(nx,nz), west(ny,nz),
-     +     scratch(2*nx+2*ny+4,nz)
+     &     scratch(2*nx+2*ny+4,nz)
 
       integer trimlen, julian
 
@@ -1539,19 +1553,19 @@ c      include 'netcdf.inc'
 
       if (.not. DESC3('BDFV') ) goto 20    ! no time-varied boundary condition
       if (nx.ne.ncols3d.or.ny.ne.nrows3d.or.nz.lt.nlays3d.or.
-     &  ftype3d.ne.bndary3) then  ! allow nz.ge.nlay3d in case 20 layer input for 21 layer stem
-       print*,'Time-varied Boundary file Wrong !',nx,ncols3d,ny,nrows3d,
-     &  nz,nlays3d,ftype3d,bndary3
-       print*,'Checking your BDFV setting'
-       stop
+     &     ftype3d.ne.bndary3) then ! allow nz.ge.nlay3d in case 20 layer input for 21 layer stem
+         print*,'Time-varied Boundary file Wrong !',
+     &        nx,ncols3d,ny,nrows3d, nz,nlays3d,ftype3d,bndary3
+         print*,'Checking your BDFV setting'
+         stop
       endif
 
       if(nz.gt.nlays3d) then
-       if(nz.eq.(nlays3d+1)) then       ! 20 layer BDFV
-        layer20=.true.
-       else
-        layer20=.false.
-       endif
+         if(nz.eq.(nlays3d+1)) then ! 20 layer BDFV
+            layer20=.true.
+         else
+            layer20=.false.
+         endif
       endif
 
 
@@ -1563,52 +1577,54 @@ c      include 'netcdf.inc'
 
  10   ibtime=sdate3d*100+stime3d/10000 ! begin time of the file in YYMMDDHH
       ietime=(mxrec3d*tstep3d+stime3d)/10000
-      ietime=(sdate3d+ietime/24)*100+mod(ietime,24) ! end time of the file in YYMMDDHH
-      inowtime=date3d*100+time3d/10000              ! nowtime in YYMMDDHH
+      ietime=(sdate3d+ietime/24)*100+mod(ietime,24) ! end time of the
+                                                    ! file in YYMMDDHH
+      inowtime=date3d*100+time3d/10000 ! nowtime in YYMMDDHH
 
       if(inowtime.ge.ibtime.and.inowtime.le.ietime) then  ! find time range
 
-       if(interp3('BDFV',varname(:TRIMLEN(varname)),
-     +    subname, date3d, time3d, (2*nx+2*ny+4)*nlays3d,scratch)) then
-         goto 30
-	else
-          Print*, 'Error interping var '// varname(:TRIMLEN(varname))//
-     +      ' from IOAPI file BDFV'
-
-          stop
-        endif
+         if(interp3('BDFV',varname(:TRIMLEN(varname)),
+     &        subname, date3d, time3d, (2*nx+2*ny+4)*nlays3d,scratch))
+     &        then
+            goto 30
+         else
+            Print*, 'Error interping var '//
+     &           varname(:TRIMLEN(varname))//
+     &           ' from IOAPI file BDFV'
+            stop
+         endif
       endif
 
  20   if (.not. INTERP3 ('BDF', varname(:TRIMLEN(varname)),
-     +    subname, date3d, time3d, (2*nx+2*ny+4)*nlays3d,scratch)) then
+     &     subname, date3d, time3d, (2*nx+2*ny+4)*nlays3d,scratch)) then
          Print*, 'Error interping var '// varname(:TRIMLEN(varname))//
-     +      ' from IOAPI file BDF'
-        print*,'date3d,time3d=',date3d,time3d
-        stop
+     &        ' from IOAPI file BDF'
+         print*,'date3d,time3d=',date3d,time3d
+         stop
       endif
 
- 30   if(layer20) then                 ! apply 20 layers' lowest layer data to current 1&2 layers
-
-        do k=nz,2,-1
-        scratch(1:(2*nx+2*ny+4),k)=scratch(1:(2*nx+2*ny+4),k-1)
-        enddo
+ 30   if(layer20) then          ! apply 20 layers' lowest layer data to
+                                ! current 1&2 layers
+         do k=nz,2,-1
+            scratch(1:(2*nx+2*ny+4),k)=scratch(1:(2*nx+2*ny+4),k-1)
+         enddo
       endif
 
       i0n = nx + ny + 2
       do k = 1,nz
-        do i = 1,nx
-          south(i,k) = scratch(i,k)
-          north(i,k) = scratch(i0n+i,k)
-        enddo
+         do i = 1,nx
+            south(i,k) = scratch(i,k)
+            north(i,k) = scratch(i0n+i,k)
+         enddo
       enddo
 
       j0e = nx + 1
       j0w = 2*nx + ny + 3
       do k = 1,nz
-        do j = 1,ny
-          east(j,k) = scratch(j0e+j,k)
-          west(j,k) = scratch(j0w+j,k)
-        enddo
+         do j = 1,ny
+            east(j,k) = scratch(j0e+j,k)
+            west(j,k) = scratch(j0w+j,k)
+         enddo
       enddo
 
       return
@@ -1616,96 +1632,103 @@ c      include 'netcdf.inc'
 
 
       subroutine tuvclouds(iz,z,pbl,p,prate,t,vapor,cw,rw,cldod,ccover,
-     & ktop,wetk)
+     &     ktop,wetk)
 C-----------------------------------------------------------------
 C     compute the Jcorrecot value due to cloud
 C     Input:
-C      iz       demension
-C      Z        model grid height above sea level (m)
-C      PBL      pbl height above sea level (m)
-C      P        Pressure   (Pa)
-C      PRATE    Precipitation rate (mm/hr)
-C      T        Temperature (k)
-c      vapor    water vapor (Kg/Kg)
-C      cw       Cloud Water Content (Kg/Kg)
-C      rw       Rain Water Content (Kg/Kg)
+C     iz       demension
+C     Z        model grid height above sea level (m)
+C     PBL      pbl height above sea level (m)
+C     P        Pressure   (Pa)
+C     PRATE    Precipitation rate (mm/hr)
+C     T        Temperature (k)
+c     vapor    water vapor (Kg/Kg)
+C     cw       Cloud Water Content (Kg/Kg)
+C     rw       Rain Water Content (Kg/Kg)
 C
 C     Output:
-C      cldod    Cloud optical depth
-C      ccover   cloud coverage
-C      Ktop     index of clound top height
-C      wetk     liquid removing factor for SO2, SO4, H2O2 and HNO3
+C     cldod    Cloud optical depth
+C     ccover   cloud coverage
+C     Ktop     index of clound top height
+C     wetk     liquid removing factor for SO2, SO4, H2O2 and HNO3
 C
-C   Author: Youhua Tang
+C     Author: Youhua Tang
 C-----------------------------------------------------------------
 
 c$$$  TODO: implicit none, resolve declaration errors
 
-      parameter(CWMIN=1e-6,   ! define if there is cloud
-     2  prmin=0.01, nwet=4 )          ! define if there is precipitation
+      parameter(CWMIN=1e-6,     ! define if there is cloud
+     &     prmin=0.01, nwet=4 ) ! define if there is precipitation
       integer iz,ktop
       real z(iz),pbl,p(iz),prate,t(iz),vapor(iz),cw(iz),rw(iz),
-     & cldod(iz),ccover(iz), wetk(iz,nwet), iradius
+     &     cldod(iz),ccover(iz), wetk(iz,nwet), iradius
 
       data rdry,cradius,iradius, rradius/287.04, 1.e-5, 9.e-5, 1.e-3/
-      ! air constant, cloud water drop, ice drop and rain drop radius in meter
+c     air constant, cloud water drop, ice drop and rain drop radius in meter
 
       real c303,c302
       parameter(C303=19.83,C302=5417.4)
 
-      ESAT(TEMK)=.611*EXP(C303-C302/TEMK)       ! for calculating saturated water vapor pressure
-      QSAT(ESAT1,PCB)=ESAT1*.622/(PCB-ESAT1)    ! TEMK is ambient temperature in K, PCB is the pressue in KPa
-                                                ! QSAT is the saturated humidity in kg/kg
+      ESAT(TEMK)=.611*EXP(C303-C302/TEMK) ! for calculating saturated
+                                          ! water vapor pressure
+      QSAT(ESAT1,PCB)=ESAT1*.622/(PCB-ESAT1) ! TEMK is ambient
+                                             ! temperature in K, PCB is
+                                             ! the pressue in KPa QSAT
+                                             ! is the saturated humidity
+                                             ! in kg/kg
 
       do k=1,iz
-        cldod(k)=0.
-	ccover(k)=0.
-	do L=1,4
-	 wetk(k,L)=0.
-	enddo
+         cldod(k)=0.
+         ccover(k)=0.
+         do L=1,4
+            wetk(k,L)=0.
+         enddo
       enddo
 
       cover_max=0.
       do k=1,iz
-       if(cover_max.lt.cw(k)) then
-        cover_max=cw(k)
-	kcover=k
-       endif
+         if(cover_max.lt.cw(k)) then
+            cover_max=cw(k)
+            kcover=k
+         endif
       enddo
 
-      if(cover_max.ge.cwmin) then  ! cloud exist
-        do k=kcover,iz
-	 if(cw(k).lt.cwmin) goto 20
-	enddo
- 20     ktop=k
+      if(cover_max.ge.cwmin) then ! cloud exist
+         do k=kcover,iz
+            if(cw(k).lt.cwmin) goto 20
+         enddo
+ 20      ktop=k
 
-       do k=1, ktop
-        rh=vapor(k)/QSAT(ESAT(         ! computing relative humudity
-     &		t(k)),p(k)/1000)         !convert to KPa
-        if(z(k).lt. pbl) then        ! within Convective Boundary
-	 RHC=0.98                           ! Cloud relative humididty
-	 if(rh.gt.rhc) then
-	  ccover(k)=0.34 *(RH - RHC)/(1. - RHC) ! SCHUMANN 89, AND WYNGAARD AND BROST 84
-	 else
-	  ccover(k)=0.
-	 endif
-	else
-	 SG1= P(K)/P(1)
-         RHC= 1. - 2.*SG1*(1.-SG1)*(1+1.732*(SG1-.5))
-         IF(RH.GT.RHC) THEN
-           CCOVER(K)= ((RH - RHC)/(1. - RHC))**2  ! Geleyn et al 82
-         ELSE
-          CCOVER(K) = 0.0
-         END IF
-	endif
-	ccover(k)=amin1(amax1(ccover(k),0.),1.)        ! cloud coverage
-       enddo
+         do k=1, ktop
+            rh=vapor(k)/QSAT(ESAT( ! computing relative humudity
+     &           t(k)),p(k)/1000) !convert to KPa
+            if(z(k).lt. pbl) then ! within Convective Boundary
+               RHC=0.98         ! Cloud relative humididty
+               if(rh.gt.rhc) then
+                  ccover(k)=0.34 *(RH - RHC)/(1. - RHC) ! SCHUMANN 89,
+                                                        ! AND WYNGAARD
+                                                        ! AND BROST 84
+               else
+                  ccover(k)=0.
+               endif
+            else
+               SG1= P(K)/P(1)
+               RHC= 1. - 2.*SG1*(1.-SG1)*(1+1.732*(SG1-.5))
+               IF(RH.GT.RHC) THEN
+                  CCOVER(K)= ((RH - RHC)/(1. - RHC))**2 ! Geleyn et al 82
+               ELSE
+                  CCOVER(K) = 0.0
+               END IF
+            endif
+            ccover(k)=amin1(amax1(ccover(k),0.),1.) ! cloud coverage
+         enddo
 
        do k=ktop-1,1,-1
-         ccover(k)=1-(1.-ccover(k+1))*(1.-ccover(k))	! cloud total coverage profile
+c     cloud total coverage profile
+          ccover(k)=1-(1.-ccover(k+1))*(1.-ccover(k))
        enddo
 
-       if(prate.gt.prmin) ccover(1:ktop)=0.9     ! while precipitation
+       if(prate.gt.prmin) ccover(1:ktop)=0.9 ! while precipitation
 
 c  o.d. = 3 L dz / [ 2 rho r ]    for water cloud
 c
@@ -1723,21 +1746,22 @@ c  bi = 2.431e+3 um*m2/kg = 2.431e-3 m3/kg  for all wavelengths
 c  re: effective ice radius
 
        do k=1,iz-1
-        airdensity=(p(k)/t(k)+p(k+1)/t(k+1))/rdry/2            ! kg/m3 air density
-	if((t(k)+t(k+1))/2.ge.273.15) then ! water cloud
-         cldod(k)=1.5*((rw(k)+rw(k+1))/rradius+(cw(k)+cw(k+1))/cradius)
-     &	 *airdensity*(z(k+1)-z(k))/1e3/2
-        else
-	 cldod(k)= (rw(k)+cw(k)+rw(k+1)+cw(k+1))/2*airdensity
-     &	  *(3.448+2.431e-3/iradius)*(z(k+1)-z(k))/850
-        endif
+          airdensity=(p(k)/t(k)+p(k+1)/t(k+1))/rdry/2 ! kg/m3 air density
+          if((t(k)+t(k+1))/2.ge.273.15) then ! water cloud
+             cldod(k)=1.5*((rw(k)+rw(k+1))/rradius +
+     &            (cw(k)+cw(k+1))/cradius)
+     &            *airdensity*(z(k+1)-z(k))/1e3/2
+          else
+             cldod(k)= (rw(k)+cw(k)+rw(k+1)+cw(k+1))/2*airdensity
+     &            *(3.448+2.431e-3/iradius)*(z(k+1)-z(k))/850
+          endif
        enddo
 
        do k=1,ktop
-        wetk(k,1)= 2e-5*prate                 ! so2
-	wetk(k,2)= 5e-5*prate**0.88           ! so4
-	wetk(k,3)= wetk(k,1)*10.              ! H2O2
-	wetk(k,4)= wetk(k,1)*10.              ! HNO3
+          wetk(k,1)= 2e-5*prate ! so2
+          wetk(k,2)= 5e-5*prate**0.88 ! so4
+          wetk(k,3)= wetk(k,1)*10. ! H2O2
+          wetk(k,4)= wetk(k,1)*10. ! HNO3
        enddo
 
 c       if(ktop+2.le.iz) then
@@ -1754,52 +1778,49 @@ c      else
 c        do k=1,iz
 c	 jcorrect(k)=1.     ! clear Sky
 c	enddo
-	ktop=0
+       ktop=0
       endif
       end
 
-
-
-
       subroutine CREATE_OUT_IOAPI_NEST
-     +  (loutname, loutgrid, nz, vertype, zvect, ztop,
-     +   yearb, monthb, dayb, hourb, dt,
-     +   nvar, varnames, varunits)
+     &     (loutname, loutgrid, nz, vertype, zvect, ztop,
+     &     yearb, monthb, dayb, hourb, dt,
+     &     nvar, varnames, varunits)
 c------------------------------------------------------------------------------
-c G. Calori, 1.11.99
+c     G. Calori, 1.11.99
 c
-c LAST REV:
+c     LAST REV:
 c
-c PURPOSE: Create/open AQMS 3D output files (EDSS/Models-3 I/O API format)
+c     PURPOSE: Create/open AQMS 3D output files (EDSS/Models-3 I/O API format)
 c
-c PRECONDITIONS:
-c Following env vars need to be set:
-c <loutname>	logical name of output file to be created
-c COORDSYS	name of coordinate system
-c <loutgrid>	logical name of grid system adopted by output file
+c     PRECONDITIONS:
+c     Following env vars need to be set:
+c     <loutname>	logical name of output file to be created
+c     COORDSYS	name of coordinate system
+c     <loutgrid>	logical name of grid system adopted by output file
 c
-c INPUT:
-c loutname		C  logical name of file to be created
-c loutgrid		C  logical name of grid system adopted by output file
-c nz			I  actual # of vertical grid points
-c vertype		I  vertical coordinates system:
+c     INPUT:
+c     loutname		C  logical name of file to be created
+c     loutgrid		C  logical name of grid system adopted by output file
+c     nz			I  actual # of vertical grid points
+c     vertype		I  vertical coordinates system:
 c     1 = terrain-following; 2 = sigma-z
-c zvect			R  vector of vertical coordinates
-c			   (m above ground, if terrain-following;
-c			   0-1 numbers, if sigma-z)
-c ztop			R  top of model domain (m above m.s.l.)
-c                          (used just in case of terrain-following)
-c yearb, month, dayb 	I  starting year (yyyy), month, day
-c hourb			I  starting hour
-c dt			I  time step (hr)
-c nvar			I  # of variables that the file will contain
-c varnames	     C*16  list of variables names
-c varunits	     C*16  list of variables units
+c     zvect			R  vector of vertical coordinates
+c     (m above ground, if terrain-following;
+c     0-1 numbers, if sigma-z)
+c     ztop			R  top of model domain (m above m.s.l.)
+c     (used just in case of terrain-following)
+c     yearb, month, dayb 	I  starting year (yyyy), month, day
+c     hourb			I  starting hour
+c     dt			I  time step (hr)
+c     nvar			I  # of variables that the file will contain
+c     varnames	     C*16  list of variables names
+c     varunits	     C*16  list of variables units
 c
-c OUTPUT:
-c <loutname> file is created/opened
+c     OUTPUT:
+c     <loutname> file is created/opened
 c
-c CALLS: I/O API library
+c     CALLS: I/O API library
 c------------------------------------------------------------------------------
       implicit none
 
@@ -1834,37 +1855,39 @@ c      io_log = INIT3()           ! start up I/O API
 
 c       get filename, coordinates system and grid name from environment
 
-      if (.not. DESC3('METEO3D') ) then   ! get grid information from meteorological 3d file to fill the description of 3d chemical output
-        print*, 'Error getting info from METEO3D in create_out_ioapi'
-        stop
+c     get grid information from meteorological 3d file to fill the
+c     description of 3d chemical output
+      if (.not. DESC3('METEO3D') ) then
+         print*, 'Error getting info from METEO3D in create_out_ioapi'
+         stop
       endif
 
-	ncols3d = ixm
-	nrows3d = iym
-c       ...set time step structure
+      ncols3d = ixm
+      nrows3d = iym
+c     ...set time step structure
 
       julb = JULIAN (yearb, monthb, dayb)
-      sdate3d =1000 * yearb + julb     ! file start date YYYYDDD
-      stime3d =10000 * hourb           ! file start time HHMMSS
-      tstep3d =10000 * dt              ! file time step HHMMSS
+      sdate3d =1000 * yearb + julb ! file start date YYYYDDD
+      stime3d =10000 * hourb    ! file start time HHMMSS
+      tstep3d =10000 * dt       ! file time step HHMMSS
 
-c       ...file description and history
+c     ...file description and history
 
       do l = 1,MXDESC3
-        fdesc3d(l) = ' '
+         fdesc3d(l) = ' '
       enddo
       fdesc3d(1) = 'Generated by program AQMS'
 
-c       ... vertical structure
+c     ... vertical structure
 
       nlays3d = nz
 
-c       ... set variables, units and descriptions
+c     ... set variables, units and descriptions
 
       nvars3d = nvar
       do iv = 1,nvar
-        vname3d(iv) = varnames(iv)
-        units3d(iv) = varunits(iv)
+         vname3d(iv) = varnames(iv)
+         units3d(iv) = varunits(iv)
       enddo
 
       do iv = 1,nvars3d
@@ -1872,64 +1895,56 @@ c       ... set variables, units and descriptions
         vtype3d(iv) = M3REAL	! basic data types
       enddo
 
-c       open file as "unknown": if it does not exist, create it;
-c       else check header against description supplied in FDESC3.EXT
-c       open for output in any case
-
-
+c     open file as "unknown": if it does not exist, create it;
+c     else check header against description supplied in FDESC3.EXT
+c     open for output in any case
       write(io_msg,'(/,a,a)')
-     +  'Opening/creating file : ' , loutname(:TRIMLEN(loutname))
+     &     'Opening/creating file : ' , loutname(:TRIMLEN(loutname))
       write(io_msg,'(a,a)')
-     +  'Coordinates system: ' , coordname(:TRIMLEN(coordname))
+     &     'Coordinates system: ' , coordname(:TRIMLEN(coordname))
       write(io_msg,'(a,a)')
-     +  'Grid system       : ' , gridname(:TRIMLEN(gridname))
+     &     'Grid system       : ' , gridname(:TRIMLEN(gridname))
 
       if (.not.
-     +    OPEN3(loutname(:TRIMLEN(loutname)), FSUNKN3, subname)
-     +   ) then
-       write(*,*)'Error opening ' // loutname(:TRIMLEN(loutname))
-c        msg3d = 'Error opening ' // loutname(:TRIMLEN(loutname))
-c        call M3EXIT (subname, date3d, time3d, msg3d, 1)
-	stop
+     &     OPEN3(loutname(:TRIMLEN(loutname)), FSUNKN3, subname)
+     &     ) then
+         write(*,*)'Error opening ' // loutname(:TRIMLEN(loutname))
+c     msg3d = 'Error opening ' // loutname(:TRIMLEN(loutname))
+c     call M3EXIT (subname, date3d, time3d, msg3d, 1)
+         stop
       endif
       write(io_msg,*)'opened IOAPI file: '//loutname(:TRIMLEN(loutname))
-
       return
       end
 
-
-
-
-
-
       subroutine WRITE_OUT_IOAPI_NEST
-     +  (loutname, year, month, day, hour, varname, field)
+     &     (loutname, year, month, day, hour, varname, field)
 c------------------------------------------------------------------------------
-c G. Calori, 1.11.99
+c     G. Calori, 1.11.99
 c
-c LAST REV:
+c     LAST REV:
 c
-c PURPOSE: Write a field to an AQMS output file
-c          (EDSS/Models-3 I/O API format)
+c     PURPOSE: Write a field to an AQMS output file
+c     (EDSS/Models-3 I/O API format)
 c
-c PRECONDITIONS:
-c 'create_out_ioapi' must has been previously called
+c     PRECONDITIONS:
+c     'create_out_ioapi' must has been previously called
 c
-c INPUT:
-c <loutname>		C  logical name of output file
-c year, month, day	I  current year (yyyy), month, day
-c hour			I  current hour
-c varname	     C*16  name of variable to be written
-c field(nwords)		R  field to be written
+c     INPUT:
+c     <loutname>		C  logical name of output file
+c     year, month, day	I  current year (yyyy), month, day
+c     hour			I  current hour
+c     varname	     C*16  name of variable to be written
+c     field(nwords)		R  field to be written
 c
-c OUTPUT:
-c on <loutname> file
+c     OUTPUT:
+c     on <loutname> file
 c
-c CALLS: I/O API library
+c     CALLS: I/O API library
 c------------------------------------------------------------------------------
       implicit none
 
-c      include 'netcdf.inc'
+c     include 'netcdf.inc'
       include 'PARMS3.EXT'	! i/o API
       include 'FDESC3.EXT'	! i/o API
       include 'IODECL3.EXT'	! i/o API
@@ -1950,30 +1965,29 @@ c      include 'netcdf.inc'
       data io_msg /6/
       data subname /'write_out_ioapi'/
 
-c	convert to i/o api time
-
+c     convert to i/o api time
       jul3d = JULIAN (year, month, day)
       date3d =1000 * year + jul3d    ! file current date YYYYDDD
       time3d =10000 * hour           ! file current time HHMMSS
 
       if(time3d.eq.240000) then
-	time3d = 0
-	date3d = date3d + 1
+         time3d = 0
+         date3d = date3d + 1
       end if
 
-c	write field
+c     write field
       if (.not.
-     +    WRITE3(loutname(:TRIMLEN(loutname)),
-     +           varname, date3d, time3d, field)
-     +   ) then
-        call ENVSTR (loutname(:TRIMLEN(loutname)),
-     +               'AQMS output file', 'dummy_out.nc',
-     +               outfile, ios)
-        msg3d = 'Error writing var ' // varname
-c     +     //  ' at date&time ', date3d, time3d,
-c     +    ' on AQMS output file ' // outfile
-        call M3EXIT (subname, date3d, time3d, msg3d, 1)
-        stop
+     &     WRITE3(loutname(:TRIMLEN(loutname)),
+     &     varname, date3d, time3d, field)
+     &     ) then
+         call ENVSTR (loutname(:TRIMLEN(loutname)),
+     &        'AQMS output file', 'dummy_out.nc',
+     &        outfile, ios)
+         msg3d = 'Error writing var ' // varname
+c     &     //  ' at date&time ', date3d, time3d,
+c     &    ' on AQMS output file ' // outfile
+         call M3EXIT (subname, date3d, time3d, msg3d, 1)
+         stop
       endif
 
       return
@@ -1985,23 +1999,23 @@ c******************************************************************
      &     year, month, day, hour,
      &     cos_flux_t)
 c******************************************************************
-c T.W. Hilton, Gara Villalba  May 2017
+c     T.W. Hilton, Gara Villalba  May 2017
 c
-c LAST REV:
+c     LAST REV:
 c
-c PURPOSE: adjust COS plant flux input to STEM to use previous time step
+c     PURPOSE: adjust COS plant flux input to STEM to use previous time step
 c     [COS] rather than a [COS] value imposed a priori
 c
 c     INPUT:
 c     ix                I  domain number of columns
 c     iy                I  domain number of rows
 c     iz                I  domain number of vertical levels
-c cos_flux_t		R  COS plant flux at time t, read from EMHOURLY
-c     jdate	                I  current timestep  YYYYDDD
+c     cos_flux_t	R  COS plant flux at time t, read from EMHOURLY
+c     jdate	        I  current timestep  YYYYDDD
 c     jtime             I current timestep HHMMSS
 c
-c OUTPUT:
-c adjusted values in cos_flux_t
+c     OUTPUT:
+c     adjusted values in cos_flux_t
 c
 c     CALLS: I/O API library
 c     **************************************************

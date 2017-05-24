@@ -288,13 +288,13 @@ c     &     2001,1,weekday,ihr, em(1,1,1,L),iflag2)   ! our emission already in 
          print*, '*********************************'
          print*, 'iflag = ',iflag
          print*, '*********************************'
-c$$$  now adjust surface COS flux to use [COS] from previous timestep
-         print *, 'current timestep: ', jday, ihr
-         print *, 'current idate, it (in input2): ', idate, it
-         print *, "(jday .GT. 2008183) .and. (ihr .GT. 0)",
-     &        ((jday .GT. 2008183) .OR. (ihr .GT. 0))
-         if ((jday .GT. 2008183) .OR. (ihr .GT. 0))  then
-            print*, 'calling adjust_cos_plantflux'
+c$$$  TWH: now adjust surface COS flux to use [COS] from previous
+c$$$  timestep.  Don't adjust for first timestep (it == 0) because there
+c$$$  is no previous timestep to use.
+         if (it > 0) then
+            print*, 'calling adjust_cos_plantflux ',
+     &           'tstep: ', it, 'date, time: ',
+     &           idate(1), idate(2), idate(3), ihr
             call adjust_cos_plantflux(ix, iy, iz,
      &           idate(1),idate(2),idate(3),ihr, q(1, 1, L))
          endif

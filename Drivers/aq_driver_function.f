@@ -360,6 +360,8 @@ c----------------------------------------------------------------------c
 c----------------------------------------------------------------------c
 c    FORWARD  SIMULATION BEGINS HERE
       call MPI_BARRIER(MPI_COMM_WORLD, Ierr)
+c     TWH: this looks like the time loop.  Verified - "it" is the time
+c     step index
       big_fwd:do it=1,iend
 c        print*,'Test 4'
 
@@ -377,9 +379,9 @@ c	  stop
 c	endif
 	print*,'Call input2 acquiring time dependent data'
         print*,'int(ut)=', int(ut)
-        print*,'ut=', int(ut)
+c$$$  print*,'ut=', int(ut)
         print*,'int(uut)=', int(uut)
-        print*,'uut=', int(uut)
+c$$$  print*,'uut=', int(uut)
         call input2(ix,iy,iz,num,int(ut),idate,
      &     sg1,u,v,w,kh,kv,t,
      &	   wc,wr2,rvel,q,em,vg,fz,sprc,

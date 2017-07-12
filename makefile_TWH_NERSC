@@ -27,7 +27,8 @@ ROOTDIR=$(HOME)
 PROJDIR=/project/projectdirs/m2319
 #the directory in which to place the stem executables
 #STEMRUNDIR=$(STEMROOTDIR)
-STEMRUNDIR=/global/cscratch1/sd/twhilton/STEM_tests/STEM_adjCOS
+STEMRUNDIR=/global/cscratch1/sd/twhilton/GaraAdjSTEMTest/
+# STEMRUNDIR=/global/cscratch1/sd/twhilton/STEM_tests/STEM_adjCOS
 
 # The Vis5D home directory
 V5DHOME=/usr/local/vis5d-5.2

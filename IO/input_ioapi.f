@@ -2029,13 +2029,14 @@ c     timesteps
       real, intent(inout) :: cos_flux_t
       integer jdate, jtime, t_prev, one_hour
       integer YYYY_prev, MM_prev, DD_prev, HH_prev
+      integer i, j, nx, ny
 c     error code
       integer ierr
 c     COS concentration from previous timestep
       real, dimension(:, :, :), allocatable :: cos_conc_prev
       real cos_assumed
 
-      cos_assumed = 450    ! TODO: units
+      cos_assumed = 4.5e-10    ! TODO: units
       allocate(cos_conc_prev(ix, iy, iz), stat=ierr)
 
 c$$$  put year, month, day into YYYYDDD format
@@ -2055,8 +2056,21 @@ c$$$  timestep
 c$$$  read previous timestep [COS] from AQOUT
       call READ_IOAPI_FIND_PREVIOUS('AQOUT', 'CO2_TRACER1',
      &     YYYY_prev, MM_prev, DD_prev, HH_prev, cos_conc_prev, ierr)
+c$$$  TODO: is cos_flux_t(:, :, 1) the bottom of domain or the top?  It's the top: it's a MxNx1 array.
+      print *, "shape cos_flux_t: ", shape(cos_flux_t)
+      nx = size(cos_flux_t, 1)
+      ny = size(cos_flux_t, 2)
+      do i=1, nx
+         do j=1, ny
+            print *, '    ratio: ', i, j,
+     &           (cos_conc_prev(i, j, 1) / cos_assumed)
+            print *, '    cos_conc_prev: ', i, j,
+     &           cos_conc_prev(i, j, 1)
+         enddo
+      enddo
       cos_flux_t(:, :, 1) = cos_flux_t(:, :, 1) *
      &     (cos_conc_prev(:, :, 1) / cos_assumed)
+
       deallocate(cos_conc_prev)
       print *, '[COS] adjustment sucessful '
       RETURN

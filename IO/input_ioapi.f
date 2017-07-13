@@ -2029,7 +2029,6 @@ c     timesteps
       real, intent(inout) :: cos_flux_t
       integer jdate, jtime, t_prev, one_hour
       integer YYYY_prev, MM_prev, DD_prev, HH_prev
-      integer i, j, nx, ny
 c     error code
       integer ierr
 c     COS concentration from previous timestep
@@ -2058,16 +2057,8 @@ c$$$  read previous timestep [COS] from AQOUT
      &     YYYY_prev, MM_prev, DD_prev, HH_prev, cos_conc_prev, ierr)
 c$$$  TODO: is cos_flux_t(:, :, 1) the bottom of domain or the top?  It's the top: it's a MxNx1 array.
       print *, "shape cos_flux_t: ", shape(cos_flux_t)
-      nx = size(cos_flux_t, 1)
-      ny = size(cos_flux_t, 2)
-      do i=1, nx
-         do j=1, ny
-            print *, '    ratio: ', i, j,
-     &           (cos_conc_prev(i, j, 1) / cos_assumed)
-            print *, '    cos_conc_prev: ', i, j,
-     &           cos_conc_prev(i, j, 1)
-         enddo
-      enddo
+      print *, '    ratio (25, 25): ', ! (25, 25) is the cell containing Livermore
+     &     (cos_conc_prev(25, 25, 1) / cos_assumed)
       cos_flux_t(:, :, 1) = cos_flux_t(:, :, 1) *
      &     (cos_conc_prev(:, :, 1) / cos_assumed)
 

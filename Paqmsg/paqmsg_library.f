@@ -2316,7 +2316,8 @@ c
 	allocate( buf(ix,iyloc, iz, Ns, NXworkers+1), STAT=ierr)
 	print*, 'init buffer'
         do i = 1,iy
-	  buf(1:ix, local_xslice_id(i), 1:iz, 1:Ns, owner_of_xslice(i)+1) =
+           buf(1:ix, local_xslice_id(i), 1:iz, 1:Ns,
+     &          owner_of_xslice(i)+1) =
      &		s(1:ix, i, 1:iz, 1:Ns)
         end do
       else

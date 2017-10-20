@@ -58,8 +58,8 @@ c-------------------------------------------------------------------------------
       logical :: lbfgs_lsave(4),restart
       integer :: lbfgs_n,lbfgs_m,lbfgs_iprint,lbfgs_isave(44), Num_grid
       double precision :: lbfgs_factor,lbfgs_pgtol,lbfgs_dsave(29)
-      character*24 ctime, t_string
-      INTEGER*4  t_0, t_end, time
+      character*24 t_string
+      INTEGER*4  t_0, t_end
 
 C     ---- write a "begin" message
       t_0 = time()
@@ -328,7 +328,7 @@ c     ---------- The end of the loop -------------
 
 C     ---- write an "end" message
       t_end = time()
-      t_string = ctime( time( t_end ) )
+      t_string = ctime(t_end)
       write(*,*) 'OPTIMIZATION RUN FINISHED: ', t_string
       write(*,*) 'TOTAL CLOCK TIME: ', t_end - t_0, ' secs'
 

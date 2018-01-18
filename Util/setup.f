@@ -39,16 +39,16 @@ cc
       dname(7)='Liquid phase reactions'
       dname(8)='particle phase species'
 c-------------------------------------------------------------------------
-      old='old' 
+      old='old'
       call aq_openfi(14,
      &  'aq_property.dat',
      &   old)
       call aq_locate(14,dname(1),iflag)
 C    Longlive gas species, longlive + shortlive gas species,
-c       longlive + shortlive + thirdbody gas species  
-      read(14,*) numl(1,1),numl(1,2),numl(1,3) 
+c       longlive + shortlive + thirdbody gas species
+      read(14,*) numl(1,1),numl(1,2),numl(1,3)
       do l=1,numl(1,3)
-      read(14,'(a)') sname(l,1)  
+      read(14,'(a)') sname(l,1)
       enddo
       rewind(14)
 cc
@@ -66,7 +66,7 @@ cc
      2  irs(l),irr(l),irt(l),irc(l)
       enddo
       rewind(14)
-cc 
+cc
       call aq_locate(14,dname(4),iflag)
       read(14,*) npht
       do l=1,npht
@@ -79,11 +79,11 @@ cc
 c-------------------------------------------------------------------
       call aq_locate(14,dname(5),iflag)
       if(iflag.eq.0) then    ! liquid species
-c--- longlive, longlive + shortlive, longlive + shortlive + thirdbody     
+c--- longlive, longlive + shortlive, longlive + shortlive + thirdbody
 c---- longlive + shortlive + thirdbody + longlive counter
       read(14,*) numl(2,1),numl(2,2),numl(2,3),numl(2,4)
       do l=1,numl(2,3)
-      read(14,'(a)') sname(l,2)  
+      read(14,'(a)') sname(l,2)
       enddo
       do l=1,numl(2,4)
       read(14,'(a)') lname1(l)
@@ -97,7 +97,7 @@ c---- longlive + shortlive + thirdbody + longlive counter
       rewind(14)
 cc
       call aq_locate(14,dname(6),iflag)
-      read(14,*) 
+      read(14,*)
      1         (((eqkcof(l,j,k),l=1,numl(2,3)),j=1,3),k=1,3)
       rewind(14)
 cc
@@ -114,10 +114,10 @@ cc
 c------------------------------------------------------------------
       call aq_locate(14,dname(8),iflag)
       if(iflag.eq.0) then          ! solid particles
-c----  longlive, longlive + shortlive, longlive + shortlive + thirdbody    
+c----  longlive, longlive + shortlive, longlive + shortlive + thirdbody
          read(14,*) numl(3,1),numl(3,2),numl(3,3)
          do l=1,numl(3,3)
-         read(14,'(a)') sname(l,3)  
+         read(14,'(a)') sname(l,3)
          enddo
       endif
 c------------------------------------------------------------------
@@ -167,8 +167,8 @@ c**********************************************************************
 cc
       do i=1,12
       iadum(i)=-1
-      enddo 
-      do i=1,12 
+      enddo
+      do i=1,12
       call aq_find(numl(1,3),adumch(i),sname(1,1),iadum(i),iflag)
       enddo
 cc
@@ -177,7 +177,7 @@ cc
       io2=iadum(3)
       ico=iadum(4)
       ino2=iadum(5)
-      iho2=iadum(6)      
+      iho2=iadum(6)
       iso2=iadum(7)
       io3=iadum(8)
       ich4=iadum(9)
@@ -215,7 +215,7 @@ c
       return
       end
 c**********************************************************************
-      subroutine aq_specid_l  
+      subroutine aq_specid_l
 c**********************************************************************
       parameter(mxspg=250)
       include 'aqsymb.cmm'
@@ -227,8 +227,8 @@ c**********************************************************************
 cc
       do i=1,1
       iadum(i)=-1
-      enddo 
-      do i=1,1 
+      enddo
+      do i=1,1
       call aq_find(numl(2,3),adumch(i),sname(1,2),iadum(i),iflag)
       enddo
 cc
@@ -245,7 +245,7 @@ cc
 	 stop
       endif
       return
-      end           
+      end
 c*****************************************************************
       subroutine aq_jobc
 C    1  (ix,iy,iz,numl,ixtrn,iytrn,iztrn,irxng,irxnl,ixm,iym,izm,ilm)
@@ -256,7 +256,7 @@ c*******************************************************************
       include 'aqcont.cmm'
       namelist /aqjob/ix,iy,iz,ixtrn,iytrn,iztrn,irxng,irxnl
       namelist /aqunit/unit_ini,unit_em,unit_qm,unit_bd,unit_out,
-     1 unit_aero 
+     1 unit_aero
 c-------------------------------------------------------------------------------------
       open(11,file=
      &   'aqms.mif',
@@ -288,13 +288,13 @@ c-------------------------------------------------------------------------------
 	  write(6,*) '** ixm,iym,izm,iLm **',ixm,iym,izm,iLm
 	  stop
       endif
-      ierror=1 
-      if(ixtrn.eq.0.and.ix.le.1) then 
-         write(6,*) '** error in ixtrn or ix',ixtrn,ix 
+      ierror=1
+      if(ixtrn.eq.0.and.ix.le.1) then
+         write(6,*) '** error in ixtrn or ix',ixtrn,ix
       else if(iytrn.eq.0.and.iy.le.1) then
-         write(6,*) '** error in iytrn or iy',iytrn,iy 
+         write(6,*) '** error in iytrn or iy',iytrn,iy
       else if(iztrn.eq.0.and.iz.le.1) then
-         write(6,*) '** error in iztrn or iz',iytrn,iy 
+         write(6,*) '** error in iztrn or iz',iytrn,iy
       else
 	 ierror=0
       endif
@@ -306,8 +306,9 @@ c*******************************************************************
 c****************************************************************
       include 'PARMS3.EXT'      ! i/o API
       include 'FDESC3.EXT'      ! i/o API
-      include 'IODECL3.EXT'     ! i/o API 
+      include 'IODECL3.EXT'     ! i/o API
       character*50 filex,filey,filez
+      logical close_status
       namelist /aqgrid/flagx,flagy,flagz,filex,filey,filez,
      1                 dxc,dyc,dht,baseh
 CSandu      namelist /aqgrid/flagx,flagy,flagz,filex,filey,filez,
@@ -320,7 +321,7 @@ c-------------------------------------------------------------------------------
      &    status='old')
       read(11,aqgrid)
       baseh2=baseh
-      dht2=dht 
+      dht2=dht
       close(11)
       if(ix.gt.2) then
 	 if(flagx.ge.0.) then
@@ -340,7 +341,7 @@ cc
          endif
       endif
 cc
-      if(iz.gt.2) then 
+      if(iz.gt.2) then
 ctyh         if(flagz.gt.0.1) then
 ctyh            dum1=float(iz-1)**flagz
 ctyh            do k=1,iz
@@ -353,14 +354,14 @@ ctyh         endif
        endif
 
        if (.not. DESC3('METEO3D') ) then   ! get grid information from meteorological 3d file to fill the description of 3d chemical output
-        print*, 'Error getting grid info from METEO3D in aq_grid' 
+        print*, 'Error getting grid info from METEO3D in aq_grid'
         stop
        endif
        dht = vgtop3d               ! meteorological model top
        do k=1,iz
         sigmaz(k)=vglvs3d(k)/vgtop3d
        enddo
-       io_log=close3('METEO3D')
+       close_status=close3('METEO3D')
        call aq_test_val_r4(1,dht,0.0,'**error:dht=0',iflag)
        call aq_test_val_r4
      1          ((iz-1),sigmaz(2),0.0,'**error:z(i)=0',iflag)
@@ -413,9 +414,9 @@ c***********************************************************************
         mdt=mdt/2
       else
         mdt=(mdt+1)/2
-      endif		
+      endif
       dt=float(3600)/(2*mdt)
- 
+
       return
       end
 c*****************************************************************
@@ -441,7 +442,7 @@ c--------------------------------------------------------------------------
          stop
       endif
 c--------------------------------------------------------------------------
-      if(unit_ini.ne.0) 
+      if(unit_ini.ne.0)
      1  call conv_conc(ix*iy*iz,numsp,sg1,sg1(1,iair),rmw,iair,unit_ini)
       return
       end

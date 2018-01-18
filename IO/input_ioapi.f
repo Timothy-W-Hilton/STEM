@@ -2047,7 +2047,7 @@ c$$$  put hour in to HHMMSS (setting both MM and SS to 00)
       print *, 'adjusting [COS] for ', year, month, day, hour
 c$$$  calculate previous time step by subtracting one hour from current
 c$$$  timestep
-      call NEXTIME(jdate, jtime, (one_hour * -1))
+      call NEXTIME(jdate, jtime, (one_hour * (-1)))
       call DAYMON(jdate, MM_prev, DD_prev)
       YYYY_prev = FLOOR(jdate /1000.0)
       HH_prev = FLOOR(jtime /10000.0)

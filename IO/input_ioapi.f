@@ -261,7 +261,7 @@ c     read emissions
 !     if(emname(L).eq.'DUST'.or.emname(L).eq.'SSF'.or.
 !     &  emname(L).eq.'SSC') then
 !         call INTERP_IOAPI('METEO2D',emname(L),                  ! Load dust and sea salt emissions
-!     &    idate(1),idate(2),idate(3),ihr,q(1,1,L) ,ix*iy,iflag)  !from METEO2D          
+!     &    idate(1),idate(2),idate(3),ihr,q(1,1,L) ,ix*iy,iflag)  !from METEO2D
 
 !       else if(index(emname(L),'BIOG').gt.0) then
 
@@ -272,10 +272,10 @@ c     read emissions
 
 !       else if(emname(L).eq.'LNOX') then
 !          call INTERP_IOAPI('LIGHTNING',emname(L),                 ! Load lightning emissions from METEO3D
-!     &    idate(1),idate(2),idate(3),ihr,em(1,1,1,L) ,ix*iy*iz,iflag)          
+!     &    idate(1),idate(2),idate(3),ihr,em(1,1,1,L) ,ix*iy*iz,iflag)
 !        do i=1,ix
 !	 do j=1,iy
-!	  em(i,j,1,L)=em(i,j,1,L)*(hdz(i,j,1)-h(i,j))*2    ! multiplying with the thickness           
+!	  em(i,j,1,L)=em(i,j,1,L)*(hdz(i,j,1)-h(i,j))*2    ! multiplying with the thickness
 !          do k=2,iz
 !            em(i,j,k,L)=em(i,j,k,L)*(hdz(i,j,k)-hdz(i,j,k-1))
 !	   enddo

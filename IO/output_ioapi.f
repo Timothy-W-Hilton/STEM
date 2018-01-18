@@ -13,18 +13,18 @@ c*********************************************************************
       subroutine prtemp(idate,ut,ix,iy,iz,sg1,sl1,iout)
 c*********************************************************************
       parameter (mxspg=250,mxgr=400)
-      include 'aqcon1.cmm'      
-      include 'aqcont.cmm'      
+      include 'aqcon1.cmm'
+      include 'aqcont.cmm'
       include 'aqsymb.cmm'
       include 'aqindx.cmm'
       dimension sg1(ix,iy,iz,1),sl1(ix,iy,iz,1),iout(1),idate(3)
       dimension dum1(mxgr*mxgr*7)
       call open_ioapw("AQRST")
       ihr=nint(ut)
-      
+
       do l=1,numl(1,2)
         call aq_copy_mat(ix*iy*iz,sg1(1,1,1,L),dum1)
-        if(unit_out.ne.0) 	
+        if(unit_out.ne.0)
      1   call conv_conc(ix*iy*iz,1,dum1,sg1(1,1,1,iair),
      1                  rmw,iair,unit_out)
 
@@ -53,16 +53,16 @@ c*********************************************************************
       ihr=nint(ut)
       if(mxgr*mxgr*5.lt.ix*iy*izout) then
 	   print*, mxgr*mxgr*5
-	   print*, ix*iy*izout 
+	   print*, ix*iy*izout
 	 write(6,*) '** critical error in prtout **'
 	 stop
       endif
-      
+
       do L=1,noutsp             ! gas-phase
       lsp=aqspout(L)
       print *, lsp, sname(lsp,1)
       call aq_copy_mat(ix*iy*izout,sg1(1,1,1,lsp),dum1)
-      if(unit_out.ne.0) 
+      if(unit_out.ne.0)
      1   call conv_conc(ix*iy*izout,1,dum1,sg1(1,1,1,iair),
      1                  rmw,iair,unit_out)
       call write_out_ioapi("AQOUT",idate(1),idate(2),idate(3),ihr,
@@ -116,7 +116,7 @@ c
 c PURPOSE: Write a field to an AQMS output file
 c          (EDSS/Models-3 I/O API format)
 c
-c PRECONDITIONS: 
+c PRECONDITIONS:
 c 'create_out_ioapi' must has been previously called
 c
 c INPUT:
@@ -125,9 +125,9 @@ c year, month, day      I  current year (yyyy), month, day
 c hour                  I  current hour
 c varname            C*16  name of variable to be written
 c field(nwords)         R  field to be written
-c 
+c
 c OUTPUT:
-c on <loutname> file 
+c on <loutname> file
 c
 c CALLS: I/O API library
 c------------------------------------------------------------------------------
@@ -159,7 +159,7 @@ c      include 'netcdf.inc'
 c       convert to i/o api time
 
       timesec = nint(realhour*3600.0)
-      hour    = timesec/3600 
+      hour    = timesec/3600
       restsec = mod(timesec,3600)
       minute  = restsec/60
       second  = mod(restsec,60)
@@ -204,7 +204,7 @@ c*********************************************************************
       integer aqspout,joutindex,aeroindex
       character outaeronam(mxspg)*16
       common /aqodx/aqspout(mxspg),noutsp,izout,joutindex(mxspg),
-     1 joutsp,jzout,aeroindex(mxspg),nout_aero,izaero,outaeronam
+     1     joutsp,jzout,aeroindex(mxspg),nout_aero,izaero,outaeronam
 
       dimension sg1(ix,iy,iz,1),sl1(ix,iy,iz,1),iout(1),idate(3)
       dimension dum1(mxgr*mxgr*7)
@@ -215,8 +215,8 @@ c*********************************************************************
 	 write(6,*) '** critical error in prtout **'
 	 stop
       endif
-      
-      do L=1,nout_aero              !aerosol  
+
+      do L=1,nout_aero              !aerosol
       lsp=aeroindex(L)
       print *, lsp, outaeronam(L)
       call aq_copy_mat(ix*iy*izaero,sg1(1,1,1,lsp),dum1)
@@ -253,7 +253,7 @@ c*********************************************************************
 	 write(6,*) '** critical error in prtout **'
 	 stop
       endif
-      
+
       print*, joutsp,joutindex(1:joutsp)
       do l=1,joutsp
       lsp=joutindex(l)

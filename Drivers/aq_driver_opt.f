@@ -164,7 +164,7 @@ c     close(27)
 c
       emi_fac = emi_fac*1 ! change the factor from 1 to make a fixed value
 
-
+      print *, 'DEBUG: Calling simulation() with arg "fwd"'
       call simulation('fwd',ix,iy,iz,N_gas,emi_fac,emi_grd,costfct) ! this can be fbw or fwd
 
       print*, 'Force stop in aq_driver_opt.f, just want forward'
@@ -414,6 +414,7 @@ C     --- Check if the value of mode is appropriate
          print*,'Accepted values are <fwd>, <fbw>, <ini> or <obs>'
       end if
 
+      print *, 'DEBUG: inside simulation()'
 C     ---- Open File for Mode -----
       open( unit=unit_mode, file='TmpMode' )
       write( unit_mode, fmt="(A3)" ) mode(1:3)

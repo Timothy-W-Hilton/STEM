@@ -17,7 +17,7 @@ STEMROOTDIR=$(PWD)
 #the directory containing the stem sources
 STEMSRCDIR=$(STEMROOTDIR)
 #the directory in which to place the stem executables
-STEMRUNDIR=$(HOME)/STEM_build
+STEMRUNDIR=/nfs/co2flux/thilton/STEM_fwd_PIC/
 #the directory containing all the local libraries, sources, etc.
 ROOTDIR=$(HOME)
 
@@ -37,6 +37,8 @@ LDFLAGS  = -O -g77libs -g -fopenmp -Wtabs
 PLDFLAGS = -O -g77libs -g -fopenmp -Wtabs
 
 # use debugging compiler and linker flags if debug target specified
+# from gcc manual: If you use multiple -O options, with or without
+# level numbers, the last such option is the one that is effective.
 debug:FFLAGS  += -g -O0
 debug:PFFLAGS  += -g -O0
 debug:LDFLAGS  += -g -O0

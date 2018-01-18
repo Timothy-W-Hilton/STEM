@@ -43,8 +43,9 @@ c*********************************************************************
       include 'aqcont.cmm'
       include 'aqindx.cmm'
       integer aqspout,joutindex,aeroindex
+      character outaeronam(mxspg)*16   ! unused but needed for common block
       common /aqodx/aqspout(mxspg),noutsp,izout,joutindex(mxspg),
-     1 joutsp,jzout,aeroindex(mxspg),nout_aero,izaero
+     1     joutsp,jzout,aeroindex(mxspg),nout_aero,izaero,outaeronam
 
       dimension sg1(ix,iy,iz,1),sl1(ix,iy,iz,1),iout(1),idate(3)
       dimension dum1(mxgr*mxgr*7)
@@ -85,8 +86,9 @@ c*********************************************************************
       include 'aqcont.cmm'
       include 'aqindx.cmm'
       integer aqspout,joutindex,aeroindex
+      character outaeronam(mxspg)*16   ! unused but needed for common block
       common /aqodx/aqspout(mxspg),noutsp,izout,joutindex(mxspg),
-     1 joutsp,jzout,aeroindex(mxspg),nout_aero,izaero
+     1     joutsp,jzout,aeroindex(mxspg),nout_aero,izaero,outaeronam
 
       real sg1(ix,iy,iz,1),sl1(ix,iy,iz,1),iout(1),idate(3)
       real buffer(ix,iy,iz)
@@ -239,8 +241,9 @@ c*********************************************************************
       include 'aqindx.cmm'
       include 'aqrxn.cmm'
       integer aqspout,joutindex,aeroindex
+      character outaeronam(mxspg)*16   ! unused but needed for common block
       common /aqodx/aqspout(mxspg),noutsp,izout,joutindex(mxspg),
-     1 joutsp,jzout,aeroindex(mxspg),nout_aero,izaero
+     1     joutsp,jzout,aeroindex(mxspg),nout_aero,izaero,outaeronam
 
       dimension sg1(ix,iy,iz,1),sl1(ix,iy,iz,1),iout(1),idate(3)
       dimension dum1(mxgr*mxgr*7)

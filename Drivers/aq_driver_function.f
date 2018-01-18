@@ -145,8 +145,8 @@ c-------------------------------------------------------------------------------
       integer :: vert_coord
       integer, parameter :: z_coord=1, sigma_coord=2
       integer :: is_em=1 !Emission to be adjusted
+      print *, "DEBUG: starting aq_driver_function.f"
       vert_coord = z_coord
-
 c
 c-------------------------------------------------------------------------------
 c   Initialize MPI Stuff

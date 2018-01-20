@@ -33,8 +33,8 @@ STEMRUNDIR=/global/cscratch1/sd/twhilton/GaraAdjSTEMTest/
 # The Vis5D home directory
 V5DHOME=/usr/local/vis5d-5.2
 
-APINCL=-I$(PROJDIR)/local/include
-APILIB= -L$(PROJDIR)/local/lib -lioapi -lnetcdf
+APINCL=-I/project/projectdirs/m2319/local/ioapi-3.2/cori_intel/include/
+APILIB= -L/project/projectdirs/m2319/local/ioapi-3.2/cori_intel/lib -lioapi -lnetcdf
 
 # ---- Include Directory ----
 DIRINCL=$(STEMSRCDIR)/Include
@@ -58,8 +58,8 @@ debug:PLDFLAGS += -g -O0
 # the module cray-libsci is loaded no further action is necessary.
 MATHLIB= # -llapack -lblas
 
-CMDOPT = $(STEMRUNDIR)/adj_COS_main.exe
-CMDFUN = $(STEMRUNDIR)/adj_COS_fun.exe
+CMDOPT = $(STEMRUNDIR)/STEM_fwd_main.exe
+CMDFUN = $(STEMRUNDIR)/STEM_fun.exe
 
 all:  $(CMDFUN) $(CMDOPT)
 debug: all

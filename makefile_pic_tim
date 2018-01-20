@@ -117,11 +117,11 @@ OBJ =  $(OBJLIB) $(OBJPAR) $(OBJTRAN) $(OBJIO) \
 	$(OBJOPT)
 
 $(CMDFUN):  $(OBJ) $(OBJDRVFUN) $(DIRINCL)/aqms.param
-	$(PLD) $(PLDFLAGS) -o $(CMDFUN) $(OBJ) $(OBJDRVFUN)  \
+	$(PLD) $(PLDFLAGS) -o $@ $(OBJ) $(OBJDRVFUN)  \
 	$(APILIB) $(MATHLIB)
 
 $(CMDOPT):  $(OBJ) $(OBJDRVOPT) $(DIRINCL)/aqms.param
-	$(PLD) $(PLDFLAGS) -o $(CMDOPT) $(OBJ) $(OBJDRVOPT)  \
+	$(PLD) $(PLDFLAGS) -o $@ $(OBJ) $(OBJDRVOPT)  \
 	$(APILIB) $(MATHLIB)
 
 f.o:

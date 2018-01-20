@@ -26,9 +26,7 @@ STEMSRCDIR=$(STEMROOTDIR)/
 ROOTDIR=$(HOME)
 PROJDIR=/project/projectdirs/m2319
 #the directory in which to place the stem executables
-#STEMRUNDIR=$(STEMROOTDIR)
-STEMRUNDIR=/global/cscratch1/sd/twhilton/GaraAdjSTEMTest/
-# STEMRUNDIR=/global/cscratch1/sd/twhilton/STEM_tests/STEM_adjCOS
+STEMRUNDIR=$(PROJ)/STEM_Runs/STEM_fwd_NERSC_cori_2018-01-20/
 
 # The Vis5D home directory
 V5DHOME=/usr/local/vis5d-5.2
@@ -129,11 +127,11 @@ OBJ =  $(OBJLIB) $(OBJPAR) $(OBJTRAN) $(OBJIO) \
 	$(OBJOPT)
 
 $(CMDFUN):  $(OBJ) $(OBJDRVFUN) $(DIRINCL)/aqms.param
-	$(PLD) $(PLDFLAGS) -o $(CMDFUN) $(OBJ) $(OBJDRVFUN)  \
+	$(PLD) $(PLDFLAGS) -o $@ $(OBJ) $(OBJDRVFUN)  \
 	$(APILIB) $(MATHLIB)
 
 $(CMDOPT):  $(OBJ) $(OBJDRVOPT) $(DIRINCL)/aqms.param
-	$(PLD) $(PLDFLAGS) -o $(CMDOPT) $(OBJ) $(OBJDRVOPT)  \
+	$(PLD) $(PLDFLAGS) -o $@ $(OBJ) $(OBJDRVOPT)  \
 	$(APILIB) $(MATHLIB)
 
 f.o:

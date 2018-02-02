@@ -20,6 +20,59 @@ fluxes that optimally match atmospheric observations.  More
 information about the STEM adjoint please see: Daescu and Carmichael,
 2003; Hakami et al., 2005; Sandu et al., 2005; Chai et al., 2006
 
+### Branches ###
+
+IMPORTANT: It is very likely that you do not want the "master" branch
+from this repository.
+
+There are several parallel branches in this repository configured for
+different computing platforms.  The 'master' branch contains the
+common roots of those branches but is not currently useful for
+simulations.
+
+1. GNU_compilers: STEM configured to compile with
+   the [GNU Fortran compiler](https://gcc.gnu.org/fortran/) and run
+   at [PIC](https://www.pic.es).  Also contains edits to adjust the
+   surface COS flux at each time step to use the previous time step's
+   simulated COS concentration rather than an assumed COS
+   concentration.
+2. NERSC_fwd: STEM configured to compile with the Intel Fortran
+   compiler (ifort) and run at NERSC (http://www.nersc.gov).
+2. adjust_COS_to_previous_tstep_gara_domain:
+
+### Prerequisites for a STEM simulation ###
+
+1. Set the STEM domain dimensions in Include/aqms.param
+2. Compile and link STEM
+3. assemble driver data, specified by ["logical names"](https://www.cmascenter.org/ioapi/documentation/all_versions/html/LOGICALS.html) according to [EDSS/Models-3 I/O API](https://www.cmascenter.org/ioapi/documentation/all_versions/html/index.html) convention.  STEM needs these input files
+   * METEO2D: 2-dimensional meteorology
+   * METEO3D: 3-dimensional meteorology
+   * DOMAIN (a.k.a. TOPO): latitude, longitude, and topography
+   * EMHOURLY: surface emissions
+   * INITF: initial species concentrations
+   * BDF: lateral boundary conditions
+   * TOPBND: vertical (i.e. top) boundary conditions
+4. create a run file that specifies the logical names for driver data
+
+### Running STEM ###
+
+The STEM source builds two executables: *_main.exe and *_fun.exe,
+where * represents a prefix specific to the simulation.  main.exe sets
+up the model domain and writes some initialization data to disk.
+fun.exe then reads those data and computes transport for each model
+grid cell and time step.  fun.exe may be run in parallel, with
+multipile processors computing several grid cells/time steps
+simultaneously.  Therefore, main.exe must be run before parallel
+fun.exe tasks are dispatched.
+
+So, the sequence for running a STEM simulation goes something like:
+
+1. run *_main.exe
+2. run *_fun.exe, possibly in parallel.
+
+There is no need to re-run *_main.exe unless the STEM domain or
+initial conditions have changed.
+
 ### References ###
 
 Campbell, J. E., G. R. Carmichael, Y. Tang, T. Chai, S. A. Vay, Y.-H. Choi, G. W. Sachse, H. B. Singh, J. L. Schnoor, J. Woo, J. M. Vukovich, D. G. Streets, L. G. Huey, and C. O. Stanier (2007), Analysis of anthropogenic CO2 signal in ICARTT using a regional chemical transport model and observed tracers, Tellus B, 59(2), 199-210, http://dx.doi.org/10.1111/j.1600-0889.2006.00239.x.

@@ -16,9 +16,13 @@ employed it.
 
 This source code repository also contains an adjoint model developed
 to quantitatively estimate STEM parameter values as well as surface
-fluxes that optimally match atmospheric observations.  More
+fluxes that optimally match atmospheric observations.  For more
 information about the STEM adjoint please see: Daescu and Carmichael,
 2003; Hakami et al., 2005; Sandu et al., 2005; Chai et al., 2006
+
+### Credits ###
+
+If presenting or publishing STEM simulations, in addition to the appropriate citations from the list below please acknowledge the [University of Iowa Center for Global & Regional Environmental Research](https://cgrer.uiowa.edu) and the [Carmichael Group](https://www.engineering.uiowa.edu/faculty-staff/gregory-carmichael) for their work developing the STEM framework.
 
 ### Branches ###
 
